@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la Classe - EduSpace Formateur</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 500: '#6b7280', 700: '#374151', 900: '#111827' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+    <div class="flex min-h-screen">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 ml-[280px]">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div class="flex items-center gap-4">
+                    <a href="classes.html" class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                            <span id="class-name">Chargement...</span>
+                            <button onclick="openEditClassModal()" class="text-gray-400 hover:text-blue-600">
+                                <i data-lucide="edit-2" class="w-5 h-5"></i>
+                            </button>
+                        </h1>
+                        <p class="text-gray-500 mt-1 flex items-center gap-2">
+                            <span class="px-2 py-0.5 bg-gray-100 rounded text-xs font-bold" id="class-category">-</span>
+                            <span id="class-level">• -</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 text-blue-800 font-mono font-bold"
+                        id="class-code">
+                        CODE: ...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                <div class="flex divide-x divide-gray-100">
+                    <button onclick="switchTab('students')" id="tab-students"
+                        class="flex-1 flex items-center justify-center gap-3 p-4 transition-all hover:bg-gray-50 tab-btn active">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span class="font-medium">Élèves</span>
+                    </button>
+                    <button onclick="switchTab('planning')" id="tab-planning"
+                        class="flex-1 flex items-center justify-center gap-3 p-4 transition-all hover:bg-gray-50 tab-btn">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                        <span class="font-medium">Planning</span>
+                    </button>
+                    <button onclick="switchTab('resources')" id="tab-resources"
+                        class="flex-1 flex items-center justify-center gap-3 p-4 transition-all hover:bg-gray-50 tab-btn">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span class="font-medium">Ressources</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONTENT: STUDENTS -->
+            <div id="content-students"
+                class="tab-content bg-white rounded-2xl border border-gray-200 shadow-sm p-8 min-h-[400px]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Liste des inscrits</h2>
+                        <p class="text-gray-500 text-sm">Gérez les élèves et les paiements.</p>
+                    </div>
+                    <button onclick="openAddStudentModal()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 font-medium">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Ajouter un Élève
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
+                            <tr>
+                                <th class="px-4 py-3">Nom</th>
+                                <th class="px-4 py-3">Statut</th>
+                                <th class="px-4 py-3">Paiement</th>
+                                <th class="px-4 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-list" class="divide-y divide-gray-100">
+                            <!-- Students list injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CONTENT: PLANNING -->
+            <div id="content-planning"
+                class="hidden tab-content bg-white rounded-2xl border border-gray-200 shadow-sm p-8 min-h-[400px]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Emploi du Temps</h2>
+                        <p class="text-gray-500 text-sm">Créneaux hebdomadaires.</p>
+                    </div>
+                    <button onclick="openEditScheduleModal()"
+                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2 font-medium text-sm">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i> Modifier
+                    </button>
+                </div>
+                <div id="planning-list" class="flex flex-wrap gap-4">
+                    <!-- Schedule injected here -->
+                </div>
+            </div>
+
+            <!-- CONTENT: RESOURCES -->
+            <div id="content-resources"
+                class="hidden tab-content bg-white rounded-2xl border border-gray-200 shadow-sm p-8 min-h-[400px]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Fichiers & Contenu</h2>
+                        <p class="text-gray-500 text-sm">Les documents partagés avec cette classe.</p>
+                    </div>
+                    <button onclick="document.getElementById('file-upload').click()"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2 font-medium">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Importer
+                    </button>
+                    <input type="file" id="file-upload" class="hidden" onchange="handleFileUpload(this)">
+                </div>
+                <div id="resources-list" class="space-y-3">
+                    <!-- Resources injected here -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Add Student Modal -->
+    <div id="add-student-modal"
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh]">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold">Ajouter un Élève</h3>
+                <button onclick="document.getElementById('add-student-modal').classList.add('hidden')"
+                    class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-4 bg-gray-50 border-b border-gray-100">
+                <input type="text" id="student-search" placeholder="Rechercher..." class="w-full p-2 border rounded-lg"
+                    onkeyup="renderAvailableStudents()">
+            </div>
+            <div class="overflow-y-auto p-2 flex-1 min-h-[200px]" id="available-students-list">
+                <!-- Available students -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal"
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-[scaleIn_0.2s_ease-out]">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Gérer Paiement</h3>
+                <button onclick="closePaymentModal()" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+            <div id="payment-modal-content" class="space-y-6">
+                <!-- Content injected via JS -->
+            </div>
+            <button onclick="savePayment()"
+                class="w-full mt-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-lg">Enregistrer</button>
+        </div>
+    </div>
+
+    <!-- Edit Schedule Modal -->
+    <div id="edit-schedule-modal"
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold">Modifier l'Emploi du Temps</h3>
+                <button onclick="document.getElementById('edit-schedule-modal').classList.add('hidden')"
+                    class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex gap-2">
+                    <select id="edit-slot-day" class="p-2 border rounded-lg bg-white outline-none flex-1">
+                        <option>Lundi</option>
+                        <option>Mardi</option>
+                        <option>Mercredi</option>
+                        <option>Jeudi</option>
+                        <option>Vendredi</option>
+                        <option>Samedi</option>
+                        <option>Dimanche</option>
+                    </select>
+                    <input type="time" id="edit-slot-start" class="p-2 border rounded-lg outline-none">
+                    <input type="time" id="edit-slot-end" class="p-2 border rounded-lg outline-none">
+                    <button onclick="addEditSlot()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Ajouter</button>
+                </div>
+                <div id="edit-slots-container"
+                    class="flex flex-wrap gap-2 min-h-[100px] p-4 bg-gray-50 rounded-xl border border-gray-100"></div>
+            </div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end">
+                <button onclick="saveSchedule()"
+                    class="px-6 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Class Modal -->
+    <div id="edit-class-modal"
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Modifier la Classe</h3>
+                <button onclick="document.getElementById('edit-class-modal').classList.add('hidden')"
+                    class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Nom de la classe</label>
+                    <input type="text" id="edit-name" class="w-full p-3 border border-gray-200 rounded-xl outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
+                        <select id="edit-category"
+                            class="w-full p-3 border border-gray-200 rounded-xl outline-none bg-white">
+                            <option value="scolaire">Scolaire</option>
+                            <option value="superieur">Supérieur</option>
+                            <option value="formation">Formation</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Niveau</label>
+                        <input type="text" id="edit-level"
+                            class="w-full p-3 border border-gray-200 rounded-xl outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Prix (TND)</label>
+                    <input type="number" id="edit-price"
+                        class="w-full p-3 border border-gray-200 rounded-xl outline-none">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="saveClassDetails()"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">Mettre à
+                    jour</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/data-manager.js"></script>
+    <script src="../../js/components/sidebar-formateur.js"></script>
+    <script>
+        // --- State ---
+        let currentClassId = null;
+        let currentClass = null;
+        let tempSlots = [];
+        let currentPaymentStudent = null;
+
+        // Mock Platform Students
+        const mockStudents = [
+            { id: 101, name: 'Youssef Ben Salah', email: 'youssef@test.com' },
+            { id: 102, name: 'Myriam Dridi', email: 'myriam@test.com' },
+            { id: 103, name: 'Ahmed Tounsi', email: 'ahmed@test.com' },
+            { id: 104, name: 'Fatma Kallel', email: 'fatma@test.com' },
+            { id: 105, name: 'Sami Mhadhbi', email: 'sami@test.com' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            currentClassId = parseInt(params.get('id'));
+
+            if (!currentClassId) {
+                alert("Classe non trouvée");
+                window.location.href = 'classes.html';
+                return;
+            }
+
+            loadClassData();
+            lucide.createIcons();
+        });
+
+        function loadClassData() {
+            const classes = DataManager.getClasses();
+            currentClass = classes.find(c => c.id === currentClassId);
+
+            if (!currentClass) {
+                alert("Classe introuvable !");
+                window.location.href = 'classes.html';
+                return;
+            }
+
+            // Header Info
+            document.getElementById('class-name').innerText = currentClass.name;
+            document.getElementById('class-category').innerText = currentClass.category || 'Général';
+            document.getElementById('class-level').innerText = `• ${currentClass.level || 'Tous niveaux'}`;
+            document.getElementById('class-code').innerText = `CODE: ${currentClass.accessCode || 'N/A'}`;
+
+            renderStudents();
+            renderPlanning();
+            renderResources();
+            lucide.createIcons();
+        }
+
+        // --- Tabs ---
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active', 'border-blue-600', 'text-blue-600', 'bg-blue-50');
+                b.querySelector('span').classList.remove('text-blue-600');
+            });
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+            const btn = document.getElementById(`tab-${tab}`);
+            btn.classList.add('active');
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+        }
+
+        // --- Students ---
+        function renderStudents() {
+            const container = document.getElementById('students-list');
+            const students = currentClass.studentIds || [];
+
+            if (students.length === 0) {
+                container.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400">Aucun élève inscrit.</td></tr>`;
+            } else {
+                container.innerHTML = students.map(s => {
+                    const price = parseFloat(currentClass.price || 0);
+                    const paid = parseFloat(s.amountPaid || 0);
+                    let payStatus = `<span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-600">Non Payé</span>`;
+                    if (paid >= price) payStatus = `<span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Payé</span>`;
+                    else if (paid > 0) payStatus = `<span class="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">Partiel</span>`;
+
+                    return `
+                        <tr class="hover:bg-gray-50 border-b border-gray-50">
+                            <td class="px-4 py-4">
+                                <div class="font-bold text-gray-900">${s.name}</div>
+                                <div class="text-xs text-gray-500">${s.email || ''}</div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Actif</span>
+                            </td>
+                            <td class="px-4 py-4 cursor-pointer hover:bg-gray-100 rounded" onclick="openPaymentModal(${s.id})">
+                                ${payStatus}
+                                <span class="text-xs text-gray-400 ml-1">(Modifier)</span>
+                            </td>
+                            <td class="px-4 py-4 text-right">
+                                <button onclick="removeStudent(${s.id})" class="text-gray-400 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function removeStudent(studentId) {
+            if (confirm("Retirer cet élève de la classe ?")) {
+                currentClass.studentIds = currentClass.studentIds.filter(s => s.id !== studentId);
+                DataManager.saveClass(currentClass);
+                loadClassData();
+            }
+        }
+
+        // --- Add Student Logic ---
+        function openAddStudentModal() {
+            document.getElementById('add-student-modal').classList.remove('hidden');
+            renderAvailableStudents();
+        }
+
+        function renderAvailableStudents() {
+            const search = document.getElementById('student-search').value.toLowerCase();
+            const container = document.getElementById('available-students-list');
+            const currentStudentIds = (currentClass.studentIds || []).map(s => s.id);
+
+            const filtered = mockStudents.filter(s =>
+                !currentStudentIds.includes(s.id) &&
+                (s.name.toLowerCase().includes(search) || s.email.toLowerCase().includes(search))
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-4">Aucun élève trouvé.</p>`;
+            } else {
+                container.innerHTML = filtered.map(s => `
+                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="addStudent(${s.id})">
+                        <div>
+                            <p class="font-bold text-gray-800">${s.name}</p>
+                            <p class="text-xs text-gray-500">${s.email}</p>
+                        </div>
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-blue-500"></i>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        }
+
+        function addStudent(id) {
+            const student = mockStudents.find(s => s.id === id);
+            if (student) {
+                if (!currentClass.studentIds) currentClass.studentIds = [];
+                currentClass.studentIds.push({
+                    ...student,
+                    amountPaid: 0,
+                    payment: 'Non Payé'
+                });
+                DataManager.saveClass(currentClass);
+                document.getElementById('add-student-modal').classList.add('hidden');
+                loadClassData();
+            }
+        }
+
+        // --- Payment Logic ---
+        function openPaymentModal(studentId) {
+            const student = currentClass.studentIds.find(s => s.id === studentId);
+            currentPaymentStudent = student;
+            const modal = document.getElementById('payment-modal');
+            const content = document.getElementById('payment-modal-content');
+
+            modal.classList.remove('hidden');
+            content.innerHTML = `
+                <div class="p-4 bg-gray-50 rounded-xl mb-4">
+                    <p class="text-sm font-bold text-gray-500 mb-1">Élève</p>
+                    <p class="font-bold text-gray-900">${student.name}</p>
+                    <div class="mt-2 flex justify-between text-sm">
+                        <span>Prix Classe:</span>
+                        <span class="font-bold">${currentClass.price} TND</span>
+                    </div>
+                </div>
+                <div>
+                     <label class="block text-sm font-bold text-gray-700 mb-2">Montant déjà payé</label>
+                     <input type="number" id="pay-amount" value="${student.amountPaid || 0}" class="w-full p-3 border border-gray-200 rounded-xl outline-none font-bold text-lg">
+                </div>
+            `;
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+        }
+
+        function savePayment() {
+            const amount = parseFloat(document.getElementById('pay-amount').value);
+            const price = parseFloat(currentClass.price);
+
+            if (currentPaymentStudent) {
+                currentPaymentStudent.amountPaid = amount;
+                if (amount >= price) currentPaymentStudent.payment = 'Payé';
+                else if (amount > 0) currentPaymentStudent.payment = 'Partiel';
+                else currentPaymentStudent.payment = 'Non Payé';
+
+                DataManager.saveClass(currentClass);
+                closePaymentModal();
+                loadClassData();
+            }
+        }
+
+        // --- Planning & Schedule Logic ---
+        function renderPlanning() {
+            const container = document.getElementById('planning-list');
+            const slots = currentClass.slots || [];
+
+            if (slots.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 w-full text-center py-4">Aucun créneau défini.</p>`;
+            } else {
+                container.innerHTML = slots.map(s => `
+                    <div class="bg-white border-2 border-blue-100 p-4 rounded-xl shadow-sm min-w-[200px]">
+                        <div class="flex items-center gap-2 text-blue-700 font-bold mb-1">
+                            <i data-lucide="calendar" class="w-4 h-4"></i> ${s.day}
+                        </div>
+                        <div class="text-gray-600 flex items-center gap-2 text-sm">
+                            <i data-lucide="clock" class="w-4 h-4"></i> ${s.start || s.startTime} - ${s.end || s.endTime}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function openEditScheduleModal() {
+            tempSlots = [...(currentClass.slots || [])];
+            renderEditSlots();
+            document.getElementById('edit-schedule-modal').classList.remove('hidden');
+        }
+
+        function renderEditSlots() {
+            const container = document.getElementById('edit-slots-container');
+            container.innerHTML = tempSlots.map((s, i) => `
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold flex items-center gap-2">
+                    ${s.day} ${s.start || s.startTime}-${s.end || s.endTime} 
+                    <button onclick="removeEditSlot(${i})" class="hover:text-red-500 font-bold">×</button>
+                </span>
+            `).join('');
+        }
+
+        function addEditSlot() {
+            const day = document.getElementById('edit-slot-day').value;
+            const start = document.getElementById('edit-slot-start').value;
+            const end = document.getElementById('edit-slot-end').value;
+            if (day && start && end) {
+                tempSlots.push({ day, startTime: start, endTime: end });
+                renderEditSlots();
+            }
+        }
+
+        function removeEditSlot(index) {
+            tempSlots.splice(index, 1);
+            renderEditSlots();
+        }
+
+        function saveSchedule() {
+            currentClass.slots = tempSlots;
+            DataManager.saveClass(currentClass);
+            document.getElementById('edit-schedule-modal').classList.add('hidden');
+            loadClassData();
+        }
+
+        // --- Edit Class Details Logic ---
+        function openEditClassModal() {
+            document.getElementById('edit-name').value = currentClass.name;
+            document.getElementById('edit-category').value = currentClass.category || 'scolaire';
+            document.getElementById('edit-level').value = currentClass.level;
+            document.getElementById('edit-price').value = currentClass.price;
+            document.getElementById('edit-class-modal').classList.remove('hidden');
+        }
+
+        function saveClassDetails() {
+            const name = document.getElementById('edit-name').value;
+            const category = document.getElementById('edit-category').value;
+            const level = document.getElementById('edit-level').value;
+            const price = document.getElementById('edit-price').value;
+
+            if (name && level && price) {
+                currentClass.name = name;
+                currentClass.category = category;
+                currentClass.level = level;
+                currentClass.price = price;
+                DataManager.saveClass(currentClass);
+                document.getElementById('edit-class-modal').classList.add('hidden');
+                loadClassData();
+            } else {
+                alert("Veuillez remplir tous les champs");
+            }
+        }
+
+
+        // --- Resources ---
+        function renderResources() {
+            const container = document.getElementById('resources-list');
+            const resources = currentClass.resources || [];
+
+            if (resources.length === 0) {
+                container.innerHTML = `<p class="text-center py-8 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">Aucun fichier partagé.</p>`;
+            } else {
+                container.innerHTML = resources.map((r, i) => `
+                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-red-100 text-red-600 rounded">
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 text-sm">${r.name}</p>
+                                <p class="text-xs text-gray-500">${r.date}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeResource(${i})" class="text-gray-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (!currentClass.resources) currentClass.resources = [];
+                currentClass.resources.push({
+                    name: file.name,
+                    date: new Date().toLocaleDateString('fr-FR'),
+                    type: 'file'
+                });
+                DataManager.saveClass(currentClass);
+                loadClassData();
+            }
+        }
+
+        function removeResource(index) {
+            if (confirm("Supprimer ce fichier ?")) {
+                currentClass.resources.splice(index, 1);
+                DataManager.saveClass(currentClass);
+                loadClassData();
+            }
+        }
+
+    </script>
+</body>
+
+</html>

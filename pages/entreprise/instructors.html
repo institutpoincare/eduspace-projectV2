@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Formateurs - EduCorp</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#4338ca',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="dashboard-layout flex">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
+
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Mes Formateurs 👨‍🏫</h1>
+                    <p class="text-gray-500">Gérez l'équipe pédagogique de votre organisation</p>
+                </div>
+                <div class="flex gap-3">
+                    <button
+                        class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg shadow-purple-200 transition-all flex items-center gap-2">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i> Ajouter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="mb-6 max-w-md relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                <input type="text" placeholder="Rechercher un formateur..."
+                    class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+            </div>
+
+            <!-- Instructors Grid -->
+            <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> -->
+            <!-- Use Table for consistency with Next.js version -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Formateur</th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Spécialité
+                                </th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Statut</th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Ajouté le</th>
+                                <th class="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <!-- Instructor 1 -->
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                                            AB</div>
+                                        <div>
+                                            <p class="font-bold text-gray-900">Ahmed Ben Amor</p>
+                                            <p class="text-xs text-gray-500">ahmed.ba@educorp.tn</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-medium text-gray-900">Expert Sécurité</div>
+                                    <div class="text-xs text-gray-500">Cybersécurité, Réseaux</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                        Actif
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500">01/12/2025</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-gray-400 hover:text-red-500 transition-colors"
+                                        title="Supprimer">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Instructor 2 -->
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://placehold.co/100x100" alt="Sarah"
+                                            class="w-10 h-10 rounded-full object-cover">
+                                        <div>
+                                            <p class="font-bold text-gray-900">Sarah Connor</p>
+                                            <p class="text-xs text-gray-500">sarah.c@educorp.tn</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-medium text-gray-900">Coach Agile</div>
+                                    <div class="text-xs text-gray-500">Scrum, Kanban</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                        Actif
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500">15/11/2025</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-gray-400 hover:text-red-500 transition-colors"
+                                        title="Supprimer">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-entreprise.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

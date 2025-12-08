@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours en Direct - EduSpace Étudiant</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb', // blue-600
+                        secondary: '#4f46e5', // indigo-600
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .calendar-day {
+            aspect-ratio: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="dashboard-layout flex">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
+            <!-- Header -->
+            <div class="space-y-2 mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Cours en direct</h1>
+                <p class="text-gray-500">Vos classes live avec vos formateurs ci-dessous</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div
+                    class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg transform hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <i data-lucide="book-open" class="w-6 h-6 opacity-80"></i>
+                        <span class="text-2xl font-bold" id="stat-total">0</span>
+                    </div>
+                    <p class="text-sm text-blue-100 font-medium">Total des classes</p>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-5 text-white shadow-lg transform hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <i data-lucide="clock" class="w-6 h-6 opacity-80"></i>
+                        <span class="text-2xl font-bold" id="stat-progress">0</span>
+                    </div>
+                    <p class="text-sm text-orange-100 font-medium">En cours</p>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg transform hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <i data-lucide="check-circle" class="w-6 h-6 opacity-80"></i>
+                        <span class="text-2xl font-bold" id="stat-completed">0</span>
+                    </div>
+                    <p class="text-sm text-green-100 font-medium">Terminés</p>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-5 text-white shadow-lg transform hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <i data-lucide="trending-up" class="w-6 h-6 opacity-80"></i>
+                        <span class="text-2xl font-bold" id="stat-avg">0%</span>
+                    </div>
+                    <p class="text-sm text-indigo-100 font-medium">Progression moyenne</p>
+                </div>
+            </div>
+
+            <!-- Live Alert Container -->
+            <div id="live-alert-container" class="mb-8"></div>
+
+            <!-- Controls: Search, Filter, View -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <!-- Search -->
+                    <div class="flex-1 w-full md:w-auto">
+                        <div class="relative">
+                            <i data-lucide="search"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="text" id="search-input" placeholder="Rechercher une classe..."
+                                class="w-full pr-11 pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="filter" class="w-4 h-4 text-gray-400"></i>
+                        <div class="flex gap-2">
+                            <button onclick="setFilter('all')"
+                                class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white"
+                                data-filter="all">Tous</button>
+                            <button onclick="setFilter('in-progress')"
+                                class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                data-filter="in-progress">En cours</button>
+                            <button onclick="setFilter('completed')"
+                                class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                data-filter="completed">Terminés</button>
+                        </div>
+                    </div>
+
+                    <!-- View Toggle -->
+                    <div class="flex gap-2 border border-gray-200 rounded-lg p-1">
+                        <button onclick="setView('grid')"
+                            class="view-btn p-2 rounded transition-colors bg-blue-600 text-white" data-view="grid"><i
+                                data-lucide="grid" class="w-5 h-5"></i></button>
+                        <button onclick="setView('list')"
+                            class="view-btn p-2 rounded transition-colors text-gray-400 hover:text-gray-600"
+                            data-view="list"><i data-lucide="list" class="w-5 h-5"></i></button>
+                        <button onclick="setView('calendar')"
+                            class="view-btn p-2 rounded transition-colors text-gray-400 hover:text-gray-600"
+                            data-view="calendar"><i data-lucide="calendar" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="content-area">
+                <!-- Grid/List View -->
+                <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+                <!-- Calendar View (Hidden by default) -->
+                <div id="calendar-view" class="hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900" id="calendar-month-year">Décembre 2023</h2>
+                        <div class="flex gap-2">
+                            <button onclick="changeMonth(-1)"
+                                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"><i data-lucide="chevron-left"
+                                    class="w-5 h-5 text-gray-600"></i></button>
+                            <button onclick="changeMonth(1)"
+                                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"><i
+                                    data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 mb-2 text-center text-sm font-bold text-gray-600">
+                        <div>Dim</div>
+                        <div>Lun</div>
+                        <div>Mar</div>
+                        <div>Mer</div>
+                        <div>Jeu</div>
+                        <div>Ven</div>
+                        <div>Sam</div>
+                    </div>
+                    <div id="calendar-days" class="grid grid-cols-7 gap-2"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-etudiant.js"></script>
+    <script>
+        // Mock Data
+        const liveClasses = [
+            {
+                id: 1,
+                name: 'Mathématiques Avancées - Bac',
+                instructor: 'Dr. Sarah Ben Ali',
+                instructorAvatar: 'https://placehold.co/100x100/4F46E5/white?text=SB',
+                nextSession: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+                sessionDuration: 90,
+                totalSessions: 12,
+                completedSessions: 5,
+                progress: 42,
+                status: 'in-progress',
+                students: 15,
+                category: 'Mathématiques',
+                thumbnail: 'https://placehold.co/600x400/4F46E5/white?text=Math'
+            },
+            {
+                id: 2,
+                name: 'Physique - Terminale',
+                instructor: 'Prof. Ahmed Mansour',
+                instructorAvatar: 'https://placehold.co/100x100/10B981/white?text=AM',
+                nextSession: new Date().toISOString(), // Today/Now (Simulating Live/Soon)
+                sessionDuration: 120,
+                totalSessions: 10,
+                completedSessions: 8,
+                progress: 80,
+                status: 'in-progress',
+                students: 12,
+                category: 'Sciences',
+                thumbnail: 'https://placehold.co/600x400/10B981/white?text=Physique'
+            },
+            {
+                id: 3,
+                name: 'Anglais Intensif',
+                instructor: 'Mme. Layla Kallel',
+                instructorAvatar: 'https://placehold.co/100x100/F59E0B/white?text=LK',
+                nextSession: new Date(Date.now() + 172800000).toISOString(), // Day after tomorrow
+                sessionDuration: 60,
+                totalSessions: 8,
+                completedSessions: 8,
+                progress: 100,
+                status: 'completed',
+                students: 20,
+                category: 'Langues',
+                thumbnail: 'https://placehold.co/600x400/F59E0B/white?text=English'
+            }
+        ];
+
+        // State
+        let currentFilter = 'all';
+        let currentView = 'grid';
+        let currentMonthDate = new Date();
+        let searchTerm = '';
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            updateStats();
+            renderContent();
+            renderLiveAlert();
+
+            // Search Listener
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderContent();
+            });
+        });
+
+        // Stats Logic
+        function updateStats() {
+            const total = liveClasses.length;
+            const inProgress = liveClasses.filter(c => c.status === 'in-progress').length;
+            const completed = liveClasses.filter(c => c.status === 'completed').length;
+            const avg = Math.round(liveClasses.reduce((acc, c) => acc + c.progress, 0) / (total || 1));
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-progress').innerText = inProgress;
+            document.getElementById('stat-completed').innerText = completed;
+            document.getElementById('stat-avg').innerText = avg + '%';
+        }
+
+        // Filtering
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('bg-gray-100', 'text-gray-600');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-600');
+                }
+            });
+            renderContent();
+        }
+
+        // View Switching
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                if (btn.dataset.view === view) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-gray-400');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+
+            if (view === 'calendar') {
+                document.getElementById('courses-grid').classList.add('hidden');
+                document.getElementById('calendar-view').classList.remove('hidden');
+                renderCalendar();
+            } else {
+                document.getElementById('courses-grid').classList.remove('hidden');
+                document.getElementById('calendar-view').classList.add('hidden');
+
+                const gridEl = document.getElementById('courses-grid');
+                if (view === 'list') {
+                    gridEl.classList.remove('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+                    gridEl.classList.add('flex', 'flex-col');
+                } else {
+                    gridEl.classList.add('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+                    gridEl.classList.remove('flex', 'flex-col');
+                }
+                renderContent();
+            }
+        }
+
+        // Helper: Is Course Live?
+        function isCourseLive(course) {
+            const now = new Date();
+            const start = new Date(course.nextSession);
+            // Simulating a 2-hour window just for visibility if near now
+            // Or just check if start time is close? 
+            // Let's say if start is within last 15 mins or next 2 hours
+            const diff = now - start;
+            // return diff >= 0 && diff <= (course.sessionDuration * 60 * 1000);
+
+            // For demo purposes, let's just make the "Physique" class live
+            return course.id === 2;
+        }
+
+        function formatNextSession(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = date - now;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffDays > 0) return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            if (diffHours > 0) return `Dans ${diffHours}h`;
+            if (diffMs < 0) return 'En cours';
+            return 'Bientôt';
+        }
+
+        // Live Alert
+        function renderLiveAlert() {
+            const liveCourse = liveClasses.find(isCourseLive); // Mock logic
+            const container = document.getElementById('live-alert-container');
+
+            if (liveCourse) {
+                container.innerHTML = `
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 rounded-2xl blur-sm opacity-75"></div>
+                        <div class="relative bg-white rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="relative flex h-3 w-3">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </span>
+                                    <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider">COURS EN DIRECT MAINTENANT</h2>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-900">${liveCourse.name}</h3>
+                                <p class="text-gray-600">avec ${liveCourse.instructor}</p>
+                            </div>
+                            <button onclick="window.location.href='../classe/${liveCourse.id}'" class="px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-xl transition-all shadow-lg flex items-center gap-3 animate-pulse">
+                                <i data-lucide="video" class="w-5 h-5"></i> Rejoindre
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Show next session
+                const next = liveClasses.sort((a, b) => new Date(a.nextSession) - new Date(b.nextSession)).find(c => new Date(c.nextSession) > new Date());
+                if (next) {
+                    container.innerHTML = `
+                        <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="timer" class="w-5 h-5"></i>
+                                    <h2 class="font-bold uppercase tracking-wider text-sm">Prochain cours en direct</h2>
+                                </div>
+                                <h3 class="text-xl font-bold">${next.name}</h3>
+                                <p class="text-purple-100 text-sm">avec ${next.instructor} • ${formatNextSession(next.nextSession)}</p>
+                            </div>
+                            <!-- Simple Countdown Mock -->
+                            <div class="flex gap-2 text-center">
+                                <div class="bg-white/20 p-2 rounded-lg min-w-[50px]"><div class="font-bold text-xl">02</div><div class="text-[10px]">Jours</div></div>
+                                <div class="bg-white/20 p-2 rounded-lg min-w-[50px]"><div class="font-bold text-xl">14</div><div class="text-[10px]">Hrs</div></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            lucide.createIcons();
+        }
+
+        // Render Content
+        function renderContent() {
+            if (currentView === 'calendar') return;
+
+            const grid = document.getElementById('courses-grid');
+            grid.innerHTML = '';
+
+            const filtered = liveClasses.filter(c => {
+                const searchMatch = c.name.toLowerCase().includes(searchTerm) || c.instructor.toLowerCase().includes(searchTerm);
+                const statusMatch = currentFilter === 'all' || c.status === currentFilter;
+                return searchMatch && statusMatch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-xl border border-gray-100 border-dashed">
+                        <i data-lucide="book-open" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+                        <p class="text-gray-500">Aucun cours trouvé</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach(course => {
+                const isList = currentView === 'list';
+                const el = document.createElement('div');
+                el.className = `bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden group ${isList ? 'flex flex-row' : ''}`;
+
+                el.innerHTML = `
+                    <div class="relative ${isList ? 'w-64 shrink-0' : 'h-48'} bg-gray-200">
+                        <img src="${course.thumbnail}" alt="${course.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        ${isCourseLive(course) ? '<div class="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full flex items-center gap-1 animate-pulse"><span class="w-2 h-2 bg-white rounded-full"></span>Live</div>' : ''}
+                        ${course.status === 'completed' ? '<div class="absolute top-3 left-3 px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i>Terminé</div>' : ''}
+                    </div>
+                    
+                    <div class="p-5 flex-1 flex flex-col">
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">${course.name}</h3>
+                        
+                        <div class="flex items-center gap-2 mb-3">
+                            <img src="${course.instructorAvatar}" class="w-8 h-8 rounded-full border-2 border-white shadow">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">${course.instructor}</p>
+                                <p class="text-xs text-gray-500">${course.category}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-sm mb-1">
+                                <span class="text-gray-600">Progression</span>
+                                <span class="text-blue-600 font-bold">${course.progress}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${course.progress}%"></div>
+                            </div>
+                            
+                            <button class="w-full py-2 bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-700 font-bold rounded-lg transition-colors">
+                                ${course.status === 'completed' ? 'Revoir' : 'Continuer'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+            lucide.createIcons();
+        }
+
+        // Calendar Logic (Simplified)
+        function renderCalendar() {
+            const container = document.getElementById('calendar-days');
+            const monthLabel = document.getElementById('calendar-month-year');
+            container.innerHTML = '';
+
+            monthLabel.innerText = currentMonthDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+            const year = currentMonthDate.getFullYear();
+            const month = currentMonthDate.getMonth();
+
+            const firstDay = new Date(year, month, 1).getDay(); // 0 is Sunday
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Empty slots
+            for (let i = 0; i < firstDay; i++) {
+                container.innerHTML += '<div></div>';
+            }
+
+            // Days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(year, month, i);
+                const isToday = new Date().toDateString() === date.toDateString();
+                const sessions = liveClasses.filter(c => new Date(c.nextSession).toDateString() === date.toDateString());
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `calendar-day p-2 rounded-xl border-2 transition-all hover:shadow-md cursor-pointer flex flex-col items-center justify-center relative
+                    ${isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-100 hover:border-blue-200'}
+                    ${sessions.length > 0 ? 'bg-green-50/50' : ''}
+                `;
+
+                let dots = '';
+                sessions.forEach(s => {
+                    dots += `<div class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1"></div>`;
+                });
+
+                dayEl.innerHTML = `<span class="font-bold text-gray-700">${i}</span><div class="flex gap-0.5">${dots}</div>`;
+                container.appendChild(dayEl);
+            }
+        }
+
+        function changeMonth(delta) {
+            currentMonthDate.setMonth(currentMonthDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+    </script>
+</body>
+
+</html>

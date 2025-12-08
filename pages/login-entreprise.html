@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Entreprise - EduSpace</title>
+    <link rel="stylesheet" href="../css/main.css">
+
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #f5f3ff, white, #eef2ff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            max-width: 28rem;
+            width: 100%;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-500);
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #4f46e5;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .login-header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--gray-600);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--gray-100);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 3rem 0.75rem 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-align: right;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            display: none;
+            padding: 1rem;
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: 0.75rem;
+            color: #991b1b;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-message.show {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .test-credentials {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
+            border-radius: 0.75rem;
+        }
+
+        .test-credentials p {
+            font-size: 0.875rem;
+            color: #4f46e5;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-credentials .credentials {
+            font-size: 0.75rem;
+            color: #5b21b6;
+            margin-bottom: 0.25rem;
+        }
+
+        .footer-text {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            margin-top: 1.5rem;
+        }
+
+        .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <a href="../index.html" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Retour à l'accueil
+        </a>
+
+        <div class="login-header">
+            <div class="login-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-4h8v4" />
+                    <!-- Windows -->
+                    <path d="M6 10h3v3H6zM15 10h3v3h-3zM6 15h3v3H6zM15 15h3v3h-3z" fill="white" fill-opacity="0.3"
+                        stroke="none" />
+                </svg>
+            </div>
+            <h1>Espace Entreprise</h1>
+            <p>Portail RH et Formation</p>
+        </div>
+
+        <div class="login-card">
+            <div class="error-message" id="errorMessage">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span id="errorText"></span>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email Professionnel</label>
+                    <div class="input-wrapper">
+                        <input type="email" class="form-input" id="email" placeholder="rh@entreprise.com"
+                            value="rh@techsplit.tn" required>
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="form-input" id="password" placeholder="••••••••" value="123456"
+                            required>
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="form-group"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <label class="form-label"
+                        style="display: flex; align-items: center; gap: 0.5rem; margin: 0; cursor: pointer;">
+                        <input type="checkbox"
+                            style="width: 1rem; height: 1rem; border-radius: 0.25rem; border-color: var(--gray-300); color: #4f46e5;">
+                        <span style="font-weight: 400; color: var(--gray-600);">Se souvenir de moi</span>
+                    </label>
+                    <a href="#"
+                        style="font-size: 0.875rem; font-weight: 500; color: #4f46e5; text-decoration: none;">Mot de
+                        passe oublié?</a>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                    </svg>
+                    Accéder au Portail
+                </button>
+            </form>
+
+            <div class="test-credentials">
+                <p>Compte de démonstration:</p>
+                <div class="credentials"><b>Entreprise:</b> TechSplit Solutions</div>
+                <div class="credentials"><b>Email:</b> rh@techsplit.tn</div>
+                <div class="credentials"><b>Mot de passe:</b> 123456</div>
+            </div>
+        </div>
+
+        <p class="footer-text">Vous n'avez pas de compte entreprise? <a href="#"
+                style="color: #4f46e5; text-decoration: none; font-weight: 600;">Contactez notre équipe commerciale</a>
+        </p>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            errorMessage.classList.remove('show');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner"></div> Connexion en cours...';
+
+            setTimeout(function () {
+                if (password === '123456' && email === 'rh@techsplit.tn') {
+                    window.eduspace.utils.setStorage('user', {
+                        role: 'entreprise',
+                        email: email,
+                        id: '900',
+                        name: 'Sarra RH',
+                        company: 'TechSplit Solutions'
+                    });
+
+                    window.location.href = 'entreprise/dashboard.html';
+                } else {
+                    errorText.textContent = 'Identifiants incorrects (Vérifiez les comptes de démo)';
+                    errorMessage.classList.add('show');
+
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                            <polyline points="10 17 15 12 10 7" />
+                            <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        Accéder au Portail
+                    `;
+                }
+            }, 800);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Classes - EduSpace Formateur</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 500: '#6b7280', 700: '#374151', 900: '#111827' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .wizard-step.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .wizard-step.completed {
+            background-color: #22c55e;
+            color: white;
+            border-color: #22c55e;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+    <div class="flex min-h-screen">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 ml-[280px]">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Gestion des Classes</h1>
+                    <p class="text-gray-500 mt-1">Gérez vos classes, inscriptions et paiements</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="openCreateModal()"
+                        class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center gap-2 font-medium shadow-lg transition-all hover:scale-105">
+                        <i data-lucide="plus" class="w-5 h-5"></i> Créer une Classe
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Total Classes</p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="stat-total-classes">0</h3>
+                        <p class="text-xs mt-2 font-medium text-green-600">+2 ce mois</p>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-xl text-blue-600"><i data-lucide="book-open" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Inscriptions</p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="stat-total-students">0</h3>
+                        <p class="text-xs mt-2 font-medium text-green-600">+15% cette semaine</p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-xl text-green-600"><i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Revenus (Est.)</p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="stat-revenue">0 TND</h3>
+                        <p class="text-xs mt-2 font-medium text-blue-600">Objectif: 15k</p>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-xl text-purple-600"><i data-lucide="dollar-sign"
+                            class="w-5 h-5"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Taux de Paiement</p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="stat-payment-rate">0%</h3>
+                        <p class="text-xs mt-2 font-medium text-orange-500">À relancer</p>
+                    </div>
+                    <div class="p-3 bg-orange-50 rounded-xl text-orange-600"><i data-lucide="trending-up"
+                            class="w-5 h-5"></i></div>
+                </div>
+            </div>
+
+            <!-- Main Content Area with Tabs -->
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 min-h-[500px]">
+                <!-- Tabs Header -->
+                <div class="border-b border-gray-200 mb-6 flex gap-8 overflow-x-auto">
+                    <button onclick="switchTab('classes')" id="tab-classes"
+                        class="tab-btn active pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors">
+                        Mes Classes
+                    </button>
+                    <button onclick="switchTab('requests')" id="tab-requests"
+                        class="tab-btn pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors">
+                        Demandes <span
+                            class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full ml-1 font-bold">1</span>
+                    </button>
+                    <button onclick="switchTab('payments')" id="tab-payments"
+                        class="tab-btn pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors">
+                        Paiements
+                    </button>
+                </div>
+
+                <!-- Tab Content: Classes -->
+                <div id="content-classes" class="tab-content block animate-[fadeIn_0.3s_ease-out]">
+                    <div id="classes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Classes injected here -->
+                    </div>
+                </div>
+
+                <!-- Tab Content: Requests -->
+                <div id="content-requests" class="tab-content hidden animate-[fadeIn_0.3s_ease-out]">
+                    <!-- Requests List (Mocked for now) -->
+                    <div class="space-y-3">
+                        <div
+                            class="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <span
+                                    class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">AT</span>
+                                <div>
+                                    <p class="font-bold text-gray-900">Amine Tounsi</p>
+                                    <p class="text-sm text-gray-500">Souhaite rejoindre : <span
+                                            class="font-medium text-blue-600">Mathématiques Avancées</span></p>
+                                    <p class="text-xs text-gray-400 mt-1">Il y a 2 heures</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="acceptRequest('Amine Tounsi', 1)"
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 shadow-sm">Accepter</button>
+                                <button
+                                    class="px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg text-sm font-bold hover:bg-red-100">Refuser</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Payments -->
+                <div id="content-payments" class="tab-content hidden animate-[fadeIn_0.3s_ease-out]">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 border-b border-gray-100">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Élève</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Classe</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Prix Total</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Payé</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Reste</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Statut</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase">Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-list" class="divide-y divide-gray-100">
+                                <!-- Payments injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Class Wizard Modal -->
+    <div id="create-modal"
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out]">
+            <!-- Header -->
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Nouvelle Classe</h2>
+                <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors"><i
+                        data-lucide="x" class="w-6 h-6 text-gray-400"></i></button>
+            </div>
+
+            <!-- Wizard Steps Header -->
+            <div class="px-8 py-4 bg-gray-50 border-b border-gray-100">
+                <div class="flex items-center justify-between max-w-lg mx-auto">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="wizard-step active w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm bg-blue-600 border-blue-600 text-white"
+                            id="step-ind-1">1</div>
+                        <span class="text-xs font-bold text-gray-500">Infos</span>
+                    </div>
+                    <div class="h-0.5 w-12 bg-gray-300"></div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
+                            id="step-ind-2">2</div>
+                        <span class="text-xs font-bold text-gray-500">Planning</span>
+                    </div>
+                    <div class="h-0.5 w-12 bg-gray-300"></div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
+                            id="step-ind-3">3</div>
+                        <span class="text-xs font-bold text-gray-500">Accès</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
+                <form id="wizard-form" onsubmit="return false;">
+                    <!-- Step 1 -->
+                    <div id="step-1" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Nom de la classe</label>
+                            <input type="text" id="w-name"
+                                class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                                placeholder="Ex: Masterclass Python">
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
+                                <select id="w-category"
+                                    class="w-full p-3 border border-gray-200 rounded-xl outline-none bg-white font-medium">
+                                    <option value="scolaire">Scolaire</option>
+                                    <option value="superieur">Supérieur</option>
+                                    <option value="formation">Formation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Niveau</label>
+                                <input type="text" id="w-level"
+                                    class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Ex: Débutant">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Prix (TND)</label>
+                            <input type="number" id="w-price"
+                                class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="120">
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div id="step-2" class="hidden space-y-6">
+                        <div
+                            class="bg-blue-50 p-4 rounded-xl flex items-center gap-4 text-blue-800 border border-blue-100">
+                            <i data-lucide="calendar" class="w-6 h-6"></i>
+                            <div>
+                                <p class="font-bold">Durée</p>
+                                <p class="text-xs opacity-75">Combien de semaines dure ce cours ?</p>
+                            </div>
+                            <input type="number" id="w-weeks" value="4"
+                                class="ml-auto w-16 p-2 rounded-lg border border-blue-200 text-center font-bold outline-none ring-blue-500 focus:ring-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Ajouter Créneaux
+                                Hebdomadaires</label>
+                            <div class="flex gap-2 mb-4">
+                                <select id="w-slot-day" class="p-2 border rounded-lg bg-white outline-none">
+                                    <option>Lundi</option>
+                                    <option>Mardi</option>
+                                    <option>Mercredi</option>
+                                    <option>Jeudi</option>
+                                    <option>Vendredi</option>
+                                    <option>Samedi</option>
+                                    <option>Dimanche</option>
+                                </select>
+                                <input type="time" id="w-slot-start" value="18:00"
+                                    class="p-2 border rounded-lg outline-none">
+                                <input type="time" id="w-slot-end" value="20:00"
+                                    class="p-2 border rounded-lg outline-none">
+                                <button onclick="addSlot()"
+                                    class="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-black">Ajouter</button>
+                            </div>
+                            <div id="slots-container" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div id="step-3" class="hidden text-center space-y-8 py-8">
+                        <div
+                            class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 animate-bounce">
+                            <i data-lucide="check" class="w-10 h-10"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Classe prête !</h3>
+                            <p class="text-gray-500">Code d'accès généré automatiquement</p>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-xl inline-block border border-gray-200">
+                            <span id="generated-code"
+                                class="text-3xl font-mono font-bold text-gray-800 tracking-wider">CLASS-XXXX</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Ce code sert de mot de passe pour vos sessions.</p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-8 py-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-between">
+                <button onclick="prevStep()" id="btn-prev"
+                    class="px-6 py-2 text-gray-500 font-bold hover:text-gray-900 disabled:opacity-50"
+                    disabled>Retour</button>
+                <button onclick="nextStep()" id="btn-next"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg transition-all">Suivant</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal"
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-[scaleIn_0.2s_ease-out]">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Gérer Paiement</h3>
+                <button onclick="document.getElementById('payment-modal').classList.add('hidden')"
+                    class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div id="payment-modal-content" class="space-y-6">
+                <!-- Content injected via JS -->
+            </div>
+
+            <button onclick="savePayment()"
+                class="w-full mt-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-lg">Enregistrer</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/data-manager.js"></script>
+    <script src="../../js/components/sidebar-formateur.js"></script>
+    <script>
+        // --- State ---
+        let currentTab = 'classes';
+        let wizStep = 1;
+        let tempSlots = [];
+        let currentPaymentStudent = null;
+        let currentPaymentClass = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadClasses();
+            lucide.createIcons();
+            updateStats();
+        });
+
+        // --- Tabs ---
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-blue-600', 'text-blue-600'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            currentTab = tab;
+        }
+
+        // --- Data Loading ---
+        function loadClasses() {
+            const classes = DataManager.getClasses();
+            const container = document.getElementById('classes-list');
+            const paymentsContainer = document.getElementById('payments-list');
+
+            // Render Classes Grid
+            if (classes.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500"><p>Aucune classe. Créez-en une !</p></div>`;
+            } else {
+                container.innerHTML = classes.map(cls => `
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1 group">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${cls.category === 'scolaire' ? 'bg-blue-100 text-blue-700' : cls.category === 'superieur' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-wide">${cls.category}</span>
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">${cls.name}</h3>
+                        <p class="text-sm text-gray-500 mb-4">${cls.level}</p>
+                        
+                        <div class="flex items-center gap-4 text-sm text-gray-600 mb-6 border-b border-gray-50 pb-4">
+                            <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i> ${cls.studentIds ? cls.studentIds.length : 0} Élèves</span>
+                            <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4"></i> ${cls.weeksDuration} Sem.</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-blue-600">${cls.price} TND</span>
+                            <a href="class-details.html?id=${cls.id}" class="text-sm font-bold text-gray-900 flex items-center gap-1 hover:gap-2 transition-all">Gérer <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Payments Table
+            const allStudents = [];
+            classes.forEach(c => {
+                (c.studentIds || []).forEach(s => allStudents.push({ ...s, className: c.name, classPrice: c.price, classId: c.id }));
+            });
+
+            if (allStudents.length === 0) {
+                paymentsContainer.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Aucune inscription pour le moment.</td></tr>`;
+            } else {
+                paymentsContainer.innerHTML = allStudents.map(s => {
+                    const paid = s.amountPaid || 0;
+                    const price = parseFloat(s.classPrice);
+                    const remaining = Math.max(0, price - paid);
+                    let statusColor = 'bg-red-100 text-red-600';
+                    let statusText = 'Non Payé';
+                    if (paid >= price) { statusColor = 'bg-green-100 text-green-700'; statusText = 'Payé'; }
+                    else if (paid > 0) { statusColor = 'bg-yellow-100 text-yellow-700'; statusText = 'Partiel'; }
+
+                    return `
+                        <tr class="hover:bg-gray-50 group transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-900">${s.name}</div>
+                                <div class="text-xs text-gray-500">${s.email || 'N/A'}</div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-600">${s.className}</td>
+                            <td class="px-6 py-4 font-bold text-gray-900">${price} TND</td>
+                            <td class="px-6 py-4 font-bold text-green-600">${paid} TND</td>
+                            <td class="px-6 py-4 font-bold text-red-500">${remaining} TND</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span></td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="openPaymentModal(${s.classId}, ${s.id})" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">Gérer</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function updateStats() {
+            const classes = DataManager.getClasses();
+            document.getElementById('stat-total-classes').innerText = classes.length;
+
+            let totalStudents = 0;
+            let totalRevenue = 0;
+            let totalPaid = 0;
+            let totalDue = 0;
+
+            classes.forEach(c => {
+                totalStudents += (c.studentIds?.length || 0);
+                (c.studentIds || []).forEach(s => {
+                    totalPaid += (s.amountPaid || 0);
+                    // Estimate revenue based on enrollments * price
+                    totalDue += parseFloat(c.price);
+                });
+            });
+
+            document.getElementById('stat-total-students').innerText = totalStudents;
+            document.getElementById('stat-revenue').innerText = `${totalPaid} TND`;
+
+            // Payment Rate
+            const rate = totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0;
+            document.getElementById('stat-payment-rate').innerText = `${rate}%`;
+        }
+
+
+        // --- Wizard Logic ---
+        function openCreateModal() {
+            document.getElementById('create-modal').classList.remove('hidden');
+            wizStep = 1;
+            updateWizardUI();
+            tempSlots = [];
+            renderSlots();
+        }
+
+        function closeModal() {
+            document.getElementById('create-modal').classList.add('hidden');
+        }
+
+        function nextStep() {
+            if (wizStep === 3) {
+                finishCreation();
+                return;
+            }
+            // Validation step 1
+            if (wizStep === 1) {
+                if (!document.getElementById('w-name').value) return alert("Nom requis");
+                if (!document.getElementById('w-price').value) return alert("Prix requis");
+            }
+            wizStep++;
+            if (wizStep === 3) {
+                document.getElementById('generated-code').innerText = 'CLASS-' + Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('btn-next').innerText = "Terminer";
+                document.getElementById('btn-next').classList.add('bg-green-600', 'hover:bg-green-700');
+                document.getElementById('btn-next').classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            }
+            updateWizardUI();
+        }
+
+        function prevStep() {
+            if (wizStep > 1) wizStep--;
+            document.getElementById('btn-next').innerText = "Suivant";
+            document.getElementById('btn-next').classList.remove('bg-green-600', 'hover:bg-green-700');
+            document.getElementById('btn-next').classList.add('bg-blue-600', 'hover:bg-blue-700');
+            updateWizardUI();
+        }
+
+        function updateWizardUI() {
+            // Steps Indication
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`step-ind-${i}`);
+                el.classList.remove('active', 'completed', 'bg-blue-600', 'border-blue-600', 'text-white', 'border-gray-300', 'text-gray-500');
+                if (i === wizStep) {
+                    el.classList.add('active', 'bg-blue-600', 'border-blue-600', 'text-white');
+                } else if (i < wizStep) {
+                    el.classList.add('completed', 'bg-green-500', 'border-green-500', 'text-white');
+                    el.innerText = '✓';
+                } else {
+                    el.classList.add('border-gray-300', 'text-gray-500');
+                    el.innerText = i;
+                }
+            }
+
+            // Content Visibility
+            [1, 2, 3].forEach(i => document.getElementById(`step-${i}`).classList.add('hidden'));
+            document.getElementById(`step-${wizStep}`).classList.remove('hidden');
+
+            document.getElementById('btn-prev').disabled = wizStep === 1;
+        }
+
+        function addSlot() {
+            const slot = {
+                day: document.getElementById('w-slot-day').value,
+                start: document.getElementById('w-slot-start').value,
+                end: document.getElementById('w-slot-end').value
+            };
+            tempSlots.push(slot);
+            renderSlots();
+        }
+
+        function renderSlots() {
+            const c = document.getElementById('slots-container');
+            c.innerHTML = tempSlots.map((s, i) => `
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold flex items-center gap-2">
+                    ${s.day} ${s.start}-${s.end} <button onclick="tempSlots.splice(${i},1);renderSlots()" class="hover:text-red-500">×</button>
+                </span>
+            `).join('');
+        }
+
+        function finishCreation() {
+            const newClass = {
+                name: document.getElementById('w-name').value,
+                category: document.getElementById('w-category').value,
+                level: document.getElementById('w-level').value,
+                price: document.getElementById('w-price').value,
+                weeksDuration: document.getElementById('w-weeks').value,
+                slots: tempSlots,
+                accessCode: document.getElementById('generated-code').innerText,
+                studentIds: []
+            };
+            DataManager.saveClass(newClass);
+            closeModal();
+            loadClasses();
+            updateStats();
+        }
+
+        // --- Payment Logic ---
+        function openPaymentModal(classId, studentId) {
+            const classes = DataManager.getClasses();
+            const cls = classes.find(c => c.id === classId);
+            const student = cls.studentIds.find(s => s.id === studentId);
+
+            currentPaymentClass = cls;
+            currentPaymentStudent = student;
+
+            const modal = document.getElementById('payment-modal');
+            const content = document.getElementById('payment-modal-content');
+
+            modal.classList.remove('hidden');
+
+            content.innerHTML = `
+                <div class="p-4 bg-gray-50 rounded-xl mb-4">
+                    <p class="text-sm font-bold text-gray-500 mb-1">Détails</p>
+                    <div class="flex justify-between">
+                        <span class="font-bold text-gray-900">${cls.name}</span>
+                        <span class="font-bold text-blue-600">${cls.price} TND</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Montant déjà payé</label>
+                    <input type="number" id="pay-amount" value="${student.amountPaid || 0}" class="w-full p-3 border border-gray-200 rounded-xl outline-none font-bold text-lg">
+                </div>
+                <div>
+                     <label class="block text-sm font-bold text-gray-700 mb-2">Méthode</label>
+                     <select id="pay-method" class="w-full p-3 border border-gray-200 rounded-xl">
+                        <option ${student.paymentMethod === 'Cash' ? 'selected' : ''}>Cash</option>
+                        <option ${student.paymentMethod === 'Virement' ? 'selected' : ''}>Virement</option>
+                        <option ${student.paymentMethod === 'Chèque' ? 'selected' : ''}>Chèque</option>
+                     </select>
+                </div>
+            `;
+        }
+
+        function savePayment() {
+            const amount = parseFloat(document.getElementById('pay-amount').value);
+            const method = document.getElementById('pay-method').value;
+            const price = parseFloat(currentPaymentClass.price);
+
+            let status = 'Non Payé';
+            if (amount >= price) status = 'Payé';
+            else if (amount > 0) status = 'En attente'; // Partial
+
+            DataManager.updateClassStudent(currentPaymentClass.id, currentPaymentStudent.id, {
+                amountPaid: amount,
+                paymentMethod: method,
+                payment: status
+            });
+
+            document.getElementById('payment-modal').classList.add('hidden');
+            loadClasses(); // Refresh
+            updateStats(); // Refresh stats
+            alert("Paiement mis à jour !");
+        }
+
+        // Mock Request Accept
+        function acceptRequest(studentName, reqId) {
+            // Mock add student to first class for demo
+            const classes = DataManager.getClasses();
+            if (classes.length > 0) {
+                const newStudent = {
+                    id: Date.now(),
+                    name: studentName,
+                    email: 'student@demo.net',
+                    amountPaid: 0,
+                    payment: 'Non Payé'
+                };
+                // Add to first class
+                const updatedClass = classes[0];
+                updatedClass.studentIds = [...(updatedClass.studentIds || []), newStudent];
+                DataManager.saveClass(updatedClass);
+
+                // Remove from UI (mock)
+                const reqEl = document.querySelector('#content-requests .space-y-3 div');
+                if (reqEl) reqEl.remove();
+
+                // Refresh
+                loadClasses();
+                updateStats();
+                alert(`Ajouté à ${updatedClass.name}`);
+            } else {
+                alert("Créez d'abord une classe !");
+            }
+        }
+    </script>
+</body>
+
+</html>

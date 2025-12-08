@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - EduSpace Parents</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="dashboard-layout flex">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
+
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Messages 💬</h1>
+                <p class="text-gray-500">Communiquez avec l'administration et les enseignants</p>
+            </div>
+
+            <!-- Layout -->
+            <div class="flex flex-col lg:flex-row gap-6 h-[calc(100vh-200px)]">
+
+                <!-- Conversations List -->
+                <div
+                    class="w-full lg:w-1/3 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+                    <div class="p-4 border-b border-gray-100">
+                        <div class="relative">
+                            <i data-lucide="search"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                            <input type="text" placeholder="Rechercher..."
+                                class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm">
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto" id="conversations-list">
+                        <!-- Convo 1 -->
+                        <div
+                            class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer border-l-4 border-blue-600 bg-blue-50 transition-colors">
+                            <div class="relative">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
+                                    MK</div>
+                                <div
+                                    class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full">
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-bold text-gray-900 truncate">Mme. Kallel</h3>
+                                    <span class="text-xs text-gray-500">10:42</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate font-medium">Concernant les progrès d'Ahmed en
+                                    Anglais...</p>
+                            </div>
+                        </div>
+
+                        <!-- Convo 2 -->
+                        <div
+                            class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer border-l-4 border-transparent transition-colors">
+                            <div class="relative">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                                    AD</div>
+                                <div
+                                    class="absolute bottom-0 right-0 w-3 h-3 bg-gray-300 border-2 border-white rounded-full">
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-bold text-gray-900 truncate">Administration</h3>
+                                    <span class="text-xs text-gray-500">Hier</span>
+                                </div>
+                                <p class="text-sm text-gray-500 truncate">Rappel: Paiement de la tranche 2</p>
+                            </div>
+                        </div>
+
+                        <!-- Convo 3 -->
+                        <div
+                            class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer border-l-4 border-transparent transition-colors">
+                            <div class="relative">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold">
+                                    SM</div>
+                                <div
+                                    class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full">
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-bold text-gray-900 truncate">Sofiène Messadi</h3>
+                                    <span class="text-xs text-gray-500">Lun</span>
+                                </div>
+                                <p class="text-sm text-gray-500 truncate">Lina a oublié son livre de maths...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+                    <!-- Chat Header -->
+                    <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
+                                MK</div>
+                            <div>
+                                <h2 class="font-bold text-gray-900">Mme. Kallel</h2>
+                                <p class="text-xs text-green-600 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> En ligne
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button
+                                class="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
+                                <i data-lucide="phone" class="w-5 h-5"></i>
+                            </button>
+                            <button
+                                class="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
+                                <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="flex-1 p-6 overflow-y-auto space-y-6 bg-gray-50/30" id="chat-messages">
+
+                        <!-- Date Separator -->
+                        <div class="flex justify-center">
+                            <span
+                                class="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-500 font-medium">Aujourd'hui</span>
+                        </div>
+
+                        <!-- Message Received -->
+                        <div class="flex items-end gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                MK</div>
+                            <div class="max-w-[70%] space-y-1">
+                                <div
+                                    class="bg-white p-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 text-gray-800 text-sm">
+                                    Bonjour M. Mani, je voulais vous informer qu'Ahmed a fait d'excellents progrès en
+                                    expression orale ces dernières semaines. Sa participation est très encourageante !
+                                    👏
+                                </div>
+                                <p class="text-xs text-gray-400 ml-1">10:42</p>
+                            </div>
+                        </div>
+
+                        <!-- Message Sent -->
+                        <div class="flex flex-row-reverse items-end gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                PA</div>
+                            <div class="max-w-[70%] space-y-1">
+                                <div class="bg-blue-600 p-3 rounded-2xl rounded-br-none shadow-md text-white text-sm">
+                                    Bonjour Mme Kallel, merci beaucoup pour ce retour ! Nous avons en effet travaillé
+                                    cela à la maison. C'est rassurant de voir que cela porte ses fruits.
+                                </div>
+                                <div class="flex items-center justify-end gap-1 text-xs text-gray-400 mr-1">
+                                    <span>10:45</span>
+                                    <i data-lucide="check-check" class="w-3 h-3 text-blue-600"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Message Received -->
+                        <div class="flex items-end gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                MK</div>
+                            <div class="max-w-[70%] space-y-1">
+                                <div
+                                    class="bg-white p-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 text-gray-800 text-sm">
+                                    Absolument. Continuez comme ça. N'hésitez pas si vous avez des questions sur le
+                                    programme du prochain trimestre.
+                                </div>
+                                <p class="text-xs text-gray-400 ml-1">10:46</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="p-4 bg-white border-t border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <button
+                                class="p-2 hover:bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
+                                <i data-lucide="paperclip" class="w-5 h-5"></i>
+                            </button>
+                            <input type="text" placeholder="Écrivez votre message..."
+                                class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm">
+                            <button
+                                class="p-3 bg-blue-600 hover:bg-blue-700 rounded-xl text-white shadow-lg shadow-blue-200 transition-all">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-parent.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Simple scroll to bottom
+        const messageContainer = document.getElementById('chat-messages');
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    </script>
+</body>
+
+</html>

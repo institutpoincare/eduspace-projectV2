@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Calendrier - EduSpace Formateur</title>
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 400: '#9ca3af', 500: '#6b7280', 700: '#374151', 900: '#111827' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Override Tailwind conflicts with Dashboard CSS where necessary */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f9fafb;
+        }
+
+        /* Ensure sidebar stays fixed as per dashboard.css */
+
+        /* Calendar Specifics */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .calendar-cell {
+            background-color: white;
+            min-height: 120px;
+            padding: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-cell:hover {
+            background-color: #f9fafb;
+        }
+
+        .calendar-cell.today {
+            background-color: #eff6ff;
+        }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 0.5rem;
+        }
+
+        .week-day {
+            text-align: center;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+
+        /* Custom Scrollbar for inner lists */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+    <div class="dashboard-layout">
+        <!-- Sidebar Container (populated by sidebar-formateur.js) -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header
+                class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-4 w-1/2">
+                    <div class="relative w-full max-w-md">
+                        <i data-lucide="search"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                        <input type="text" placeholder="Rechercher une session..."
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg relative">
+                        <i data-lucide="bell" class="w-6 h-6"></i>
+                        <span
+                            class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    </button>
+                    <div
+                        class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                        IN</div>
+                </div>
+            </header>
+
+            <div class="flex flex-col lg:flex-row gap-8 h-[calc(100vh-140px)]">
+                <!-- Main Calendar Area -->
+                <div class="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Calendar Header -->
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">Mon Calendrier</h1>
+                            <p class="text-gray-500 text-sm mt-1">Planifiez et gérez vos sessions</p>
+
+                            <div class="flex items-center gap-4 mt-6">
+                                <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-200">
+                                    <button onclick="changeMonth(-1)"
+                                        class="p-1 hover:bg-white rounded-md shadow-sm transition-all"><i
+                                            data-lucide="chevron-left" class="w-5 h-5 text-gray-600"></i></button>
+                                    <button onclick="goToToday()"
+                                        class="px-3 py-1 text-sm font-bold text-gray-700 hover:bg-white rounded-md transition-all">Aujourd'hui</button>
+                                    <button onclick="changeMonth(1)"
+                                        class="p-1 hover:bg-white rounded-md shadow-sm transition-all"><i
+                                            data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i></button>
+                                </div>
+                                <h2 id="current-month" class="text-xl font-bold capitalize min-w-[150px]">Décembre 2025
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div class="flex bg-gray-100 p-1.5 rounded-xl self-start lg:self-center">
+                            <button
+                                class="px-4 py-2 bg-white shadow-sm rounded-lg text-sm font-bold text-gray-900">Mois</button>
+                            <button
+                                class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900">Semaine</button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div class="flex-1 flex flex-col p-6 overflow-hidden">
+                        <div class="week-grid mb-2">
+                            <div class="week-day">DIM</div>
+                            <div class="week-day">LUN</div>
+                            <div class="week-day">MAR</div>
+                            <div class="week-day">MER</div>
+                            <div class="week-day">JEU</div>
+                            <div class="week-day">VEN</div>
+                            <div class="week-day">SAM</div>
+                        </div>
+                        <div id="calendar-grid" class="calendar-grid flex-1 overflow-y-auto custom-scrollbar">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Agenda -->
+                <div class="w-full lg:w-80 flex flex-col gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex-1 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg text-gray-900">Sessions du jour</h3>
+                            <p id="today-date-sidebar" class="text-sm text-gray-500 capitalize"></p>
+                        </div>
+
+                        <div id="agenda-list" class="space-y-4 overflow-y-auto flex-1 custom-scrollbar pr-2">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/data-manager.js"></script>
+    <script src="../../js/components/sidebar-formateur.js"></script>
+    <script>
+        let currentDate = new Date();
+
+        function getDaysInMonth(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sunday
+
+            const days = [];
+            for (let i = 0; i < firstDayOfWeek; i++) days.push(null);
+            for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
+            return days;
+        }
+
+        function isSameDay(d1, d2) {
+            return d1 && d2 &&
+                d1.getDate() === d2.getDate() &&
+                d1.getMonth() === d2.getMonth() &&
+                d1.getFullYear() === d2.getFullYear();
+        }
+
+        function generateSessions(classes, monthDate) {
+            const sessions = [];
+            const year = monthDate.getFullYear();
+            const month = monthDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayName = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'][date.getDay()];
+
+                classes.forEach(cls => {
+                    const activeSlots = cls.slots.filter(s => s.day === dayName);
+                    activeSlots.forEach(slot => {
+                        sessions.push({
+                            id: cls.id,
+                            title: cls.name,
+                            startTime: slot.startTime,
+                            endTime: slot.endTime,
+                            date: date,
+                            type: cls.category === 'scolaire' ? 'blue' : 'purple',
+                            categoryLabel: cls.category === 'scolaire' ? 'Scolaire' : 'Formation',
+                            accessCode: cls.accessCode
+                        });
+                    });
+                });
+            }
+            return sessions.sort((a, b) => a.startTime.localeCompare(b.startTime));
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthTitle = document.getElementById('current-month');
+            const classes = DataManager.getClasses();
+
+            monthTitle.textContent = currentDate.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+
+            const days = getDaysInMonth(currentDate);
+            const sessions = generateSessions(classes, currentDate);
+
+            grid.innerHTML = '';
+
+            days.forEach(day => {
+                const cell = document.createElement('div');
+                const isToday = isSameDay(day, new Date());
+                cell.className = `calendar-cell ${isToday ? 'today' : ''} flex flex-col gap-1`;
+
+                if (day) {
+                    const dayNum = document.createElement('span');
+                    dayNum.className = `w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold mb-1 ${isToday ? 'bg-blue-600 text-white' : 'text-gray-700'}`;
+                    dayNum.textContent = day.getDate();
+                    cell.appendChild(dayNum);
+
+                    const daySessions = sessions.filter(s => isSameDay(s.date, day));
+                    daySessions.forEach(s => {
+                        const chip = document.createElement('div');
+                        if (s.type === 'blue') {
+                            chip.className = 'px-2 py-1 rounded bg-blue-50 border-l-2 border-blue-500 text-xs font-semibold text-blue-700 truncate cursor-pointer hover:bg-blue-100 transition-colors';
+                        } else {
+                            chip.className = 'px-2 py-1 rounded bg-purple-50 border-l-2 border-purple-500 text-xs font-semibold text-purple-700 truncate cursor-pointer hover:bg-purple-100 transition-colors';
+                        }
+                        chip.textContent = `${s.startTime} ${s.title}`;
+                        chip.onclick = () => alert(`Session: ${s.title}\nHeure: ${s.startTime} - ${s.endTime}`);
+                        cell.appendChild(chip);
+                    });
+                } else {
+                    cell.style.backgroundColor = '#f9fafb';
+                }
+                grid.appendChild(cell);
+            });
+
+            lucide.createIcons();
+        }
+
+        function renderAgenda() {
+            const list = document.getElementById('agenda-list');
+            const classes = DataManager.getClasses();
+            const today = new Date();
+
+            document.getElementById('today-date-sidebar').textContent = today.toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            const sessions = generateSessions(classes, today).filter(s => isSameDay(s.date, today));
+
+            if (sessions.length === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-48 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        <i data-lucide="coffee" class="w-10 h-10 mb-2 opacity-50"></i>
+                        <p class="text-sm font-medium">Aucune session aujourd'hui</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            list.innerHTML = sessions.map(s => `
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-blue-200 transition-colors group">
+                    <p class="text-sm font-medium text-gray-500 mb-1">${s.startTime} - ${s.endTime} <span class="ml-2 text-xs bg-white px-2 py-0.5 rounded border border-gray-200">${s.categoryLabel}</span></p>
+                    <h4 class="font-bold text-gray-900 text-base mb-4">${s.title}</h4>
+                    <button onclick="joinSession('${s.accessCode}')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        Rejoindre
+                    </button>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function joinSession(code) {
+            alert(`Lancement de la réunion Google Meet : ${code}`);
+            window.open(`https://meet.google.com/${code}`, '_blank');
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalendar();
+            renderAgenda();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

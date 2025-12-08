@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Médiathèque - EduSpace Formateur</title>
+
+    <!-- Core CSS (Dashboard Layout + Main) -->
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+
+    <!-- Tailwind for modern card design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 400: '#9ca3af', 500: '#6b7280', 700: '#374151', 900: '#111827' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Override default styles for Tailwind interoperability -->
+    <style>
+        .dashboard-layout {
+            display: flex;
+        }
+
+        /* Ensure flex row for sidebar */
+
+        /* Ensure sidebar stays fixed as formatted in dashboard.css */
+
+        /* Grid gap override if needed */
+        .course-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+    <div class="dashboard-layout">
+        <!-- Sidebar Injection -->
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <!-- Top Header -->
+            <header
+                class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-4 w-1/2">
+                    <div class="relative w-full max-w-md">
+                        <i data-lucide="search"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                        <input type="text" placeholder="Rechercher un cours..."
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg relative">
+                        <i data-lucide="bell" class="w-6 h-6"></i>
+                        <span
+                            class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    </button>
+                    <div
+                        class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                        IN</div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Médiathèque</h1>
+                        <p class="text-gray-500 mt-1">Gérez vos contenus de cours et documents</p>
+                    </div>
+                    <a href="enregistre.html"
+                        class="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-900/20 transition-transform hover:-translate-y-0.5">
+                        <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Nouveau Contenu
+                    </a>
+                </div>
+
+                <div id="courses-grid" class="course-card-grid">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/data-manager.js"></script>
+    <script src="../../js/components/sidebar-formateur.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const courses = DataManager.getCourses();
+            const container = document.getElementById('courses-grid');
+
+            if (courses.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+                        <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                            <i data-lucide="folder-open" class="w-10 h-10 text-blue-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">C'est un peu vide ici</h3>
+                        <p class="text-gray-500 mb-6">Commencez par créer votre premier cours.</p>
+                        <a href="enregistre.html" class="text-blue-600 font-bold hover:underline">Créer un cours maintenant &rarr;</a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = courses.map(c => `
+                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden group hover:shadow-xl hover:border-blue-200 transition-all duration-300">
+                        <div class="h-40 bg-gradient-to-br from-blue-600 to-indigo-700 relative p-6 flex flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full border border-white/10">
+                                    ${c.level || 'Niveau non défini'}
+                                </span>
+                                <div class="bg-white/20 p-2 rounded-lg backdrop-blur-md text-white">
+                                    <i data-lucide="video" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-white font-bold text-xl leading-tight truncate" title="${c.title}">${c.title}</h3>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="flex items-center gap-6 mb-6">
+                                <div class="flex items-center gap-2 text-gray-500">
+                                    <div class="p-2 bg-gray-50 rounded-lg text-gray-400 group-hover:text-blue-500 group-hover:bg-blue-50 transition-colors">
+                                        <i data-lucide="layers" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-sm font-medium"><span class="font-bold text-gray-900">${c.chapters || 0}</span> Chap.</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-500">
+                                     <div class="p-2 bg-gray-50 rounded-lg text-gray-400 group-hover:text-green-500 group-hover:bg-green-50 transition-colors">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-sm font-medium"><span class="font-bold text-gray-900">${c.documents || 0}</span> Docs</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 pt-6 border-t border-gray-50">
+                                <button onclick="window.location.href='enregistre.html?id=${c.id}'" class="flex-1 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold rounded-lg transition-colors border border-gray-100 flex items-center justify-center gap-2">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i> Modifier
+                                </button>
+                                <button onclick="deleteCourse(${c.id})" class="p-2.5 text-red-500 hover:bg-red-50 border border-gray-100 hover:border-red-100 rounded-lg transition-colors group/delete" title="Supprimer">
+                                    <i data-lucide="trash-2" class="w-5 h-5 group-hover/delete:animate-bounce"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        });
+
+        function deleteCourse(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce cours ?')) {
+                // In real app, DataManager would handle delete
+                alert('Fonctionnalité de suppression à implémenter dans DataManager (suppression locale simulée).');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+
+</html>

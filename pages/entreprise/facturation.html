@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Financière & Rentabilité - EduCorp</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#4338ca',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(5px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="dashboard-layout flex">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
+
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Finance & Rentabilité 📈</h1>
+                    <p class="text-gray-500">Pilotage financier global : Recettes, Dépenses et Bilans.</p>
+                </div>
+                <div class="flex gap-3">
+                    <!-- Note: Add Student moved to 'Employés' section as requested -->
+                    <button onclick="window.location.href='employes.html'"
+                        class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i data-lucide="arrow-right-circle" class="w-5 h-5"></i> Aller aux Inscriptions
+                    </button>
+                    <button onclick="openPaymentAndInvoiceModal()"
+                        class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i> Nouveau Paiement
+                    </button>
+                </div>
+            </div>
+
+            <!-- Revenue Breakdown Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Daily -->
+                <div
+                    class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl p-6 shadow-lg shadow-indigo-200 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="sun" class="w-16 h-16"></i></div>
+                    <p class="text-indigo-100 text-sm font-bold uppercase mb-1">Revenu Journalier (Auj)</p>
+                    <h2 class="text-3xl font-bold">1 250 TND</h2>
+                    <p class="text-indigo-200 text-xs mt-2">+12% vs Hier</p>
+                </div>
+                <!-- Monthly -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm font-bold uppercase mb-1">Revenu Mensuel (Déc)</p>
+                            <h2 class="text-3xl font-bold text-gray-900">24 500 TND</h2>
+                        </div>
+                        <div class="p-3 bg-green-50 rounded-xl"><i data-lucide="calendar"
+                                class="w-6 h-6 text-green-600"></i></div>
+                    </div>
+                </div>
+                <!-- Annual -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm font-bold uppercase mb-1">Revenu Annuel (2025)</p>
+                            <h2 class="text-3xl font-bold text-gray-900">145 000 TND</h2>
+                        </div>
+                        <div class="p-3 bg-purple-50 rounded-xl"><i data-lucide="bar-chart"
+                                class="w-6 h-6 text-purple-600"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Balance / Custom Report Section -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i data-lucide="filter" class="w-5 h-5 text-indigo-600"></i>
+                        Bilan Personnalisé
+                    </h3>
+                    <div class="flex gap-2 text-sm bg-gray-50 p-1 rounded-lg">
+                        <button class="px-3 py-1 bg-white shadow-sm rounded-md font-medium text-gray-900">Par
+                            Jour</button>
+                        <button class="px-3 py-1 hover:bg-gray-200 rounded-md font-medium text-gray-600">3
+                            Jours</button>
+                        <button class="px-3 py-1 hover:bg-gray-200 rounded-md font-medium text-gray-600">Cette
+                            Semaine</button>
+                        <button class="px-3 py-1 hover:bg-gray-200 rounded-md font-medium text-gray-600">Ce
+                            Mois</button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-1 w-full grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Du</label>
+                            <input type="text" id="dateFrom"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                placeholder="Date début">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Au</label>
+                            <input type="text" id="dateTo"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                placeholder="Date fin">
+                        </div>
+                    </div>
+                    <button
+                        class="w-full md:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
+                        <i data-lucide="search" class="w-4 h-4"></i> Générer Bilan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="flex gap-4 mb-6 border-b border-gray-200 pb-1 overflow-x-auto">
+                <button onclick="switchTab('desk')" id="tab-desk"
+                    class="tab-btn px-4 py-2 text-indigo-600 font-bold border-b-2 border-indigo-600 transition-colors whitespace-nowrap flex items-center gap-2">
+                    <i data-lucide="monitor" class="w-4 h-4"></i> Guichet de Paiement
+                </button>
+                <button onclick="switchTab('instructors')" id="tab-instructors"
+                    class="tab-btn px-4 py-2 text-gray-500 font-medium hover:text-gray-700 transition-colors whitespace-nowrap flex items-center gap-2">
+                    <i data-lucide="banknote" class="w-4 h-4"></i> Salaires Formateurs
+                </button>
+                <button onclick="switchTab('unpaid')" id="tab-unpaid"
+                    class="tab-btn px-4 py-2 text-gray-500 font-medium hover:text-gray-700 transition-colors whitespace-nowrap flex items-center gap-2">
+                    <i data-lucide="user-x" class="w-4 h-4"></i> Gestion Impayés
+                </button>
+            </div>
+
+            <!-- TAB 0: PAYMENT DESK (GUICHET) -->
+            <div id="content-desk" class="tab-content space-y-6 animate-fade-in">
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                        <h3 class="text-lg font-bold text-gray-900">Traitement des Paiements</h3>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <div class="relative flex-1 md:w-96">
+                                <i data-lucide="search"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                <input type="text" placeholder="Référence (REF-123) ou Nom Apprenant..."
+                                    class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Results / Quick Actions List -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Référence
+                                    </th>
+                                    <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Apprenant
+                                    </th>
+                                    <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Formation
+                                    </th>
+                                    <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Reste à
+                                        Payer</th>
+                                    <th class="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase">Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4"><span
+                                            class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">REF-2023-889</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                                                MK</div>
+                                            <span class="font-bold text-gray-900 text-sm">Mariem Khlifi</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Design Graphique</td>
+                                    <td class="px-6 py-4 font-mono text-sm font-bold text-red-600">800 TND</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button onclick="openPaymentAndInvoiceModal('Mariem Khlifi', 800)"
+                                            class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-md">Encaisser</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4"><span
+                                            class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">REF-2023-902</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                                HJ</div>
+                                            <span class="font-bold text-gray-900 text-sm">Houssem Jarraya</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Devops CI/CD</td>
+                                    <td class="px-6 py-4 font-mono text-sm font-bold text-red-600">1 500 TND</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button onclick="openPaymentAndInvoiceModal('Houssem Jarraya', 1500)"
+                                            class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-md">Encaisser</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: INSTRUCTORS -->
+            <div id="content-instructors" class="hidden tab-content space-y-6 animate-fade-in">
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <h3 class="font-bold text-gray-900 mb-4">Salaires Formateurs à Valider</h3>
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Formateur</th>
+                                <th class="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase">Heures</th>
+                                <th class="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase">Total Dû</th>
+                                <th class="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 font-bold text-gray-900">Ahmed B.</td>
+                                <td class="px-6 py-4 text-center font-bold">42h</td>
+                                <td class="px-6 py-4 text-right font-bold text-indigo-600">2 100 TND</td>
+                                <td class="px-6 py-4 text-right"><button
+                                        class="px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-bold">Générer
+                                        Paie</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: UNPAID -->
+            <div id="content-unpaid" class="hidden tab-content space-y-6 animate-fade-in">
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-red-500 uppercase">Apprenant
+                                    (Impayé)</th>
+                                <th class="text-right px-6 py-4 text-xs font-bold text-red-500 uppercase">Reste Dû</th>
+                                <th class="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="bg-red-50/50">
+                                <td class="px-6 py-4 font-bold text-gray-900">Mariem K.</td>
+                                <td class="px-6 py-4 text-right font-bold text-red-600">800 TND</td>
+                                <td class="px-6 py-4 text-right"><button
+                                        class="text-indigo-600 text-xs font-bold underline">Régulariser
+                                        Maintenant</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: PAYMENT & INVOICE -->
+    <div id="paymentInvoiceModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Encaisser un Paiement</h3>
+                <button onclick="toggleModal('paymentInvoiceModal')" class="text-gray-400 hover:text-gray-600"><i
+                        data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+
+            <div class="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Apprenant (Réf:
+                        REF-2023-889)</label>
+                    <input type="text" value="Mariem Khlifi" id="payStudentName"
+                        class="w-full bg-transparent font-bold text-gray-900 outline-none border-b border-gray-300 focus:border-indigo-600"
+                        readonly>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Formation</label>
+                    <p class="font-medium text-gray-700">Design Graphique (Total: 1 200 TND)</p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-indigo-700 mb-2">Montant Versé (TND)</label>
+                <div class="relative">
+                    <i data-lucide="banknote"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-600"></i>
+                    <input type="number" id="payNow" oninput="calculateRemaining()" value="0"
+                        class="w-full pl-12 pr-4 py-3 border-2 border-indigo-100 bg-indigo-50/50 rounded-xl font-bold text-xl text-indigo-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-indigo-300"
+                        placeholder="0.00">
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-gray-900 text-white p-4 rounded-xl shadow-lg">
+                <span class="text-sm font-medium text-gray-300">Nouveau Reste à Payer:</span>
+                <span id="payRemaining" class="text-2xl font-bold tracking-tight">800 TND</span>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3">
+                <button
+                    class="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 flex items-center gap-2">
+                    <i data-lucide="check" class="w-5 h-5"></i> Valider Paiement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-entreprise.js"></script>
+    <script>
+        lucide.createIcons();
+        flatpickr("#dateFrom", { dateFormat: "d/m/Y" });
+        flatpickr("#dateTo", { dateFormat: "d/m/Y" });
+
+        function switchTab(tabId) {
+            const tabs = ['desk', 'instructors', 'unpaid'];
+            tabs.forEach(id => {
+                const content = document.getElementById(`content-${id}`);
+                const btn = document.getElementById(`tab-${id}`);
+
+                if (content && btn) {
+                    content.classList.add('hidden');
+                    if (id === tabId) {
+                        btn.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+                        btn.classList.remove('text-gray-500', 'hover:text-gray-700');
+                        content.classList.remove('hidden');
+                    } else {
+                        btn.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+                        btn.classList.add('text-gray-500', 'hover:text-gray-700');
+                    }
+                }
+            });
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openPaymentAndInvoiceModal(studentName = 'Mariem Khlifi', remaining = 800) {
+            document.getElementById('payStudentName').value = studentName;
+            document.getElementById('payRemaining').innerText = remaining + ' TND';
+            toggleModal('paymentInvoiceModal');
+        }
+
+        function calculateRemaining() {
+            // Simplified logic for demo
+            const totalRemaining = 800; // Mock current remaining
+            const now = parseFloat(document.getElementById('payNow').value) || 0;
+
+            const newRemaining = totalRemaining - now;
+            const remainingSpan = document.getElementById('payRemaining');
+
+            if (newRemaining <= 0) {
+                remainingSpan.innerHTML = '<span class="text-green-400">SOLDÉ</span>';
+            } else {
+                remainingSpan.innerText = newRemaining + ' TND';
+            }
+        }
+    </script>
+</body>
+
+</html>

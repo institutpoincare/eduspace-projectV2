@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Paiements - EduSpace Étudiant</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="dashboard-layout flex">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
+            <!-- Header -->
+            <div class="space-y-2 mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Mes Paiements</h1>
+                <p class="text-gray-500">Gérez vos transactions et téléchargez vos factures</p>
+            </div>
+
+            <!-- Financial Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Total Paid -->
+                <div
+                    class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                    <i data-lucide="trending-up" class="absolute -right-4 -top-4 w-32 h-32 opacity-10 rotate-12"></i>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-green-100 font-medium text-sm">Total payé</p>
+                                <h3 class="text-3xl font-bold mt-1">2 450.00 TND</h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-green-100 pt-4 border-t border-white/20">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>4 cours payés</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Due -->
+                <div
+                    class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                    <i data-lucide="alert-circle" class="absolute -right-4 -top-4 w-32 h-32 opacity-10 rotate-12"></i>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                                <i data-lucide="calendar" class="w-6 h-6"></i>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-orange-100 font-medium text-sm">Prochaine échéance</p>
+                                <h3 class="text-3xl font-bold mt-1">350.00 TND</h3>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-white/20">
+                            <div class="flex items-center justify-between text-sm text-orange-100">
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> 15 Déc
+                                    2025</span>
+                                <span class="font-medium truncate max-w-[150px]">Physique Quantique</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
+                <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-50 rounded-lg">
+                            <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-900">Historique des transactions</h2>
+                    </div>
+
+                    <div class="flex gap-2 bg-gray-50 p-1 rounded-lg">
+                        <button onclick="filterTable('all')"
+                            class="filter-btn px-4 py-2 text-xs font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all"
+                            data-filter="all">Tout</button>
+                        <button onclick="filterTable('paid')"
+                            class="filter-btn px-4 py-2 text-xs font-bold rounded-md text-gray-500 hover:text-gray-900 transition-all"
+                            data-filter="paid">Payé</button>
+                        <button onclick="filterTable('pending')"
+                            class="filter-btn px-4 py-2 text-xs font-bold rounded-md text-gray-500 hover:text-gray-900 transition-all"
+                            data-filter="pending">En attente</button>
+                        <button onclick="filterTable('late')"
+                            class="filter-btn px-4 py-2 text-xs font-bold rounded-md text-gray-500 hover:text-gray-900 transition-all"
+                            data-filter="late">Retard</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Date</th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Cours</th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Montant</th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Méthode</th>
+                                <th class="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Statut</th>
+                                <th class="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-body" class="divide-y divide-gray-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payment Methods Info -->
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex gap-4 items-start">
+                <div class="p-3 bg-blue-100 rounded-xl shrink-0">
+                    <i data-lucide="credit-card" class="w-6 h-6 text-blue-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Moyens de paiement acceptés</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span
+                            class="px-3 py-1 bg-white border border-blue-200 rounded-full text-xs font-bold text-gray-700">Edinar</span>
+                        <span
+                            class="px-3 py-1 bg-white border border-blue-200 rounded-full text-xs font-bold text-gray-700">Virement
+                            Bancaire</span>
+                        <span
+                            class="px-3 py-1 bg-white border border-blue-200 rounded-full text-xs font-bold text-gray-700">Sobflous</span>
+                        <span
+                            class="px-3 py-1 bg-white border border-blue-200 rounded-full text-xs font-bold text-gray-700">Carte
+                            Bancaire</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-etudiant.js"></script>
+    <script>
+        const transactions = [
+            {
+                id: 1,
+                date: '2023-11-15',
+                course: 'Mathématiques Avancées',
+                instructor: 'Dr. Sarah Ben Ali',
+                amount: 450,
+                method: 'Carte Bancaire',
+                status: 'paid'
+            },
+            {
+                id: 2,
+                date: '2023-10-28',
+                course: 'Fullstack JS Bootcamp',
+                instructor: 'Mohamed Tounsi',
+                amount: 850,
+                method: 'Virement',
+                status: 'paid'
+            },
+            {
+                id: 3,
+                date: '2023-12-15',
+                course: 'Physique Quantique',
+                instructor: 'Ahmed Jlassi',
+                amount: 350,
+                method: '-',
+                status: 'pending'
+            },
+            {
+                id: 4,
+                date: '2023-09-20',
+                course: 'Dev Mobile React Native',
+                instructor: 'Karim Ben Salem',
+                amount: 200,
+                method: '-',
+                status: 'late'
+            },
+            {
+                id: 5,
+                date: '2023-10-05',
+                course: 'Anglais B2',
+                instructor: 'Mme. Kallel',
+                amount: 600,
+                method: 'Sobflous',
+                status: 'paid'
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderTable('all');
+        });
+
+        function filterTable(status) {
+            // Update buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === status) {
+                    btn.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+                    btn.classList.remove('text-gray-500', 'hover:text-gray-900');
+                } else {
+                    btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+                    btn.classList.add('text-gray-500', 'hover:text-gray-900');
+                }
+            });
+            renderTable(status);
+        }
+
+        function renderTable(filter) {
+            const tbody = document.getElementById('transactions-body');
+            tbody.innerHTML = '';
+
+            const filtered = transactions.filter(t => filter === 'all' || t.status === filter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">Aucune transaction trouvée for ce filtre.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(t => {
+                const date = new Date(t.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+                let statusHtml = '';
+                let actionHtml = '';
+
+                switch (t.status) {
+                    case 'paid':
+                        statusHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><i data-lucide="check-circle" class="w-3 h-3"></i> Payé</span>`;
+                        actionHtml = `<button onclick="downloadInvoice(${t.id})" class="text-blue-600 hover:text-blue-700 font-bold text-xs flex items-center gap-1 justify-end w-full"><i data-lucide="download" class="w-3 h-3"></i> Facture</button>`;
+                        break;
+                    case 'pending':
+                        statusHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"><i data-lucide="clock" class="w-3 h-3"></i> En attente</span>`;
+                        actionHtml = `<button class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Payer</button>`;
+                        break;
+                    case 'late':
+                        statusHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Retard</span>`;
+                        actionHtml = `<button class="bg-red-600 text-white hover:bg-red-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Régulariser</button>`;
+                        break;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">${date}</td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-bold text-gray-900">${t.course}</div>
+                        <div class="text-xs text-gray-500">${t.instructor}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${t.amount.toFixed(2)} TND</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.method}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${statusHtml}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function downloadInvoice(id) {
+            alert('Téléchargement de la facture #' + id);
+        }
+    </script>
+</body>
+
+</html>
