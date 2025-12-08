@@ -6,131 +6,332 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord Formateur - EduSpace</title>
     <link rel="stylesheet" href="../../css/main.css">
-
-    <style>
-        body {
-            background: var(--gray-50);
-        }
-
-        .dashboard {
-            min-height: 100vh;
-            padding: 2rem;
-        }
-
-        .dashboard-header {
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .dashboard-header h1 {
-            font-size: 2rem;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-        }
-
-        .dashboard-header p {
-            color: var(--gray-600);
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .dashboard-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .dashboard-card h3 {
-            font-size: 1.25rem;
-            color: var(--gray-900);
-            margin-bottom: 1rem;
-        }
-
-        .btn-logout {
-            background: var(--red-600);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btn-logout:hover {
-            background: var(--red-700);
-        }
-
-        .btn-action {
-            background: var(--green-600);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            margin-top: 1rem;
-        }
-
-        .btn-action:hover {
-            background: var(--green-700);
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <div class="dashboard container">
-        <div class="dashboard-header">
-            <h1>Bienvenue, Formateur! 🎬</h1>
-            <p>Gérez vos cours et vos étudiants</p>
-            <button class="btn-logout" onclick="logout()">Déconnexion</button>
-        </div>
+    <div class="dashboard-layout">
+        <!-- Sidebar injected by JS -->
+        <script src="../../js/components/sidebar-formateur.js"></script>
 
-        <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <h3>Mes Cours en Direct</h3>
-                <p>Créez et gérez vos cours en direct.</p>
-                <button class="btn-action">Créer un cours</button>
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h1 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-900);">Tableau de Bord</h1>
+                </div>
+
+                <div class="search-bar hidden md:flex">
+                    <i data-lucide="search" style="color: var(--gray-400); width: 20px;"></i>
+                    <input type="text" class="search-input" placeholder="Rechercher un cours, un étudiant...">
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="relative">
+                        <button style="padding: 0.5rem; border-radius: 50%; hover:bg-blue-50; color: var(--gray-500);">
+                            <i data-lucide="bell" style="width: 20px;"></i>
+                            <span
+                                style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--red-500); border-radius: 50%; border: 2px solid white;"></span>
+                        </button>
+                    </div>
+                    <div style="width: 1px; height: 24px; background: var(--gray-200);"></div>
+                    <div
+                        style="display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: var(--gray-50); border-radius: 2rem;">
+                        <div class="avatar" style="width: 2rem; height: 2rem; font-size: 0.75rem;">IN</div>
+                        <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Instructeur</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Analytics Section -->
+            <div class="grid-2" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div>
+                        <p
+                            style="color: var(--gray-500); font-weight: 500; font-size: 0.875rem; margin-bottom: 0.25rem;">
+                            Étudiants Connectés</p>
+                        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-900);">42</h3>
+                        <div
+                            style="display: flex; align-items: center; gap: 0.25rem; margin-top: 0.5rem; color: var(--green-600); font-size: 0.75rem; font-weight: 500;">
+                            <span
+                                style="width: 8px; height: 8px; background: var(--green-500); border-radius: 50%;"></span>
+                            En ligne maintenant
+                        </div>
+                    </div>
+                    <div
+                        style="padding: 1rem; background: var(--green-50); color: var(--green-600); border-radius: 0.75rem;">
+                        <i data-lucide="users" style="width: 32px; height: 32px;"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p
+                            style="color: var(--gray-500); font-weight: 500; font-size: 0.875rem; margin-bottom: 0.25rem;">
+                            Étudiants Intéressés</p>
+                        <h3 style="font-size: 1.875rem; font-weight: 700; color: var(--gray-900);">128</h3>
+                        <div
+                            style="display: flex; align-items: center; gap: 0.25rem; margin-top: 0.5rem; color: var(--blue-600); font-size: 0.75rem; font-weight: 500;">
+                            <i data-lucide="trending-up" style="width: 12px;"></i>
+                            +5 cette semaine
+                        </div>
+                    </div>
+                    <div
+                        style="padding: 1rem; background: var(--blue-50); color: var(--blue-600); border-radius: 0.75rem;">
+                        <i data-lucide="user-plus" style="width: 32px; height: 32px;"></i>
+                    </div>
+                </div>
             </div>
 
-            <div class="dashboard-card">
-                <h3>Cours Enregistrés</h3>
-                <p>Gérez votre bibliothèque de cours enregistrés.</p>
-                <button class="btn-action">Voir mes cours</button>
+            <!-- Hero Section -->
+            <div class="grid-3" style="margin-bottom: 2rem;">
+                <!-- Next Session -->
+                <div class="col-span-2 hero-card">
+                    <div class="hero-card-pattern"></div>
+                    <div style="position: relative; z-index: 10;">
+                        <div
+                            style="display: flex; align-items: center; gap: 0.5rem; opacity: 0.9; margin-bottom: 1rem;">
+                            <i data-lucide="video" style="width: 20px;"></i>
+                            <span
+                                style="text-transform: uppercase; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;">Prochain
+                                Cours</span>
+                        </div>
+
+                        <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem;">Mathématiques Avancées -
+                            Terminale</h2>
+
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <div class="countdown-box">
+                                <span class="countdown-number" id="hours">02</span>
+                                <span class="countdown-label">Heures</span>
+                            </div>
+                            <div class="countdown-box">
+                                <span class="countdown-number" id="minutes">45</span>
+                                <span class="countdown-label">Minutes</span>
+                            </div>
+                            <div class="countdown-box">
+                                <span class="countdown-number" id="seconds">10</span>
+                                <span class="countdown-label">Secondes</span>
+                            </div>
+                        </div>
+
+                        <button
+                            style="background: white; color: var(--blue-600); padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-lg);">
+                            <i data-lucide="video" style="width: 20px;"></i>
+                            Rejoindre le Live
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div>
+                    <h3
+                        style="font-size: 0.75rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
+                        Actions Rapides</h3>
+
+                    <a href="#" class="action-card">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div
+                                style="padding: 0.5rem; background: var(--orange-50); color: orange; border-radius: 0.5rem;">
+                                <i data-lucide="dollar-sign" style="width: 20px;"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-weight: 700; font-size: 0.875rem;">2 Paiements</h4>
+                                <p style="font-size: 0.75rem; color: var(--gray-500);">À vérifier</p>
+                            </div>
+                        </div>
+                        <i data-lucide="arrow-right" style="width: 16px; color: var(--gray-400);"></i>
+                    </a>
+
+                    <a href="#" class="action-card">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div
+                                style="padding: 0.5rem; background: var(--blue-50); color: var(--blue-600); border-radius: 0.5rem;">
+                                <i data-lucide="message-circle" style="width: 20px;"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-weight: 700; font-size: 0.875rem;">5 Messages</h4>
+                                <p style="font-size: 0.75rem; color: var(--gray-500);">Nouveaux</p>
+                            </div>
+                        </div>
+                        <i data-lucide="arrow-right" style="width: 16px; color: var(--gray-400);"></i>
+                    </a>
+
+                    <a href="#" class="action-card">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div
+                                style="padding: 0.5rem; background: var(--red-50); color: var(--red-600); border-radius: 0.5rem;">
+                                <i data-lucide="file-text" style="width: 20px;"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-weight: 700; font-size: 0.875rem;">1 Facture</h4>
+                                <p style="font-size: 0.75rem; color: var(--gray-500);">Non réglée</p>
+                            </div>
+                        </div>
+                        <i data-lucide="arrow-right" style="width: 16px; color: var(--gray-400);"></i>
+                    </a>
+                </div>
             </div>
 
-            <div class="dashboard-card">
-                <h3>Mes Étudiants</h3>
-                <p>Suivez la progression de vos étudiants.</p>
-                <button class="btn-action">Voir les étudiants</button>
+            <!-- Bottom Section -->
+            <div class="grid-3">
+                <!-- Schedule -->
+                <div class="col-span-2"
+                    style="background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <i data-lucide="calendar" style="width: 20px; color: var(--blue-600);"></i>
+                        <h3 style="font-weight: 700; font-size: 1.125rem;">Aujourd'hui</h3>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Session Items -->
+                        <div
+                            style="display: flex; items-center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 0.75rem;">
+                            <i data-lucide="clock" style="color: var(--gray-400);"></i>
+                            <div style="flex: 1;">
+                                <h4 style="font-weight: 700; margin-bottom: 0.125rem;">Physique - Mécanique</h4>
+                                <p style="font-size: 0.875rem; color: var(--gray-500);">10:00 - 12:00</p>
+                            </div>
+                            <span
+                                style="padding: 0.25rem 0.75rem; background: var(--green-100); color: var(--green-700); border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">Terminé</span>
+                        </div>
+
+                        <div
+                            style="display: flex; items-center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 0.75rem;">
+                            <i data-lucide="clock" style="color: var(--gray-400);"></i>
+                            <div style="flex: 1;">
+                                <h4 style="font-weight: 700; margin-bottom: 0.125rem;">Mathématiques Avancées</h4>
+                                <p style="font-size: 0.875rem; color: var(--gray-500);">14:00 - 16:00</p>
+                            </div>
+                            <span
+                                style="padding: 0.25rem 0.75rem; background: var(--blue-100); color: var(--blue-700); border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">À
+                                venir</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div
+                    style="background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <i data-lucide="message-circle" style="width: 20px; color: var(--blue-600);"></i>
+                        <h3 style="font-weight: 700; font-size: 1.125rem;">Messages</h3>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div class="message-item">
+                            <div class="avatar" style="background: var(--blue-100); color: var(--blue-600);">AM</div>
+                            <div style="flex: 1; overflow: hidden;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.125rem;">
+                                    <h5 style="font-weight: 700; font-size: 0.875rem;">Amine Tounsi</h5>
+                                    <span style="font-size: 0.75rem; color: var(--gray-400);">10:30</span>
+                                </div>
+                                <p
+                                    style="font-size: 0.875rem; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    Bonjour monsieur, pour le devoir...</p>
+                            </div>
+                        </div>
+
+                        <div class="message-item">
+                            <div class="avatar" style="background: var(--purple-100); color: var(--purple-600);">SB
+                            </div>
+                            <div style="flex: 1; overflow: hidden;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.125rem;">
+                                    <h5 style="font-weight: 700; font-size: 0.875rem;">Sarra Ben Ali</h5>
+                                    <span style="font-size: 0.75rem; color: var(--gray-400);">Hier</span>
+                                </div>
+                                <p
+                                    style="font-size: 0.875rem; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    Merci pour le cours !</p>
+                            </div>
+                        </div>
+
+                        <a href="#"
+                            style="display: block; text-align: center; padding: 0.75rem; font-weight: 700; font-size: 0.875rem; color: var(--blue-600); text-decoration: none; background: var(--blue-50); border-radius: 0.5rem; margin-top: 0.5rem;">
+                            Voir tous les messages
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div class="dashboard-card">
-                <h3>Calendrier</h3>
-                <p>Planifiez vos sessions de cours.</p>
-                <button class="btn-action">Voir le calendrier</button>
+            <!-- Financial Stats -->
+            <div
+                style="margin-top: 2rem; background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                    <i data-lucide="dollar-sign" style="width: 20px; color: var(--green-600);"></i>
+                    <h3 style="font-weight: 700; font-size: 1.125rem;">Finances</h3>
+                </div>
+
+                <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div
+                        style="padding: 1.25rem; background: var(--green-50); border-radius: 0.75rem; border: 1px solid var(--green-100);">
+                        <p
+                            style="font-size: 0.75rem; font-weight: 600; color: var(--green-600); margin-bottom: 0.25rem;">
+                            RECETTES TOTALES</p>
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: var(--green-700);">12,500 TND</h4>
+                    </div>
+
+                    <div
+                        style="padding: 1.25rem; background: var(--purple-50); border-radius: 0.75rem; border: 1px solid var(--purple-100);">
+                        <p
+                            style="font-size: 0.75rem; font-weight: 600; color: var(--purple-600); margin-bottom: 0.25rem;">
+                            VENTES VIDÉOS</p>
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: var(--purple-700);">2,300 TND</h4>
+                    </div>
+
+                    <div
+                        style="padding: 1.25rem; background: var(--blue-50); border-radius: 0.75rem; border: 1px solid var(--blue-100);">
+                        <p
+                            style="font-size: 0.75rem; font-weight: 600; color: var(--blue-600); margin-bottom: 0.25rem;">
+                            NET À PERCEVOIR</p>
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: var(--blue-700);">12,350 TND</h4>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="../../js/main.js"></script>
     <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Check auth
         const user = window.eduspace.utils.getCurrentUser();
         if (!user || user.role !== 'formateur') {
             window.location.href = '../login-formateur.html';
         }
 
-        function logout() {
-            window.eduspace.utils.logout();
+        // Countdown Timer
+        function updateCountdown() {
+            const now = new Date();
+            // Target time: today at 14:00 (or next day if passed)
+            let target = new Date();
+            target.setHours(14, 0, 0, 0);
+
+            if (now > target) {
+                target.setDate(target.getDate() + 1);
+            }
+
+            const diff = target - now;
+
+            if (diff > 0) {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            }
         }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
     </script>
 </body>
 
