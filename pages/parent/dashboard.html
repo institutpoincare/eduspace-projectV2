@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Parent - EduSpace</title>
+    <link rel="stylesheet" href="../../css/main.css">
+
+    <style>
+        body {
+            background: var(--gray-50);
+        }
+
+        .dashboard {
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: var(--gray-600);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .dashboard-card h3 {
+            font-size: 1.25rem;
+            color: var(--gray-900);
+            margin-bottom: 1rem;
+        }
+
+        .btn-logout {
+            background: var(--red-600);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-logout:hover {
+            background: var(--red-700);
+        }
+
+        .btn-action {
+            background: var(--blue-600);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action:hover {
+            background: var(--blue-700);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard container">
+        <div class="dashboard-header">
+            <h1>Bienvenue, Parent! 👨‍👩‍👧‍👦</h1>
+            <p>Suivez la scolarité de votre enfant</p>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3>Progression</h3>
+                <p>Consultez les progrès de votre enfant.</p>
+                <button class="btn-action">Voir les détails</button>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Cours Inscrits</h3>
+                <p>Liste des cours auxquels votre enfant est inscrit.</p>
+                <button class="btn-action">Voir les cours</button>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Messages</h3>
+                <p>Communiquez avec les formateurs.</p>
+                <button class="btn-action">Voir les messages</button>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Paiements</h3>
+                <p>Gérez vos paiements et factures.</p>
+                <button class="btn-action">Voir les paiements</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/main.js"></script>
+    <script>
+        const user = window.eduspace.utils.getCurrentUser();
+        if (!user || user.role !== 'parent') {
+            window.location.href = '../login-parent.html';
+        }
+
+        function logout() {
+            window.eduspace.utils.logout();
+        }
+    </script>
+</body>
+
+</html>
