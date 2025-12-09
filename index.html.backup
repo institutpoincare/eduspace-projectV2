@@ -281,21 +281,10 @@
                             </div>
                         </div>
                         <p class="text-sm text-gray-500 mb-4">Expert DevOps & Cloud Computing</p>
-                        <div class="flex items-center justify-between text-sm mb-4">
+                        <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-400 flex items-center gap-1"><i data-lucide="users"
                                     class="w-4 h-4"></i> 15k+ élèves</span>
                             <span class="text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-lg">Top 1%</span>
-                        </div>
-                        <!-- Action Buttons -->
-                        <div class="flex gap-2">
-                            <button onclick="viewInstructorCV('ahmed')"
-                                class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> Voir CV
-                            </button>
-                            <button onclick="startChat('ahmed', 'formateur')"
-                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -320,21 +309,10 @@
                             </div>
                         </div>
                         <p class="text-sm text-gray-500 mb-4">Design UX/UI & Créativité</p>
-                        <div class="flex items-center justify-between text-sm mb-4">
+                        <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-400 flex items-center gap-1"><i data-lucide="users"
                                     class="w-4 h-4"></i> 8k+ élèves</span>
                             <span class="text-purple-600 font-bold bg-purple-50 px-3 py-1 rounded-lg">Excellence</span>
-                        </div>
-                        <!-- Action Buttons -->
-                        <div class="flex gap-2">
-                            <button onclick="viewInstructorCV('sarah')"
-                                class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> Voir CV
-                            </button>
-                            <button onclick="startChat('sarah', 'formateur')"
-                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -359,21 +337,10 @@
                             </div>
                         </div>
                         <p class="text-sm text-gray-500 mb-4">Marketing Digital & SEO</p>
-                        <div class="flex items-center justify-between text-sm mb-4">
+                        <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-400 flex items-center gap-1"><i data-lucide="users"
                                     class="w-4 h-4"></i> 12k+ élèves</span>
                             <span class="text-green-600 font-bold bg-green-50 px-3 py-1 rounded-lg">Vérifié</span>
-                        </div>
-                        <!-- Action Buttons -->
-                        <div class="flex gap-2">
-                            <button onclick="viewInstructorCV('leila')"
-                                class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> Voir CV
-                            </button>
-                            <button onclick="startChat('leila', 'formateur')"
-                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -398,21 +365,10 @@
                             </div>
                         </div>
                         <p class="text-sm text-gray-500 mb-4">Développement Mobile iOS</p>
-                        <div class="flex items-center justify-between text-sm mb-4">
+                        <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-400 flex items-center gap-1"><i data-lucide="users"
                                     class="w-4 h-4"></i> 5k+ élèves</span>
                             <span class="text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-lg">Nouveau</span>
-                        </div>
-                        <!-- Action Buttons -->
-                        <div class="flex gap-2">
-                            <button onclick="viewInstructorCV('karim')"
-                                class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> Voir CV
-                            </button>
-                            <button onclick="startChat('karim', 'formateur')"
-                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -521,7 +477,6 @@
     <!-- Scripts -->
     <script src="js/components/navbar.js"></script>
     <script src="js/components/footer.js"></script>
-    <script src="js/landing-interactions.js"></script>
     <script src="js/main.js"></script>
 </body>
 
