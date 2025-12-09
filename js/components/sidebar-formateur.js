@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 
-                <button onclick="window.eduspace.utils.logout()" style="width: 100%; padding: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid var(--red-200); background: white; color: var(--red-700); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-weight: 500;">
+                <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='../../index.html'" style="width: 100%; padding: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid var(--red-200); background: white; color: var(--red-700); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-weight: 500;">
                     <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
                     <span>Se déconnecter</span>
                 </button>

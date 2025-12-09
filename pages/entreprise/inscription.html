@@ -353,6 +353,8 @@
                 btnNext.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Valider Inscription';
                 btnNext.onclick = () => finishRegistration();
             }
+            // Re-render icons
+            if (window.lucide) lucide.createIcons();
         }
 
         function updateTotal() {

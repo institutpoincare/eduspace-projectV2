@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formateur - EduSpace Entreprise</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .sidebar {
+            width: 280px;
+            transition: all 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content min-h-screen flex flex-col">
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
+                    <i data-lucide="menu" class="w-6 h-6 text-gray-600"></i>
+                </button>
+                <h1 class="text-xl font-bold text-gray-800">Espace Formateur Associé</h1>
+            </div>
+            <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                <div
+                    class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
+                    F</div>
+                <span class="text-sm font-medium text-gray-700 hidden sm:block">Formateur</span>
+            </div>
+        </header>
+
+        <main class="flex-1 p-6">
+
+            <!-- Welcome -->
+            <div class="bg-purple-600 rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold mb-2">Bonjour, Professeur</h2>
+                    <p class="text-purple-100">Vous avez 2 classes aujourd'hui dans l'entreprise.</p>
+                    <div class="mt-6 flex gap-3">
+                        <button
+                            class="px-4 py-2 bg-white text-purple-600 font-bold rounded-lg hover:bg-purple-50 transition-colors">
+                            <i data-lucide="video" class="w-4 h-4 inline mr-2"></i> Lancer la classe virtuelle
+                        </button>
+                        <button
+                            class="px-4 py-2 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400 transition-colors border border-purple-400">
+                            Create Recorded Course
+                        </button>
+                    </div>
+                </div>
+                <!-- Decor -->
+                <i data-lucide="presentation"
+                    class="absolute right-0 bottom-0 w-48 h-48 text-purple-500 opacity-20 -mr-10 -mb-10"></i>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- My Classes -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="font-bold text-lg mb-4 flex items-center"><i data-lucide="users"
+                            class="w-5 h-5 mr-2 text-indigo-600"></i> Mes Classes Assignées</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <h4 class="font-bold text-gray-800">Groupe DevOps Junior</h4>
+                                <p class="text-sm text-gray-500">14:00 - 16:00 • Salle B (Virtuel)</p>
+                            </div>
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">En
+                                Direct</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <h4 class="font-bold text-gray-800">Leadership Management</h4>
+                                <p class="text-sm text-gray-500">Demain • 09:00</p>
+                            </div>
+                            <span
+                                class="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Planifié</span>
+                        </div>
+                    </div>
+                    <a href="classes.html"
+                        class="block text-center mt-4 text-indigo-600 text-sm font-bold hover:underline">Voir toutes les
+                        classes</a>
+                </div>
+
+                <!-- My Content -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="font-bold text-lg mb-4 flex items-center"><i data-lucide="folder"
+                            class="w-5 h-5 mr-2 text-purple-600"></i> Mon Contenu</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div
+                            class="p-4 border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-center hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <div
+                                class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-2 group-hover:bg-blue-100 transition-colors">
+                                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                            </div>
+                            <span class="font-bold text-gray-700 text-sm">Uploader Video</span>
+                        </div>
+                        <div
+                            class="p-4 border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-center hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <div
+                                class="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center text-pink-600 mb-2 group-hover:bg-pink-100 transition-colors">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <span class="font-bold text-gray-700 text-sm">Ajouter PDF</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-entreprise.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports & Statistiques - CRM</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <main class="main-content ml-[280px] p-8 transition-all duration-300">
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Rapports & Statistiques</h1>
+                <p class="text-gray-500 mt-1">Suivez vos performances commerciales en temps réel.</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <select
+                    class="bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option>Ce mois</option>
+                    <option>Dernier mois</option>
+                    <option>Ce trimestre</option>
+                    <option>Cette année</option>
+                </select>
+                <button
+                    class="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm font-medium">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Exporter PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-2xl shadow-lg text-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white/20">+18%</span>
+                </div>
+                <h3 class="text-white/80 text-sm font-medium">Chiffre d'Affaires</h3>
+                <p class="text-3xl font-bold mt-1">124 500 €</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-lg text-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white/20">+12</span>
+                </div>
+                <h3 class="text-white/80 text-sm font-medium">Nouveaux Clients</h3>
+                <p class="text-3xl font-bold mt-1">47</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl shadow-lg text-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <i data-lucide="percent" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white/20">+3%</span>
+                </div>
+                <h3 class="text-white/80 text-sm font-medium">Taux de Conversion</h3>
+                <p class="text-3xl font-bold mt-1">28.5%</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 p-6 rounded-2xl shadow-lg text-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <i data-lucide="clock" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white/20">-2j</span>
+                </div>
+                <h3 class="text-white/80 text-sm font-medium">Cycle de Vente Moyen</h3>
+                <p class="text-3xl font-bold mt-1">14 jours</p>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Revenue Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Évolution du Chiffre d'Affaires</h3>
+                        <p class="text-sm text-gray-500">Derniers 6 mois</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <i data-lucide="more-horizontal" class="w-5 h-5 text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+                <canvas id="revenueChart" height="80"></canvas>
+            </div>
+
+            <!-- Conversion Funnel -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Entonnoir de Conversion</h3>
+                        <p class="text-sm text-gray-500">Pipeline actuel</p>
+                    </div>
+                </div>
+                <canvas id="funnelChart" height="80"></canvas>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Lead Sources -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-900">Sources de Leads</h3>
+                    <p class="text-sm text-gray-500">Répartition</p>
+                </div>
+                <canvas id="sourcesChart"></canvas>
+                <div class="mt-6 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span class="text-sm text-gray-600">Facebook</span>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900">42%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="text-sm text-gray-600">Site Web</span>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900">28%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                            <span class="text-sm text-gray-600">Référencement</span>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900">18%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+                            <span class="text-sm text-gray-600">Autres</span>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900">12%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-900">Activités Récentes</h3>
+                    <p class="text-sm text-gray-500">Dernières 24 heures</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="p-2 bg-green-100 rounded-lg">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">Deal gagné - Banque Postale</h4>
+                            <p class="text-sm text-gray-500">Contrat signé pour 15 000 €</p>
+                            <span class="text-xs text-gray-400 mt-1 inline-block">Il y a 2 heures</span>
+                        </div>
+                        <span class="text-lg font-bold text-green-600">+15k €</span>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="p-2 bg-blue-100 rounded-lg">
+                            <i data-lucide="user-plus" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">Nouveau lead - Facebook</h4>
+                            <p class="text-sm text-gray-500">Emma S. intéressée par formation Python</p>
+                            <span class="text-xs text-gray-400 mt-1 inline-block">Il y a 4 heures</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="p-2 bg-purple-100 rounded-lg">
+                            <i data-lucide="phone" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">Appel planifié</h4>
+                            <p class="text-sm text-gray-500">RDV avec Cabinet Avocats demain 10h</p>
+                            <span class="text-xs text-gray-400 mt-1 inline-block">Il y a 6 heures</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-900">Performance par Commercial</h3>
+                <p class="text-sm text-gray-500">Classement du mois</p>
+            </div>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                        <th class="p-4">Rang</th>
+                        <th class="p-4">Commercial</th>
+                        <th class="p-4">Leads</th>
+                        <th class="p-4">Conversions</th>
+                        <th class="p-4">CA Généré</th>
+                        <th class="p-4">Taux</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🥇</span>
+                                <span class="font-bold text-gray-900">1</span>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                                    A</div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Agent Commercial</p>
+                                    <p class="text-xs text-gray-500">Vous</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-medium text-gray-900">124</td>
+                        <td class="p-4 font-medium text-gray-900">35</td>
+                        <td class="p-4 font-bold text-green-600">124 500 €</td>
+                        <td class="p-4">
+                            <span
+                                class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">28.2%</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🥈</span>
+                                <span class="font-bold text-gray-900">2</span>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
+                                    M</div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Marie Dupont</p>
+                                    <p class="text-xs text-gray-500">Commercial Senior</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-medium text-gray-900">98</td>
+                        <td class="p-4 font-medium text-gray-900">28</td>
+                        <td class="p-4 font-bold text-green-600">98 200 €</td>
+                        <td class="p-4">
+                            <span
+                                class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">28.6%</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <!-- Sidebar Script -->
+    <script src="../../js/components/sidebar-entreprise.js"></script>
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['Août', 'Sept', 'Oct', 'Nov', 'Déc', 'Jan'],
+                datasets: [{
+                    label: 'Chiffre d\'Affaires (€)',
+                    data: [85000, 92000, 88000, 105000, 118000, 124500],
+                    borderColor: 'rgb(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString() + ' €';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Funnel Chart
+        const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+        new Chart(funnelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Leads', 'Contactés', 'Qualifiés', 'Propositions', 'Gagnés'],
+                datasets: [{
+                    label: 'Nombre',
+                    data: [150, 98, 65, 42, 28],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(99, 102, 241, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(34, 197, 94, 0.8)'
+                    ],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Sources Pie Chart
+        const sourcesCtx = document.getElementById('sourcesChart').getContext('2d');
+        new Chart(sourcesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Facebook', 'Site Web', 'Référencement', 'Autres'],
+                datasets: [{
+                    data: [42, 28, 18, 12],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(249, 115, 22, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

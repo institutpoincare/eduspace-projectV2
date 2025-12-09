@@ -3,20 +3,50 @@
     const navbarHTML = `
         <div class="navbar">
             <div class="container navbar-content">
-                <a href="/index.html" class="logo">EduSpace</a>
+                <a href="${getPath('index.html')}" class="logo">EduSpace</a>
                 <nav class="nav-links">
-                    <a href="/index.html">Accueil</a>
-                    <a href="#catalogue">Catalogue</a>
-                    <a href="#tableau-bord">Tableau de Bord</a>
-                    <a href="#mes-cours">Mes Cours</a>
+                    <a href="${getPath('index.html')}">Accueil</a>
+                    <a href="${getPath('pages/catalogue.html')}">Catalogue</a>
+                    <a href="${getPath('pages/login-etudiant.html')}">Tableau de Bord</a>
                 </nav>
                 <div class="nav-actions">
-                    <a href="/pages/login-etudiant.html" class="btn-link">Connexion</a>
-                    <a href="/pages/login-etudiant.html" class="btn btn-primary">Inscription</a>
+                    <a href="${getPath('pages/login-choix.html')}" class="btn-link">Connexion</a>
+                    <a href="${getPath('pages/inscription-choix.html')}" class="btn btn-primary">Inscription</a>
                 </div>
             </div>
         </div>
     `;
+
+    function getPath(path) {
+        const currentPath = window.location.pathname;
+        // Check if we are in a subdirectory (pages/)
+        if (currentPath.includes('/pages/')) {
+            // Count how many levels deep: /pages/etudiant/ -> 2 levels -> ../../
+            // Simple heuristic: if in pages/, add ../
+            // But we need to be careful.
+            // If path starts with pages/, and we are in pages/, we remove pages/ from target and add ../ ?? 
+            // No, easier:
+
+            // Target: pages/catalogue.html
+            // Current: pages/catalogue.html (depth 1)
+            // relative: catalogue.html? No, we want to go from pages/FOO to pages/BAR.
+
+            // Method: Absolute Path Fallback if served, otherwise simplistic relative.
+
+            // If we are in 'pages/' depth (1 level deep from root)
+            const isInPages = currentPath.includes('/pages/') && !currentPath.includes('/pages/etudiant/') && !currentPath.includes('/pages/formateur/') && !currentPath.includes('/pages/entreprise/') && !currentPath.includes('/pages/parent/');
+
+            // If we are in 'pages/etudiant/' etc (2 levels deep)
+            const isTwoDeep = currentPath.includes('/pages/etudiant/') || currentPath.includes('/pages/formateur/') || currentPath.includes('/pages/entreprise/') || currentPath.includes('/pages/parent/');
+
+            let prefix = '';
+            if (isTwoDeep) prefix = '../../';
+            else if (isInPages) prefix = '../';
+
+            return prefix + path;
+        }
+        return path;
+    }
 
     const navbarStyles = `
         <style>

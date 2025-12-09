@@ -21,6 +21,11 @@ const sidebarHTML = `
             Menu Étudiant
         </div>
 
+        <a href="catalogue.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
+            <i data-lucide="shopping-bag" class="w-5 h-5 group-hover:text-pink-600 group-hover:scale-110 transition-all"></i>
+            <span class="font-medium group-hover:text-gray-900 sidebar-text">Catalogue</span>
+        </a>
+
         <a href="dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
             <i data-lucide="layout" class="w-5 h-5 group-hover:text-blue-600 group-hover:scale-110 transition-all"></i>
             <span class="font-medium group-hover:text-gray-900 sidebar-text">Tableau de bord</span>
@@ -69,7 +74,9 @@ const sidebarHTML = `
                 <p class="text-sm font-bold text-gray-900 truncate">Ahmed Mani</p>
                 <p class="text-xs text-gray-500 truncate">Étudiant</p>
             </div>
-            <i data-lucide="log-out" class="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors sidebar-text" onclick="window.location.href='../../index.html'"></i>
+            <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='../../index.html'" class="p-1 hover:bg-gray-100 rounded-lg transition-colors" title="Se déconnecter">
+                <i data-lucide="log-out" class="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors sidebar-text"></i>
+            </button>
         </div>
     </div>
 </aside>
@@ -79,6 +86,21 @@ const sidebarHTML = `
 const sidebarContainer = document.getElementById('sidebar-container');
 if (sidebarContainer) {
     sidebarContainer.innerHTML = sidebarHTML;
+
+    // --- LOGIC TO HIDE CATALOGUE FOR ENTERPRISE STUDENTS ---
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.role === 'etudiant_entreprise') {
+            const navItems = sidebarContainer.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.getAttribute('href').includes('catalogue')) {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    } catch (e) { console.error('Error checking user role:', e); }
+    // --------------------------------------------------------
+
 } else {
     console.error('Sidebar container not found!');
 }

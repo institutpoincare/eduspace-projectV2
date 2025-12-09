@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Commercial - CRM</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom scrollbar for Kanban */
+        .kanban-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .kanban-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .kanban-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .kanban-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <main class="main-content ml-[280px] p-8 transition-all duration-300">
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">CRM Commercial</h1>
+                <p class="text-gray-500 mt-1">Gérez vos opportunités et vos relations clients.</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Facebook Integration Button -->
+                <button onclick="simulateFacebookSync()" id="btn-fb-sync"
+                    class="flex items-center gap-2 bg-[#1877F2] text-white px-5 py-2.5 rounded-xl hover:bg-[#166fe5] transition-colors shadow-sm font-medium">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                    Connecter Facebook
+                </button>
+
+                <button
+                    class="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm font-medium">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    Nouveau Lead
+                </button>
+                <div class="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm">
+                    <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                    <input type="text" placeholder="Rechercher..."
+                        class="bg-transparent border-none focus:outline-none text-sm w-48">
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Metric 1: Nouveaux Clients -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-green-50 rounded-xl">
+                        <i data-lucide="user-check" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-700">+8%</span>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium">Nouveaux Clients</h3>
+                <p class="text-2xl font-bold text-gray-900 mt-1">12</p>
+            </div>
+
+            <!-- Metric 2: Nouvelles Inscriptions -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-blue-50 rounded-xl">
+                        <i data-lucide="file-check" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">+15%</span>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium">Nouvelles Inscriptions</h3>
+                <p class="text-2xl font-bold text-gray-900 mt-1">24</p>
+            </div>
+
+            <!-- Metric 3: Prospects en cours -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-indigo-50 rounded-xl">
+                        <i data-lucide="message-circle" class="w-6 h-6 text-indigo-600"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-700">+5</span>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium">Prospects en cours</h3>
+                <p class="text-2xl font-bold text-gray-900 mt-1">45</p>
+            </div>
+
+            <!-- Metric 4: Non Inscrits -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-red-50 rounded-xl">
+                        <i data-lucide="user-x" class="w-6 h-6 text-red-600"></i>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-700">-2%</span>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium">Non Inscrits</h3>
+                <p class="text-2xl font-bold text-gray-900 mt-1">8</p>
+            </div>
+        </div>
+
+        <!-- CRM Views Tabs -->
+        <div class="mb-6 border-b border-gray-200">
+            <nav class="flex space-x-8" aria-label="Tabs">
+                <button
+                    class="border-indigo-500 text-indigo-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i data-lucide="kanban" class="w-4 h-4"></i>
+                    Pipeline (Kanban)
+                </button>
+                <button
+                    class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    Contacts
+                </button>
+                <button
+                    class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i data-lucide="activity" class="w-4 h-4"></i>
+                    Activités
+                </button>
+            </nav>
+        </div>
+
+        <!-- Content 1: Pipeline (Kanban) -->
+        <div id="tab-content-pipeline" class="tab-content transition-opacity duration-300">
+            <div class="overflow-x-auto kanban-scroll pb-6">
+                <div class="flex gap-6 min-w-max pb-4">
+
+                    <!-- Column: Nouveau -->
+                    <div class="w-80 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <h3 class="font-semibold text-gray-700">Nouveau</h3>
+                            <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                                id="count-new">3</span>
+                        </div>
+                        <div class="space-y-3 kanban-column" id="col-new">
+                            <!-- Card 1 -->
+                            <div
+                                class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move kanban-card transition-all">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md">Entreprise
+                                        A</span>
+                                    <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-horizontal"
+                                            class="w-4 h-4"></i></button>
+                                </div>
+                                <h4 class="font-bold text-gray-900 mb-1">Formation Leadership</h4>
+                                <p class="text-sm text-gray-500 mb-3">Besoin pour 5 managers</p>
+                                <div class="flex items-center justify-between mt-4 text-xs text-gray-400">
+                                    <div class="flex items-center gap-1">
+                                        <i data-lucide="calendar" class="w-3 h-3"></i> 2j
+                                    </div>
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs">
+                                            A</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div
+                                class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move kanban-card transition-all">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md">Startup
+                                        Tech</span>
+                                    <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-horizontal"
+                                            class="w-4 h-4"></i></button>
+                                </div>
+                                <h4 class="font-bold text-gray-900 mb-1">Pack Onboarding</h4>
+                                <p class="text-sm text-gray-500 mb-3">Questions sur les tarifs</p>
+                                <div class="flex items-center justify-between mt-4 text-xs text-gray-400">
+                                    <div class="flex items-center gap-1">
+                                        <i data-lucide="calendar" class="w-3 h-3"></i> 4h
+                                    </div>
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">
+                                            S</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column: Contacté -->
+                    <div class="w-80 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <h3 class="font-semibold text-gray-700">Contacté</h3>
+                            <span
+                                class="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full">2</span>
+                        </div>
+                        <div class="space-y-3 kanban-column" id="col-contacted">
+                            <!-- Card 3 -->
+                            <div
+                                class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move kanban-card transition-all">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-md">Univ
+                                        Lyon</span>
+                                    <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-horizontal"
+                                            class="w-4 h-4"></i></button>
+                                </div>
+                                <h4 class="font-bold text-gray-900 mb-1">Auditorium Equipment</h4>
+                                <p class="text-sm text-gray-500 mb-3">RDV téléphonique passé</p>
+                                <div class="flex items-center justify-between mt-4 text-xs text-gray-400">
+                                    <div class="flex items-center gap-1">
+                                        <i data-lucide="calendar" class="w-3 h-3"></i> 5j
+                                    </div>
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs">
+                                            A</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column: Qualifié -->
+                    <div class="w-80 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <h3 class="font-semibold text-gray-700">Qualifié</h3>
+                            <span
+                                class="bg-purple-100 text-purple-700 text-xs font-medium px-2.5 py-0.5 rounded-full">1</span>
+                        </div>
+                        <div class="space-y-3 kanban-column" id="col-qualified">
+                            <!-- Card 4 -->
+                            <div
+                                class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move kanban-card transition-all border-l-4 border-l-purple-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-md">Cabinet
+                                        Avocats</span>
+                                    <div class="text-xs font-bold text-gray-900">15k €</div>
+                                </div>
+                                <h4 class="font-bold text-gray-900 mb-1">Formation Juridique</h4>
+                                <p class="text-sm text-gray-500 mb-3">Budget validé, en attente PO</p>
+                                <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                                    <div class="bg-purple-500 h-1.5 rounded-full" style="width: 75%"></div>
+                                </div>
+                                <div class="flex items-center justify-between mt-2 text-xs text-gray-400">
+                                    <div class="flex items-center gap-1 text-red-500 font-medium">
+                                        <!-- Urgent visual -->
+                                        <i data-lucide="alert-circle" class="w-3 h-3"></i> Relancer
+                                    </div>
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs">
+                                            A</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column: Proposition -->
+                    <div class="w-80 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <h3 class="font-semibold text-gray-700">Proposition</h3>
+                            <span
+                                class="bg-orange-100 text-orange-700 text-xs font-medium px-2.5 py-0.5 rounded-full">1</span>
+                        </div>
+                        <div class="space-y-3 kanban-column" id="col-proposal">
+                            <div
+                                class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move kanban-card transition-all border-l-4 border-l-orange-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-md">Logistique
+                                        Inc.</span>
+                                    <div class="text-xs font-bold text-gray-900">4k €</div>
+                                </div>
+                                <h4 class="font-bold text-gray-900 mb-1">Formation Sécurité</h4>
+                                <p class="text-sm text-gray-500 mb-3">Devis envoyé le 07/03</p>
+                                <div class="flex items-center justify-between mt-4 text-xs text-gray-400">
+                                    <div class="flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3 h-3 text-green-500"></i> Validé tech
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column: Gagné -->
+                    <div class="w-80 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <h3 class="font-semibold text-gray-700">Gagné 🎉</h3>
+                            <span
+                                class="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">4</span>
+                        </div>
+                        <div class="space-y-3 opacity-75 kanban-column" id="col-won">
+                            <div
+                                class="bg-green-50 p-4 rounded-xl shadow-sm border border-green-100 kanban-card transition-all">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-medium text-green-600 px-2 py-1 rounded-md">Banque
+                                        Postale</span>
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-green-600"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-900 mb-1 line-through text-gray-500">Séminaire Annuel
+                                </h4>
+                                <p class="text-sm text-gray-500">Signé le 01/03</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Content 2: Contacts -->
+        <div id="tab-content-contacts" class="tab-content hidden transition-opacity duration-300">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full text-left border-collapse" id="contacts-table-body">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold">
+                            <th class="p-4">Nom</th>
+                            <th class="p-4">Entreprise</th>
+                            <th class="p-4">Email</th>
+                            <th class="p-4">Statut</th>
+                            <th class="p-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-4 font-medium text-gray-900">Jean Dubois</td>
+                            <td class="p-4 text-gray-600">Entreprise A</td>
+                            <td class="p-4 text-gray-500">jean.d@entreprise-a.com</td>
+                            <td class="p-4"><span
+                                    class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">Nouveau</span>
+                            </td>
+                            <td class="p-4 text-right"><button class="text-gray-400 hover:text-indigo-600"><i
+                                        data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-4 font-medium text-gray-900">Sarah Connor</td>
+                            <td class="p-4 text-gray-600">Cyberdyne Systems</td>
+                            <td class="p-4 text-gray-500">s.connor@sky.net</td>
+                            <td class="p-4"><span
+                                    class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">À
+                                    Relancer</span></td>
+                            <td class="p-4 text-right"><button class="text-gray-400 hover:text-indigo-600"><i
+                                        data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-4 font-medium text-gray-900">Dr. Emmett Brown</td>
+                            <td class="p-4 text-gray-600">Univ Lyon</td>
+                            <td class="p-4 text-gray-500">doc@univ-lyon.fr</td>
+                            <td class="p-4"><span
+                                    class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs font-medium">Client</span>
+                            </td>
+                            <td class="p-4 text-right"><button class="text-gray-400 hover:text-indigo-600"><i
+                                        data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Content 3: Activities -->
+        <div id="tab-content-activities" class="tab-content hidden transition-opacity duration-300">
+            <div class="max-w-3xl">
+                <div class="relative border-l-2 border-gray-200 ml-3 space-y-8 pb-8">
+
+                    <div class="relative pl-8">
+                        <div class="absolute -left-2.5 bg-blue-500 h-5 w-5 rounded-full border-4 border-white"></div>
+                        <p class="text-sm text-gray-500 mb-1">Aujourd'hui, 09:30</p>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-1">Appel sortant - Entreprise A</h4>
+                            <p class="text-sm text-gray-600">Discussion positive avec le DRH. Intéressés par le pack
+                                Leadership. À relancer mardi.</p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-8">
+                        <div class="absolute -left-2.5 bg-green-500 h-5 w-5 rounded-full border-4 border-white"></div>
+                        <p class="text-sm text-gray-500 mb-1">Hier, 14:15</p>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-1">Email envoyé - Startup Tech</h4>
+                            <p class="text-sm text-gray-600">Envoi de la brochure et de la grille tarifaire comme
+                                convenu.</p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-8">
+                        <div class="absolute -left-2.5 bg-gray-400 h-5 w-5 rounded-full border-4 border-white"></div>
+                        <p class="text-sm text-gray-500 mb-1">05 Mars, 11:00</p>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-1">Déjeuner Client - Banque Postale</h4>
+                            <p class="text-sm text-gray-600">Vérification de la satisfaction post-séminaire. Tout est
+                                OK.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Sidebar Script -->
+    <script src="../../js/components/sidebar-entreprise.js"></script>
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Tabs Logic
+        const tabs = document.querySelectorAll('[aria-label="Tabs"] button');
+        // Get contents via IDs to be safe
+        const contentPipeline = document.getElementById('tab-content-pipeline');
+        const contentContacts = document.getElementById('tab-content-contacts');
+        const contentActivities = document.getElementById('tab-content-activities');
+        const contents = [contentPipeline, contentContacts, contentActivities];
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                // Reset Tabs
+                tabs.forEach(t => {
+                    t.classList.remove('border-indigo-500', 'text-indigo-600');
+                    t.classList.add('border-transparent', 'text-gray-500');
+                });
+                // Activate Clicked Tab
+                tab.classList.remove('border-transparent', 'text-gray-500');
+                tab.classList.add('border-indigo-500', 'text-indigo-600');
+
+                // Switch Content
+                contents.forEach(c => c.classList.add('hidden'));
+                contents[index].classList.remove('hidden');
+            });
+        });
+
+        // Simple Drag and Drop Logic
+        const cards = document.querySelectorAll('.kanban-card');
+        const columns = document.querySelectorAll('.kanban-column');
+
+        function initDragAndDrop() {
+            const cards = document.querySelectorAll('.kanban-card');
+            cards.forEach(card => {
+                card.setAttribute('draggable', 'true');
+                card.addEventListener('dragstart', () => {
+                    card.classList.add('opacity-50');
+                    card.classList.add('dragging');
+                });
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('opacity-50');
+                    card.classList.remove('dragging');
+                });
+            });
+        }
+
+        initDragAndDrop();
+
+        columns.forEach(column => {
+            column.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(column, e.clientY);
+                const draggable = document.querySelector('.dragging');
+                if (afterElement == null) {
+                    column.appendChild(draggable);
+                } else {
+                    column.insertBefore(draggable, afterElement);
+                }
+            });
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.kanban-card:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // --- FACEBOOK INTEGRATION LOGIC ---
+        function simulateFacebookSync() {
+            const btn = document.getElementById('btn-fb-sync');
+            const originalContent = btn.innerHTML;
+
+            // 1. Loading State
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Connexion...';
+            lucide.createIcons();
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            // 2. Simulate API Delay
+            setTimeout(() => {
+                // 3. Create Mock Leads
+                const newLeads = [
+                    { name: 'Emma. S', company: 'Lead Facebook', desc: 'Intéressée par formation Python', time: '12 min' },
+                    { name: 'Lucas M.', company: 'Lead Facebook', desc: 'Demande catalogue PDF', time: '45 min' }
+                ];
+
+                // 4. Inject into Kanban
+                const colNew = document.getElementById('col-new');
+                const countBadge = document.getElementById('count-new');
+                const kpiLeads = document.getElementById('kpi-leads');
+
+                let currentCount = parseInt(countBadge.innerText);
+                let currentKPI = parseInt(kpiLeads.innerText);
+
+                newLeads.forEach(lead => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move kanban-card transition-all border-l-4 border-l-[#1877F2] fade-in mb-3";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-medium text-white bg-[#1877F2] px-2 py-1 rounded-md flex items-center gap-1">
+                                <i data-lucide="facebook" class="w-3 h-3"></i> Facebook
+                            </span>
+                            <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-1">${lead.name}</h4>
+                        <p class="text-sm text-gray-500 mb-3">${lead.desc}</p>
+                        <div class="flex items-center justify-between mt-4 text-xs text-gray-400">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3"></i> ${lead.time}
+                            </div>
+                            <div class="flex -space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-[#1877F2] text-white flex items-center justify-center text-xs">F</div>
+                            </div>
+                        </div>
+                    `;
+                    // Prepend to top
+                    colNew.insertBefore(card, colNew.firstChild);
+
+                    // Add to contacts (optional but good for consistency)
+                    addContactRow(lead);
+                });
+
+                // Update Counters
+                countBadge.innerText = currentCount + newLeads.length;
+                kpiLeads.innerText = currentKPI + newLeads.length;
+
+                // Re-init Drag and Drop and Icons
+                initDragAndDrop();
+                lucide.createIcons();
+
+                // 5. Success State
+                btn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Connecté';
+                btn.classList.remove('bg-[#1877F2]', 'hover:bg-[#166fe5]');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                lucide.createIcons();
+
+                // Reset button after 3s
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed', 'bg-green-600', 'hover:bg-green-700');
+                    btn.classList.add('bg-[#1877F2]', 'hover:bg-[#166fe5]');
+                    lucide.createIcons();
+                }, 3000);
+
+            }, 1500); // 1.5s delay
+        }
+
+        function addContactRow(lead) {
+            const tbody = document.querySelector('tbody'); // Simple selector since there is only one table
+            if (!tbody) return;
+
+            const row = document.createElement('tr');
+            row.className = "hover:bg-gray-50 transition-colors fade-in";
+            row.innerHTML = `
+                <td class="p-4 font-medium text-gray-900">${lead.name}</td>
+                <td class="p-4 text-gray-600">Facebook</td>
+                <td class="p-4 text-gray-500">pending@facebook.com</td>
+                <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">Nouveau</span></td>
+                <td class="p-4 text-right"><button class="text-gray-400 hover:text-indigo-600"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            `;
+            tbody.insertBefore(row, tbody.firstChild);
+        }
+
+    </script>
+</body>
+
+</html>

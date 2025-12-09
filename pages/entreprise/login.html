@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Entreprise - EduSpace</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dynamic Theme Colors will be injected via JS */
+    </style>
+</head>
+
+<body>
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative overflow-hidden">
+
+        <a href="login-choix.html" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-6 h-6"></i>
+        </a>
+
+        <div class="text-center mb-8 pt-6">
+            <div id="icon-container"
+                class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors">
+                <i id="role-icon" data-lucide="building-2" class="w-8 h-8 text-gray-500"></i>
+            </div>
+            <h1 id="page-title" class="text-2xl font-bold text-gray-900 mb-2">Connexion</h1>
+            <p id="page-subtitle" class="text-sm text-gray-500">Veuillez saisir vos identifiants professionnels.</p>
+        </div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Identifiant / Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="email"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                        placeholder="ID Professionnel" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                        placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center">
+                    <input type="checkbox"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <span class="ml-2 text-gray-600">Se souvenir de moi</span>
+                </label>
+                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Mot de passe oublié ?</a>
+            </div>
+
+            <button type="submit" id="submit-btn"
+                class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                Se connecter
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-gray-400">
+            Accès sécurisé par EduSpace Enterprise SSO
+        </div>
+    </div>
+
+    <script>
+        // Configuration for different roles
+        const roles = {
+            'gerant': {
+                title: 'Espace Gérant',
+                subtitle: 'Supervision et Stratégie',
+                icon: 'briefcase',
+                color: 'indigo',
+                gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                email: 'gerant@entreprise.com',
+                password: 'password123',
+                redirect: 'dashboard.html'
+            },
+            'admin': {
+                title: 'Portal Administratif',
+                subtitle: 'Gestion RH et Logistique',
+                icon: 'settings',
+                color: 'blue',
+                gradient: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)',
+                email: 'admin@entreprise.com',
+                password: 'password123',
+                redirect: 'dashboard-admin.html'
+            },
+            'commercial': {
+                title: 'Espace Commercial',
+                subtitle: 'Ventes et Relations Clients',
+                icon: 'trending-up',
+                color: 'emerald',
+                gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+                email: 'commercial@entreprise.com',
+                password: 'password123',
+                redirect: 'dashboard-commercial.html'
+            },
+            'formateur': {
+                title: 'Formateur Associé',
+                subtitle: 'Accès Pédagogique Entreprise',
+                icon: 'presentation',
+                color: 'purple',
+                gradient: 'linear-gradient(135deg, #834d9b 0%, #d04ed6 100%)',
+                email: 'formateur@entreprise.com',
+                password: 'password123',
+                redirect: 'dashboard-formateur.html'
+            },
+            'etudiant': {
+                title: 'Espace Étudiant',
+                subtitle: 'Formation Continue',
+                icon: 'graduation-cap',
+                color: 'orange',
+                gradient: 'linear-gradient(135deg, #f09819 0%, #edde5d 100%)',
+                email: 'etudiant@entreprise.com',
+                password: 'password123',
+                redirect: '../etudiant/dashboard.html'
+            },
+            'parent': {
+                title: 'Espace Famille',
+                subtitle: 'Avantages Parent Associé',
+                icon: 'users',
+                color: 'pink',
+                gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
+                email: 'parent@entreprise.com',
+                password: 'password123',
+                redirect: '../parent/dashboard.html'
+            }
+        };
+
+        // Detect Role from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentRole = urlParams.get('role') || 'gerant';
+        const config = roles[currentRole] || roles['gerant'];
+
+        // Apply Configuration
+        document.body.style.background = config.gradient;
+        document.getElementById('page-title').innerText = config.title;
+        document.getElementById('page-subtitle').innerText = config.subtitle;
+
+        const iconContainer = document.getElementById('icon-container');
+        // Tailwind classes handling is tricky via JS text replacement for arbitrary colors if not safelisted.
+        // But inline styles work.
+        // Let's use generic Tailwind color classes that are standard.
+        // We will just change text color via JS logic roughly or stick to one color for now for simplicity, OR dynamic substitution.
+
+        // Simpler: Just generic styles.
+        document.getElementById('role-icon').setAttribute('data-lucide', config.icon);
+
+        // Pre-fill email and password
+        if (config.email) document.getElementById('email').value = config.email;
+        if (config.password) document.getElementById('password').value = config.password;
+
+        // Initialize Icons
+        lucide.createIcons();
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Connexion en cours...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Set Role in LocalStorage for persistence
+                let storageRole = 'entreprise_' + currentRole;
+                if (currentRole === 'etudiant') storageRole = 'etudiant_entreprise';
+                if (currentRole === 'parent') storageRole = 'parent_entreprise';
+
+                const user = {
+                    role: storageRole,
+                    name: 'Utilisateur ' + config.title,
+                    email: config.email || 'user@test.com'
+                };
+
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // Redirect
+                window.location.href = config.redirect || 'dashboard.html';
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>

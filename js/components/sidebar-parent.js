@@ -59,7 +59,9 @@ const sidebarHTML = `
                 <p class="text-sm font-bold text-gray-900 truncate">Parent Demo</p>
                 <p class="text-xs text-gray-500 truncate">Espace Parents</p>
             </div>
-            <i data-lucide="log-out" class="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors sidebar-text" onclick="window.location.href='../../index.html'"></i>
+            <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='../../index.html'" class="p-1 hover:bg-gray-100 rounded-lg transition-colors" title="Se déconnecter">
+                <i data-lucide="log-out" class="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors sidebar-text"></i>
+            </button>
         </div>
     </div>
 </aside>

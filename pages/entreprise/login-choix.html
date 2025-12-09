@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Entreprise - EduSpace</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            border-color: #4f46e5;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <div class="container mx-auto px-4 py-12 flex flex-col items-center">
+
+        <a href="../login-choix.html"
+            class="self-start mb-8 flex items-center text-gray-600 hover:text-indigo-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Retour au choix principal
+        </a>
+
+        <div class="text-center mb-12 animate-fade-in-up">
+            <div
+                class="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200">
+                <i data-lucide="building-2" class="w-10 h-10 text-white"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Espace Entreprise
+            </h1>
+            <p class="text-lg text-gray-600 max-w-xl mx-auto">
+                Sélectionnez votre rôle au sein de l'organisation pour accéder à votre espace dédié.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
+
+            <!-- Gérant -->
+            <a href="login.html?role=gerant"
+                class="role-card bg-white rounded-2xl p-6 border border-gray-100 shadow-lg cursor-pointer transition-all hover:shadow-xl group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i data-lucide="briefcase" class="w-6 h-6"></i>
+                    </div>
+                    <i data-lucide="chevron-right"
+                        class="w-5 h-5 text-gray-300 group-hover:text-indigo-600 transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Gérant / CEO</h3>
+                <p class="text-sm text-gray-500">Administration globale et pilotage stratégique.</p>
+            </a>
+
+            <!-- Agent Administratif -->
+            <a href="login.html?role=admin"
+                class="role-card bg-white rounded-2xl p-6 border border-gray-100 shadow-lg cursor-pointer transition-all hover:shadow-xl group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i data-lucide="settings" class="w-6 h-6"></i>
+                    </div>
+                    <i data-lucide="chevron-right"
+                        class="w-5 h-5 text-gray-300 group-hover:text-blue-600 transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Agent Administratif</h3>
+                <p class="text-sm text-gray-500">Gestion RH, plannings et logistique.</p>
+            </a>
+
+            <!-- Agent Commercial -->
+            <a href="login.html?role=commercial"
+                class="role-card bg-white rounded-2xl p-6 border border-gray-100 shadow-lg cursor-pointer transition-all hover:shadow-xl group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <i data-lucide="chevron-right"
+                        class="w-5 h-5 text-gray-300 group-hover:text-emerald-600 transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Agent Commercial</h3>
+                <p class="text-sm text-gray-500">Suivi des ventes et relations clients.</p>
+            </a>
+
+            <!-- Formateur Associé -->
+            <a href="login.html?role=formateur"
+                class="role-card bg-white rounded-2xl p-6 border border-gray-100 shadow-lg cursor-pointer transition-all hover:shadow-xl group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="p-3 bg-purple-50 text-purple-600 rounded-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <i data-lucide="presentation" class="w-6 h-6"></i>
+                    </div>
+                    <i data-lucide="chevron-right"
+                        class="w-5 h-5 text-gray-300 group-hover:text-purple-600 transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Formateur Associé</h3>
+                <p class="text-sm text-gray-500">Accès aux classes et supports de cours.</p>
+            </a>
+
+            <!-- Étudiant (Entreprise) -->
+            <a href="login.html?role=etudiant"
+                class="role-card bg-white rounded-2xl p-6 border border-gray-100 shadow-lg cursor-pointer transition-all hover:shadow-xl group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="p-3 bg-orange-50 text-orange-600 rounded-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                        <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                    </div>
+                    <i data-lucide="chevron-right"
+                        class="w-5 h-5 text-gray-300 group-hover:text-orange-600 transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Étudiant</h3>
+                <p class="text-sm text-gray-500">Accès aux formations professionnelles.</p>
+            </a>
+
+            <!-- Parent (Entreprise) -->
+            <a href="login.html?role=parent"
+                class="role-card bg-white rounded-2xl p-6 border border-gray-100 shadow-lg cursor-pointer transition-all hover:shadow-xl group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="p-3 bg-pink-50 text-pink-600 rounded-xl group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                    <i data-lucide="chevron-right"
+                        class="w-5 h-5 text-gray-300 group-hover:text-pink-600 transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Parent Associé</h3>
+                <p class="text-sm text-gray-500">Avantages famille et suivi.</p>
+            </a>
+
+        </div>
+
+        <div class="mt-12 text-center text-sm text-gray-500">
+            © 2025 EduSpace Enterprise Solutions
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
