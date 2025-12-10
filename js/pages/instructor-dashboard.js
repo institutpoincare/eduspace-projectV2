@@ -24,7 +24,8 @@ class InstructorDashboard {
 
         if (!this.currentInstructor) {
             console.error('❌ Aucun formateur connecté');
-            window.location.href = '/pages/formateur/login.html';
+            // Redirection vers la page de login générique (ou accueil si pas de login spécifique)
+            window.location.href = '../../pages/login-etudiant.html';
             return;
         }
 
