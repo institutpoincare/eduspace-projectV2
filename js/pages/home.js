@@ -215,7 +215,7 @@ function renderCenters(centers) {
                 </div>
                 
                 <div class="mt-8 flex gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                     <button class="flex-1 bg-white text-gray-900 py-4 rounded-xl font-bold text-sm hover:bg-gray-50 shadow-lg">Détails</button>
+                     <button onclick="requestCenterInfo('${center.id}')" class="flex-1 bg-white text-gray-900 py-4 rounded-xl font-bold text-sm hover:bg-gray-50 shadow-lg">Détails</button>
                      <button onclick="startChat('${center.id}', 'center')" class="px-6 py-4 bg-white/20 text-white rounded-xl font-bold text-sm hover:bg-white/30 backdrop-blur-md"><i data-lucide="message-circle" class="w-6 h-6"></i></button>
                 </div>
             </div>
@@ -224,6 +224,11 @@ function renderCenters(centers) {
     }).join('');
 
     if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Notification de succès pour l'utilisateur
+    if (window.showNotification) {
+        setTimeout(() => showNotification('Les meilleurs formateurs sont prêts pour vous !', 'success'), 1000);
+    }
 }
 
 function hideLoaders() {
