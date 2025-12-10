@@ -1,4 +1,4 @@
-// Instructor Sidebar Component
+// Instructor Sidebar Component - Tailwind Version
 (function () {
     // Determine current page
     const currentPath = window.location.pathname;
@@ -19,9 +19,14 @@
             if (item.href === 'classes.html' && currentPath.includes('class-details.html')) {
                 isActive = true;
             }
+
+            const baseClass = "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium mb-1";
+            const activeClass = "bg-indigo-600 text-white shadow-lg shadow-indigo-200";
+            const inactiveClass = "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600";
+
             return `
-                <a href="${item.href}" class="nav-item ${isActive ? 'active' : ''}" title="${item.label}">
-                    <i data-lucide="${item.icon}"></i>
+                <a href="${item.href}" class="${baseClass} ${isActive ? activeClass : inactiveClass}" title="${item.label}">
+                    <i data-lucide="${item.icon}" class="w-5 h-5"></i>
                     <span>${item.label}</span>
                 </a>
             `;
@@ -29,61 +34,35 @@
     };
 
     const sidebarHTML = `
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-logo">
-                <div style="background: linear-gradient(to right, var(--blue-600), var(--blue-500)); padding: 0.5rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; justify-content: center; min-width: 32px;">
-                    <i data-lucide="graduation-cap" style="width: 20px; height: 20px;"></i>
+        <div class="flex flex-col h-full bg-white border-r border-gray-100 p-6">
+            <div class="flex items-center gap-3 mb-10 px-2">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
                 </div>
-                <span style="font-size: 1.25rem; font-weight: 700; color: var(--gray-900);">EduSpace</span>
-                <button onclick="toggleSidebar()" class="sidebar-toggle-btn" style="margin-left: auto; background: none; border: none; cursor: pointer; color: var(--gray-400); padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
-                    <i data-lucide="panel-left-close" style="width: 20px; height: 20px;"></i>
-                </button>
+                <div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">EduSpace</span>
+                    <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-widest">Formateur</span>
+                </div>
             </div>
 
-            <nav class="sidebar-nav">
-                <div class="menu-title" style="font-size: 0.75rem; font-weight: 600; color: var(--gray-400); text-transform: uppercase; padding: 0 1rem 0.5rem;">Menu Principal</div>
+            <nav class="flex-1 space-y-1">
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest px-4 mb-4 mt-2">Menu Principal</div>
                 ${generateNavItems()}
             </nav>
 
-            <div class="sidebar-footer">
-                <div class="user-info" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <div class="avatar" style="background: linear-gradient(to right, var(--blue-500), var(--purple-500)); color: white; min-width: 40px;">IN</div>
-                    <div style="flex: 1; overflow: hidden;">
-                        <div style="font-weight: 700; font-size: 0.875rem; color: var(--gray-900);">Instructeur</div>
-                        <div style="font-size: 0.75rem; color: var(--gray-500);">Enseignant</div>
-                    </div>
-                </div>
-                
-                <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='../../index.html'" style="width: 100%; padding: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid var(--red-200); background: white; color: var(--red-700); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-weight: 500;">
-                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+            <div class="mt-auto pt-6 border-t border-gray-100">
+                <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='../../index.html'" 
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors font-medium border border-transparent hover:border-red-100">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
                     <span>Se déconnecter</span>
                 </button>
             </div>
-        </aside>
+        </div>
     `;
 
-    // Initialize State
-    const savedState = localStorage.getItem('sidebar-collapsed');
-    if (savedState === 'true') {
-        document.body.classList.add('sidebar-collapsed');
-    }
-
-    // Define Toggle Function Globally
-    window.toggleSidebar = function () {
-        document.body.classList.toggle('sidebar-collapsed');
-        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-        localStorage.setItem('sidebar-collapsed', isCollapsed);
-
-        // Optional: Update icon logic if needed visually, but simpler is fine
-    };
-
-    // document.write(sidebarHTML);
     const container = document.getElementById('sidebar-container');
     if (container) {
         container.innerHTML = sidebarHTML;
-        // Re-run Lucide to render new icons
         if (window.lucide) window.lucide.createIcons();
-    } else {
-        console.error('Sidebar Container not found!');
     }
 })();
