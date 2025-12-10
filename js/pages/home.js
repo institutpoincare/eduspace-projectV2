@@ -120,54 +120,50 @@ function renderInstructors(instructors) {
 
     // Vider le loader
     container.innerHTML = instructors.slice(0, 4).map(instructor => `
-        <div class="group bg-white rounded-[2rem] border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2">
+        <div class="group bg-white rounded-[2.5rem] border border-gray-100 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2 h-full">
             <!-- Hover Glow Effect -->
             <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
 
-            <div class="relative p-6 z-10 flex flex-col h-full bg-white">
+            <div class="relative p-8 z-10 flex flex-col h-full bg-white">
                 <!-- Header -->
-                <div class="flex items-start justify-between mb-6">
+                <div class="flex items-start justify-between mb-8">
                     <div class="flex gap-5 items-center">
-                        <div class="relative w-20 h-20">
+                        <div class="relative w-24 h-24">
                             <!-- Profile Image with Ring Animation -->
-                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 animate-pulse opacity-50 blur"></div>
-                            <img src="${instructor.image || 'https://ui-avatars.com/api/?name=' + instructor.name}" class="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10 border-2 border-white">
+                            <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-indigo-500 to-purple-500 animate-pulse opacity-50 blur"></div>
+                            <img src="${instructor.image || 'https://ui-avatars.com/api/?name=' + instructor.name}" class="w-24 h-24 rounded-3xl object-cover shadow-xl relative z-10 border-4 border-white">
                             
                             <!-- Status Indicator -->
-                            <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm flex items-center gap-1 z-20">
-                                <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+                            <div class="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full border-4 border-white shadow-sm flex items-center gap-1.5 z-20">
+                                <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
                                 Live
                             </div>
                         </div>
 
                         <div>
-                            <h3 class="font-bold text-xl text-gray-900 group-hover:text-indigo-600 transition-colors">${instructor.name}</h3>
-                            <p class="text-gray-500 font-medium">${instructor.specialty}</p>
-                            <div class="flex items-center gap-2 mt-2">
-                                <div class="flex text-yellow-400">
-                                    ${Array(5).fill('<i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>').join('')}
+                            <h3 class="font-bold text-2xl text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight mb-1">${instructor.name}</h3>
+                            <p class="text-indigo-600 font-medium text-sm bg-indigo-50 px-3 py-1 rounded-lg inline-block">${instructor.specialty}</p>
+                            <div class="flex items-center gap-2 mt-3">
+                                <div class="flex text-yellow-400 gap-0.5">
+                                    ${Array(5).fill('<i data-lucide="star" class="w-4 h-4 fill-current"></i>').join('')}
                                 </div>
-                                <span class="text-xs font-bold text-gray-400">(${instructor.rating} avis)</span>
+                                <span class="text-sm font-bold text-gray-400">(${instructor.rating} avis)</span>
                             </div>
                         </div>
                     </div>
-
-                    <button class="w-10 h-10 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all">
-                        <i data-lucide="heart" class="w-5 h-5"></i>
-                    </button>
                 </div>
 
-                <p class="text-gray-600 text-sm mb-6 leading-relaxed line-clamp-2">
+                <p class="text-gray-600 text-base mb-8 leading-relaxed line-clamp-3 flex-1">
                     ${instructor.bio || "Expert qualifié prêt à vous accompagner dans votre apprentissage."}
                 </p>
 
                 <!-- Action Buttons -->
-                <div class="mt-auto flex gap-3">
-                    <button onclick="viewInstructorCV('${instructor.id}')" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 text-sm">
-                        Voir CV <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <div class="mt-auto flex gap-4">
+                    <button onclick="viewInstructorCV('${instructor.id}')" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 text-base">
+                        Voir CV <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
-                    <button onclick="startChat('${instructor.id}', 'instructor')" class="px-5 py-3 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors text-sm">
-                        Chat
+                    <button onclick="startChat('${instructor.id}', 'instructor')" class="px-6 py-4 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors text-base hover:text-indigo-600">
+                        <i data-lucide="message-circle" class="w-6 h-6"></i>
                     </button>
                 </div>
             </div>
@@ -198,29 +194,29 @@ function renderCenters(centers) {
         const gradient = gradients[index % gradients.length];
 
         return `
-        <div class="bg-gradient-to-br ${gradient} rounded-3xl p-8 text-white relative overflow-hidden group hover:shadow-2xl hover:shadow-indigo-500/20 transition-all cursor-pointer">
-            <div class="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:scale-150"></div>
+        <div class="bg-gradient-to-br ${gradient} rounded-[2.5rem] p-10 text-white relative overflow-hidden group hover:shadow-2xl hover:shadow-indigo-500/20 transition-all cursor-pointer transform hover:-translate-y-2 h-full flex flex-col">
+            <div class="absolute top-0 right-0 p-40 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:scale-150 duration-700"></div>
             
             <div class="relative z-10 flex flex-col h-full">
-                <div class="flex items-start justify-between mb-6">
-                    <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-indigo-600 font-bold text-2xl shadow-lg">
+                <div class="flex items-start justify-between mb-8">
+                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-indigo-600 font-bold text-3xl shadow-xl">
                         ${index + 1}
                     </div>
-                    <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold border border-white/20">
+                    <span class="px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold border border-white/20 uppercase tracking-widest">
                         ${center.category || 'Formation'}
                     </span>
                 </div>
 
-                <h3 class="text-2xl font-bold mb-2">${center.name}</h3>
-                <p class="text-white/80 mb-6 flex-1 line-clamp-3">${center.description}</p>
+                <h3 class="text-3xl font-extrabold mb-4 leading-tight">${center.name}</h3>
+                <p class="text-white/80 mb-8 flex-1 text-lg leading-relaxed line-clamp-3">${center.description}</p>
 
-                <div class="flex items-center gap-4 text-sm font-medium pt-6 border-t border-white/10">
-                    <span><i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i> ${center.location}</span>
+                <div class="flex items-center gap-4 text-base font-medium pt-8 border-t border-white/10">
+                    <span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5"></i> ${center.location}</span>
                 </div>
                 
-                <div class="mt-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                     <button class="flex-1 bg-white text-gray-900 py-2 rounded-lg font-bold text-sm hover:bg-gray-50">Détails</button>
-                     <button onclick="startChat('${center.id}', 'center')" class="px-4 py-2 bg-white/20 text-white rounded-lg font-bold text-sm hover:bg-white/30"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
+                <div class="mt-8 flex gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                     <button class="flex-1 bg-white text-gray-900 py-4 rounded-xl font-bold text-sm hover:bg-gray-50 shadow-lg">Détails</button>
+                     <button onclick="startChat('${center.id}', 'center')" class="px-6 py-4 bg-white/20 text-white rounded-xl font-bold text-sm hover:bg-white/30 backdrop-blur-md"><i data-lucide="message-circle" class="w-6 h-6"></i></button>
                 </div>
             </div>
         </div>
