@@ -191,7 +191,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../../js/data-manager.js"></script>
+    <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js"></script>
     <script>
         // Initialize state
@@ -239,8 +239,8 @@
             const month = targetDate.getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            // Map Day Names to JS getDay() index
-            const dayMap = { 'Dimanche': 0, 'Lundi': 1, 'Mardi': 2, 'Mercredi': 3, 'Jeudi': 4, 'Vendredi': 5, 'Samedi': 6 };
+            // Normalize Day Names to Index (handle case sensitivity)
+            const dayMap = { 'dimanche': 0, 'lundi': 1, 'mardi': 2, 'mercredi': 3, 'jeudi': 4, 'vendredi': 5, 'samedi': 6 };
 
             // For monthly view, check every day of the month
             for (let day = 1; day <= daysInMonth; day++) {
@@ -248,20 +248,37 @@
                 const dayIndex = date.getDay(); // 0-6
 
                 classesList.forEach(cls => {
-                    const activeSlots = (cls.slots || []).filter(s => dayMap[s.day] === dayIndex);
-                    activeSlots.forEach(slot => {
-                        sessions.push({
-                            id: cls.id,
-                            title: cls.name || cls.title,
-                            startTime: slot.start || slot.startTime,
-                            endTime: slot.end || slot.endTime,
-                            date: date,
-                            type: (cls.category === 'scolaire') ? 'blue' : 'purple',
-                            categoryLabel: cls.category || 'Cours',
-                            accessCode: cls.accessCode,
-                            link: (cls.contents && cls.contents.find(c => c.type === 'link')) ? cls.contents.find(c => c.type === 'link').value : null
+                    // Check if date is within course duration
+                    const startDate = cls.createdAt ? new Date(cls.createdAt) : new Date(); // Fallback to now if missing
+                    const durationWeeks = parseInt(cls.weeksDuration) || 52; // Default to 1 year if not specified
+                    const endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + (durationWeeks * 7));
+
+                    // Only show if date is within range (ignoring time for simple comparison)
+                    const checkDate = new Date(date).setHours(0, 0, 0, 0);
+                    // Allow sessions starting from startDate week
+                    if (checkDate >= startDate.setHours(0, 0, 0, 0) && checkDate <= endDate.setHours(0, 0, 0, 0)) {
+
+                        const activeSlots = (cls.slots || []).filter(s => {
+                            // Robust comparison (case insensitive, trim)
+                            const sDay = (s.day || '').toLowerCase().trim();
+                            return dayMap[sDay] === dayIndex;
                         });
-                    });
+
+                        activeSlots.forEach(slot => {
+                            sessions.push({
+                                id: cls.id,
+                                title: cls.name || cls.title,
+                                startTime: slot.start || slot.startTime,
+                                endTime: slot.end || slot.endTime,
+                                date: date,
+                                type: (cls.category === 'scolaire') ? 'blue' : 'purple',
+                                categoryLabel: cls.category || 'Cours',
+                                accessCode: cls.accessCode,
+                                link: (cls.contents && cls.contents.find(c => c.type === 'link')) ? cls.contents.find(c => c.type === 'link').value : null
+                            });
+                        });
+                    }
                 });
             }
             return sessions.sort((a, b) => a.startTime.localeCompare(b.startTime));
