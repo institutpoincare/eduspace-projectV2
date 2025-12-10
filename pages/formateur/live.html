@@ -434,7 +434,7 @@
             showList();
         }
 
-        // --- CHAPTERS LOGIC (Same as before but cleaned) ---
+        // --- CHAPTERS LOGIC ---
         function renderChapters() {
             const container = document.getElementById('chapters-container');
             container.innerHTML = '';
@@ -449,12 +449,29 @@
                     </div>
                     <div class="p-4 space-y-3">
                         ${chap.subChapters.map((sub, sIdx) => `
-                            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                <input type="text" value="${sub.title}" onchange="chapters[${cIdx}].subChapters[${sIdx}].title = this.value" placeholder="Titre Leçon" class="flex-1 bg-transparent text-sm font-medium outline-none">
-                                <div class="flex gap-2">
-                                     <button onclick="openQuizEditor(${cIdx}, ${sIdx})" class="${sub.quiz ? 'text-purple-600' : 'text-gray-400'} hover:text-purple-600"><i data-lucide="help-circle" class="w-4 h-4"></i></button>
-                                     <button onclick="removeSubChapter(${cIdx}, ${sIdx})" class="text-gray-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div class="flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                    <input type="text" value="${sub.title}" onchange="chapters[${cIdx}].subChapters[${sIdx}].title = this.value" placeholder="Titre Leçon" class="flex-1 bg-transparent text-sm font-medium outline-none">
+                                    <div class="flex gap-2">
+                                         <button onclick="openQuizEditor(${cIdx}, ${sIdx})" class="${sub.quiz && sub.quiz.questions.length > 0 ? 'text-purple-600 bg-purple-50 border border-purple-200' : 'text-gray-400 hover:text-purple-600'} p-1.5 rounded transition-colors" title="Quiz"><i data-lucide="help-circle" class="w-4 h-4"></i></button>
+                                         <button onclick="removeSubChapter(${cIdx}, ${sIdx})" class="text-gray-400 hover:text-red-500 p-1.5 rounded transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Document Row -->
+                                <div class="flex items-center gap-2 pl-5">
+                                    ${!sub.pdf ? `
+                                        <label class="cursor-pointer text-xs flex items-center gap-1.5 text-gray-500 hover:text-blue-600 bg-white border border-gray-200 px-2 py-1 rounded-md transition-colors shadow-sm">
+                                            <i data-lucide="upload" class="w-3 h-3"></i> Ajouter Document PDF
+                                            <input type="file" accept="application/pdf" class="hidden" onchange="handlePDFUpload(${cIdx}, ${sIdx}, this)">
+                                        </label>
+                                    ` : `
+                                        <div class="flex items-center gap-2 bg-green-50 text-green-700 px-2 py-1 rounded-md border border-green-100 text-xs font-medium">
+                                            <i data-lucide="file-text" class="w-3 h-3"></i> ${sub.pdf}
+                                            <button onclick="removePDF(${cIdx}, ${sIdx})" class="hover:text-red-500 ml-1"><i data-lucide="x" class="w-3 h-3"></i></button>
+                                        </div>
+                                    `}
                                 </div>
                             </div>
                         `).join('')}
@@ -468,8 +485,22 @@
 
         function addNewChapter() { chapters.push({ id: Date.now(), title: '', subChapters: [] }); renderChapters(); }
         function removeChapter(idxs) { chapters.splice(idxs, 1); renderChapters(); }
-        function addSubChapter(c) { chapters[c].subChapters.push({ id: Date.now(), title: '', quiz: null }); renderChapters(); }
+
+        function addSubChapter(c) { chapters[c].subChapters.push({ id: Date.now(), title: '', quiz: null, pdf: null }); renderChapters(); }
         function removeSubChapter(c, s) { chapters[c].subChapters.splice(s, 1); renderChapters(); }
+
+        function handlePDFUpload(c, s, input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                chapters[c].subChapters[s].pdf = file.name;
+                renderChapters();
+            }
+        }
+
+        function removePDF(c, s) {
+            chapters[c].subChapters[s].pdf = null;
+            renderChapters();
+        }
 
         // --- QUIZ LOGIC ---
         function openQuizEditor(c, s) {
