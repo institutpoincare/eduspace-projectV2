@@ -263,7 +263,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
                             id="step-ind-3">3</div>
-                        <span class="text-xs font-bold text-gray-500">Contenu</span>
+                        <span class="text-xs font-bold text-gray-500">Programme</span>
                     </div>
                     <div class="h-0.5 w-12 bg-gray-300"></div>
                     <!-- Step 4 -->
@@ -348,26 +348,26 @@
                         </div>
                     </div>
 
-                    <!-- Step 3: Contenu -->
+                    <!-- Step 3: Programme (Sessions -> Leçons) -->
                     <div id="step-3" class="hidden space-y-6">
-                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                            <label class="block text-sm font-bold text-blue-900 mb-2">Ajouter un cours existant
-                                (Live/Enregistré)</label>
-                            <div class="flex gap-2">
-                                <select id="w-content-select"
-                                    class="flex-1 p-3 border border-blue-200 rounded-xl outline-none bg-white">
-                                    <option value="">Sélectionner un cours...</option>
-                                    <!-- Options injected via JS -->
-                                </select>
-                                <button onclick="addContentModule()"
-                                    class="px-4 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700">Ajouter</button>
-                            </div>
-                            <div id="content-modules-list" class="mt-3 space-y-2"></div>
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
+                            <h3 class="text-blue-900 font-bold text-lg mb-1">Programme des Séances</h3>
+                            <p class="text-blue-700 text-sm">Assignez une leçon (issue de "Création Contenu Live") à
+                                chaque séance de cette classe.</p>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Liens Externes (Google Meet,
-                                Drive)</label>
+                        <div id="sessions-container"
+                            class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                            <!-- Sessions generated via JS -->
+                            <div class="text-center text-gray-500 py-8">
+                                Configurez d'abord le planning à l'étape 2.
+                            </div>
+                        </div>
+
+                        <!-- Liens Externes (Toujours utile pour le Meet global) -->
+                        <div class="mt-6 pt-6 border-t border-gray-100">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Lien Google Meet / Drive
+                                (Global)</label>
                             <div class="flex gap-2">
                                 <input type="text" id="w-link-url" placeholder="https://meet.google.com/..."
                                     class="flex-1 p-3 border border-gray-200 rounded-xl outline-none">
@@ -376,17 +376,9 @@
                             </div>
                             <div id="external-links-list" class="mt-3 space-y-2"></div>
                         </div>
-
-                        <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-100 transition-colors cursor-pointer"
-                            onclick="document.getElementById('file-upload').click()">
-                            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-gray-400 mb-2"></i>
-                            <p class="text-sm font-bold text-gray-600">Fichiers (PDF, Slides)</p>
-                            <input type="file" id="file-upload" class="hidden" multiple
-                                onchange="alert('Fichiers ajoutés (simulation)')">
-                        </div>
                     </div>
 
-                    <!-- Step 4: Accès -->
+                    <!-- Step 4: Accès & Élèves -->
                     <div id="step-4" class="hidden space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
                             <!-- Code Generate -->
@@ -466,11 +458,13 @@
         let currentTab = 'classes';
         let wizStep = 1;
         let tempSlots = [];
-        let tempContents = []; // Array of content modules or links
-        let currentPaymentStudent = null;
-        let currentPaymentClass = null;
+        let tempContents = []; // Link objects {type, title, value}
+        let tempSessionMappings = []; // {sessionIndex, lessonId}
+        let availableLessons = [];
         let isEditing = false;
         let editingId = null;
+        let currentPaymentClass = null;
+        let currentPaymentStudent = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             if (window.dataManager) {
@@ -481,22 +475,19 @@
             await updateStats();
         });
 
-        // --- Sidebar Toggle ---
-        function toggleSidebar() {
-            document.body.classList.toggle('sidebar-hidden');
-        }
+        // --- Sidebar ---
+        function toggleSidebar() { document.body.classList.toggle('sidebar-hidden'); }
 
         // --- Tabs ---
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-blue-600', 'text-blue-600'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`content-${tab}`).classList.remove('hidden');
             currentTab = tab;
         }
 
-        // --- CRUD Logic ---
+        // --- CRUD Classes ---
         async function loadClasses() {
             const classes = await dataManager.getAll('courses');
             const container = document.getElementById('classes-list');
@@ -506,23 +497,20 @@
                 container.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500"><p>Aucune classe. Créez-en une !</p></div>`;
             } else {
                 container.innerHTML = classes.map(cls => `
-                    <div class="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg transition-all hover:-translate-y-1 group flex flex-col h-full">
+                     <div class="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg transition-all hover:-translate-y-1 group flex flex-col h-full">
                         <div class="flex justify-between items-start mb-3">
                             <span class="px-3 py-1 rounded-full text-xs font-bold ${cls.category === 'scolaire' ? 'bg-blue-100 text-blue-700' : cls.category === 'superieur' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-wide">${cls.category || 'Formation'}</span>
                             <div class="text-lg font-bold text-blue-600">${cls.price} TND</div>
                         </div>
-                        
                         <h3 class="text-xl font-bold text-gray-900 mb-1 leading-tight line-clamp-2">${cls.name || cls.title}</h3>
                         <p class="text-sm text-gray-500 mb-4">${cls.level || 'Tous niveaux'}</p>
-                        
                         <div class="flex-1">
                             <div class="flex items-center gap-4 text-xs font-bold text-gray-500 mb-4 bg-gray-50 p-2 rounded-lg">
                                 <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> ${cls.studentIds ? cls.studentIds.length : 0} Élèves</span>
-                                <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3 h-3"></i> ${cls.weeksDuration || 4} Sem.</span>
+                                <span class="flex items-center gap-1.5"><i data-lucide="layers" class="w-3 h-3"></i> ${cls.sessionMappings ? cls.sessionMappings.length : 0} Séances</span>
                             </div>
                         </div>
-
-                        <!-- Actions Buttons -->
+                         <!-- Actions Buttons -->
                         <div class="grid grid-cols-2 gap-2 border-t border-gray-100 pt-4 mt-2">
                              <a href="class-details.html?id=${cls.id}" class="col-span-2 flex items-center justify-center gap-2 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm mb-1">
                                 <i data-lucide="eye" class="w-4 h-4"></i> Gérer
@@ -537,7 +525,11 @@
                     </div>
                 `).join('');
             }
-            // Payments
+            lucide.createIcons();
+            loadPayments(classes, paymentsContainer);
+        }
+
+        function loadPayments(classes, container) {
             const allStudents = [];
             if (classes) {
                 classes.forEach(c => {
@@ -545,9 +537,9 @@
                 });
             }
             if (allStudents.length === 0) {
-                paymentsContainer.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Aucune inscription pour le moment.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Aucune inscription pour le moment.</td></tr>`;
             } else {
-                paymentsContainer.innerHTML = allStudents.map(s => {
+                container.innerHTML = allStudents.map(s => {
                     const paid = s.amountPaid || 0;
                     const price = parseFloat(s.classPrice);
                     const remaining = Math.max(0, price - paid);
@@ -574,16 +566,12 @@
                     `;
                 }).join('');
             }
-            lucide.createIcons();
         }
 
         async function updateStats() {
             const classes = await dataManager.getAll('courses');
             document.getElementById('stat-total-classes').innerText = classes.length;
-            let totalStudents = 0;
-            let totalRevenue = 0;
-            let totalPaid = 0;
-            let totalDue = 0;
+            let totalStudents = 0; let totalRevenue = 0; let totalPaid = 0; let totalDue = 0;
             classes.forEach(c => {
                 totalStudents += (c.studentIds?.length || 0);
                 (c.studentIds || []).forEach(s => {
@@ -597,35 +585,28 @@
             document.getElementById('stat-payment-rate').innerText = `${rate}%`;
         }
 
-        // --- Wizard Functions ---
+        // --- Wizard Logic ---
         async function openCreateModal() {
-            isEditing = false;
-            editingId = null;
+            isEditing = false; editingId = null;
             document.getElementById('create-modal').classList.remove('hidden');
             document.getElementById('wizard-form').reset();
             document.getElementById('generated-code').innerText = 'CLASS-XXXX';
             wizStep = 1;
-            tempSlots = [];
-            tempContents = [];
+            tempSlots = []; tempContents = []; tempSessionMappings = [];
 
-            await loadAvailableContent();
+            await loadAvailableLessons();
             await loadAvailableStudents();
-
-            updateWizardUI();
-            renderSlots();
-            renderContents();
+            updateWizardUI(); renderSlots(); renderExternalLinks();
         }
 
-        function closeModal() {
-            document.getElementById('create-modal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('create-modal').classList.add('hidden'); }
 
         async function editClass(id) {
             const classes = await dataManager.getAll('courses');
             const cls = classes.find(c => c.id === id);
             if (!cls) return;
-            isEditing = true;
-            editingId = id;
+            isEditing = true; editingId = id;
+
             document.getElementById('w-name').value = cls.name || cls.title;
             document.getElementById('w-category').value = cls.category;
             document.getElementById('w-level').value = cls.level;
@@ -634,22 +615,20 @@
 
             tempSlots = cls.slots || [];
             tempContents = cls.contents || [];
+            tempSessionMappings = cls.sessionMappings || [];
 
-            await loadAvailableContent();
-            await loadAvailableStudents(cls.studentIds || []); // Mark existing
+            await loadAvailableLessons();
+            await loadAvailableStudents(cls.studentIds || []);
 
             document.getElementById('create-modal').classList.remove('hidden');
             wizStep = 1;
-            updateWizardUI();
-            renderSlots();
-            renderContents();
+            updateWizardUI(); renderSlots(); renderExternalLinks();
         }
 
         async function deleteClass(id) {
-            if (confirm("Êtes-vous sûr de vouloir supprimer cette classe ?")) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ?")) {
                 await dataManager.delete('courses', id);
-                await loadClasses();
-                await updateStats();
+                await loadClasses(); await updateStats();
             }
         }
 
@@ -659,11 +638,15 @@
                 if (!document.getElementById('w-name').value) return alert("Nom requis");
                 if (!document.getElementById('w-price').value) return alert("Prix requis");
             }
+            if (wizStep === 2) {
+                if (tempSlots.length === 0) return alert("Ajoutez au moins un créneau !");
+                generateSessionList();
+            }
+
             wizStep++;
             if (wizStep === 4) {
-                if (!isEditing) document.getElementById('generated-code').innerText = 'CLASS-' + Math.floor(1000 + Math.random() * 9000);
-                else document.getElementById('generated-code').innerText = 'CLASS-EDITED';
-
+                const code = isEditing ? 'CLASS-EDITED' : ('CLASS-' + Math.floor(1000 + Math.random() * 9000));
+                document.getElementById('generated-code').innerText = code;
                 const btn = document.getElementById('btn-next');
                 btn.innerText = isEditing ? "Sauvegarder" : "Terminer";
                 btn.classList.add('bg-green-600', 'hover:bg-green-700');
@@ -679,7 +662,7 @@
 
         function prevStep() {
             if (wizStep > 1) wizStep--;
-            if (wizStep < 4) {
+            if (wizStep < 4) { // Reset button style
                 const btn = document.getElementById('btn-next');
                 btn.innerText = "Suivant";
                 btn.classList.remove('bg-green-600', 'hover:bg-green-700');
@@ -696,13 +679,13 @@
                 if (i === wizStep) el.classList.add('active', 'bg-blue-600', 'border-blue-600', 'text-white');
                 else if (i < wizStep) { el.classList.add('completed', 'bg-green-500', 'border-green-500', 'text-white'); el.innerText = '✓'; }
                 else { el.classList.add('border-gray-300', 'text-gray-500'); el.innerText = i; }
-                const content = document.getElementById(`step-${i}`);
-                if (content) content.classList.add('hidden');
+                document.getElementById(`step-${i}`).classList.add('hidden');
             }
             document.getElementById(`step-${wizStep}`).classList.remove('hidden');
             document.getElementById('btn-prev').disabled = wizStep === 1;
         }
 
+        // --- Step 2 Slots ---
         function addSlot() {
             tempSlots.push({
                 day: document.getElementById('w-slot-day').value,
@@ -711,7 +694,6 @@
             });
             renderSlots();
         }
-
         function renderSlots() {
             document.getElementById('slots-container').innerHTML = tempSlots.map((s, i) => `
                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold flex items-center gap-2">
@@ -720,24 +702,61 @@
             `).join('');
         }
 
-        // --- Step 3 Content Logic ---
-        async function loadAvailableContent() {
-            const sessions = [
-                { id: 's1', title: 'Intro Python Live' }, { id: 's2', title: 'Workshop React' },
-                { id: 's3', title: 'Mentoring Projet' }
-            ]; // Mocked as requested for 'existing' courses
-            const select = document.getElementById('w-content-select');
-            select.innerHTML = '<option value="">Sélectionner un cours...</option>' +
-                sessions.map(s => `<option value="${s.id}">${s.title}</option>`).join('');
+        // --- Step 3 Session/Lesson Logic ---
+        async function loadAvailableLessons() {
+            const sessions = await dataManager.getAll('sessions') || [];
+            if (sessions.length > 0) {
+                availableLessons = sessions.map(s => ({ id: s.id, title: s.title || s.topic || 'Cours sans titre' }));
+            } else {
+                // Mock if no live sessions created yet
+                availableLessons = [
+                    { id: 'l1', title: 'Cours 1: Introduction' },
+                    { id: 'l2', title: 'Cours 2: Variables & Types' },
+                    { id: 'l3', title: 'Cours 3: Structures conditionnelles' },
+                    { id: 'l4', title: 'Cours 4: Boucles' },
+                    { id: 'l5', title: 'Cours 5: Fonctions avancées' },
+                    { id: 'l6', title: 'Cours 6: POO Basics' }
+                ];
+            }
         }
 
-        function addContentModule() {
-            const select = document.getElementById('w-content-select');
-            const value = select.value;
-            const text = select.options[select.selectedIndex].text;
-            if (!value) return;
-            tempContents.push({ type: 'session', title: text, value: value });
-            renderContents();
+        function generateSessionList() {
+            const weeks = parseInt(document.getElementById('w-weeks').value) || 1;
+            const slotsPerWeek = tempSlots.length;
+            const totalSessions = weeks * slotsPerWeek;
+            const container = document.getElementById('sessions-container');
+
+            if (totalSessions === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500">Aucune session calculée.</div>';
+                return;
+            }
+
+            let html = '';
+            for (let i = 1; i <= totalSessions; i++) {
+                const existingLesson = tempSessionMappings.find(m => m.sessionIndex === i)?.lessonId || '';
+                const options = `<option value="">-- Choisir une leçon --</option>` +
+                    availableLessons.map(l => `<option value="${l.id}" ${existingLesson === l.id ? 'selected' : ''}>${l.title}</option>`).join('');
+
+                html += `
+                    <div class="flex items-center gap-4 bg-white p-3 border border-gray-100 rounded-lg">
+                        <div class="flex flex-col w-24 shrink-0">
+                            <span class="font-bold text-gray-700 text-sm">Séance ${i}</span>
+                            <span class="text-xs text-gray-400">Semaine ${Math.ceil(i / slotsPerWeek)}</span>
+                        </div>
+                        <select onchange="updateSessionMapping(${i}, this.value)" class="flex-1 p-2 border border-blue-200 rounded-lg bg-gray-50 outline-none text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all">
+                            ${options}
+                        </select>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function updateSessionMapping(index, lessonId) {
+            tempSessionMappings = tempSessionMappings.filter(m => m.sessionIndex !== index);
+            if (lessonId) {
+                tempSessionMappings.push({ sessionIndex: index, lessonId: lessonId });
+            }
         }
 
         function addExternalLink() {
@@ -748,25 +767,12 @@
             else if (input.value.includes('drive.google')) title = "Google Drive";
             tempContents.push({ type: 'link', title: title, value: input.value });
             input.value = '';
-            renderContents();
+            renderExternalLinks();
         }
 
-        function renderContents() {
-            const list = document.getElementById('content-modules-list');
+        function renderExternalLinks() {
             const linksList = document.getElementById('external-links-list');
-            const modules = tempContents.filter(c => c.type === 'session');
             const links = tempContents.filter(c => c.type === 'link');
-
-            list.innerHTML = modules.map((c, i) => `
-                <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="video" class="w-4 h-4"></i></div>
-                        <span class="font-medium text-sm">${c.title}</span>
-                    </div>
-                    <button onclick="removeContent('${c.value}')" class="text-gray-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>
-            `).join('');
-
             linksList.innerHTML = links.map((c, i) => `
                  <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
                     <div class="flex items-center gap-3">
@@ -776,24 +782,15 @@
                             <span class="text-xs text-gray-400 truncate block max-w-[200px]">${c.value}</span>
                         </div>
                     </div>
-                    <button onclick="removeContent('${c.value}')" class="text-gray-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button onclick="tempContents.splice(tempContents.indexOf(c), 1); renderExternalLinks();" class="text-gray-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        function removeContent(val) {
-            const idx = tempContents.findIndex(c => c.value === val);
-            if (idx > -1) {
-                tempContents.splice(idx, 1);
-                renderContents();
-            }
-        }
-
-        // --- Step 4 Student Logic ---
+        // --- Step 4 Students ---
         async function loadAvailableStudents(existingStudents = []) {
             let users = await dataManager.getAll('users');
-            // Mock users if empty for demo
             if (!users || users.length === 0) {
                 users = [
                     { id: 'u1', name: 'Sami Mansour', email: 'sami@example.com', role: 'student' },
@@ -831,14 +828,11 @@
             });
         }
 
+        // --- Finish ---
         async function finishCreation() {
             const checkboxes = document.querySelectorAll('.student-checkbox:checked');
             const selectedStudents = Array.from(checkboxes).map(cb => ({
-                id: cb.value,
-                name: cb.dataset.name,
-                email: cb.dataset.email,
-                amountPaid: 0,
-                payment: 'Non Payé'
+                id: cb.value, name: cb.dataset.name, email: cb.dataset.email, amountPaid: 0, payment: 'Non Payé'
             }));
 
             const classData = {
@@ -848,7 +842,8 @@
                 price: parseFloat(document.getElementById('w-price').value),
                 weeksDuration: document.getElementById('w-weeks').value,
                 slots: tempSlots,
-                contents: tempContents,
+                contents: tempContents, // just links
+                sessionMappings: tempSessionMappings, // The important part
                 accessCode: document.getElementById('generated-code').innerText,
                 studentIds: selectedStudents,
                 status: 'active',
@@ -857,38 +852,34 @@
             };
             if (isEditing && editingId) {
                 await dataManager.update('courses', editingId, classData);
-                alert("Classe modifiée !");
+                alert("Classe modifiée");
             } else {
                 classData.id = 'course_' + Date.now();
                 await dataManager.create('courses', classData);
-                alert("Classe créée !");
+                alert("Classe créée");
             }
             closeModal();
             document.getElementById('btn-next').innerText = "Suivant";
-            await loadClasses();
-            await updateStats();
+            await loadClasses(); await updateStats();
         }
 
+        // --- Payment ---
         async function openPaymentModal(classId, studentId) {
             const classes = await dataManager.getAll('courses');
             const cls = classes.find(c => c.id === classId);
             if (!cls) return;
             const student = cls.studentIds.find(s => s.id === studentId);
             if (!student) return;
-            currentPaymentClass = cls;
-            currentPaymentStudent = student;
+            currentPaymentClass = cls; currentPaymentStudent = student;
             document.getElementById('payment-modal').classList.remove('hidden');
             document.getElementById('payment-modal-content').innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-xl mb-4">
                     <p class="text-sm font-bold text-gray-500 mb-1">Détails</p>
-                    <div class="flex justify-between">
-                        <span class="font-bold text-gray-900">${cls.name}</span>
-                        <span class="font-bold text-blue-600">${cls.price} TND</span>
-                    </div>
+                    <div class="flex justify-between"><span class="font-bold text-gray-900">${cls.name}</span><span class="font-bold text-blue-600">${cls.price} TND</span></div>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Montant déjà payé</label>
-                    <input type="number" id="pay-amount" value="${student.amountPaid || 0}" class="w-full p-3 border border-gray-200 rounded-xl outline-none font-bold text-lg">
+                     <label class="block text-sm font-bold text-gray-700 mb-2">Montant déjà payé</label>
+                     <input type="number" id="pay-amount" value="${student.amountPaid || 0}" class="w-full p-3 border border-gray-200 rounded-xl outline-none font-bold text-lg">
                 </div>
                 <div>
                      <label class="block text-sm font-bold text-gray-700 mb-2">Méthode</label>
@@ -897,10 +888,8 @@
                         <option ${student.paymentMethod === 'Virement' ? 'selected' : ''}>Virement</option>
                         <option ${student.paymentMethod === 'Chèque' ? 'selected' : ''}>Chèque</option>
                      </select>
-                </div>
-            `;
+                </div>`;
         }
-
         async function savePayment() {
             const amount = parseFloat(document.getElementById('pay-amount').value);
             const method = document.getElementById('pay-method').value;
@@ -908,24 +897,10 @@
             currentPaymentStudent.paymentMethod = method;
             await dataManager.update('courses', currentPaymentClass.id, currentPaymentClass);
             document.getElementById('payment-modal').classList.add('hidden');
-            await loadClasses();
-            await updateStats();
-            alert("Paiement mis à jour !");
+            await loadClasses(); await updateStats();
+            alert("Paiement mis à jour");
         }
-
-        async function acceptRequest(studentName, reqId) {
-            const classes = await dataManager.getAll('courses');
-            if (classes.length > 0) {
-                const newStudent = { id: 'student_' + Date.now(), name: studentName, email: 'student@demo.net', amountPaid: 0, payment: 'Non Payé' };
-                const updatedClass = classes[0];
-                updatedClass.studentIds = [...(updatedClass.studentIds || []), newStudent];
-                await dataManager.update('courses', updatedClass.id, updatedClass);
-                document.querySelector('#content-requests .space-y-3 div')?.remove();
-                await loadClasses();
-                await updateStats();
-                alert(`Ajouté à ${updatedClass.name}`);
-            } else { alert("Créez d'abord une classe !"); }
-        }
+        async function acceptRequest(n, i) { alert('Simulation acceptée'); }
     </script>
 </body>
 
