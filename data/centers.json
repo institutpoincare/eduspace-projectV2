@@ -1,0 +1,170 @@
+{
+    "centers": [
+        {
+            "id": "gomycode",
+            "name": "GoMyCode",
+            "description": "Leader de la formation tech en Afrique. Bootcamps intensifs et projets pratiques.",
+            "location": "Tunis, Centre Urbain Nord",
+            "gradient": "from-indigo-600 to-purple-600",
+            "badge": "Tech Leader",
+            "logo": "GMC",
+            "sessions": [
+                {
+                    "id": "gmc-1",
+                    "title": "Full Stack JavaScript",
+                    "startDate": "2025-01-15",
+                    "duration": "3 mois",
+                    "price": 2500,
+                    "spots": 20
+                },
+                {
+                    "id": "gmc-2",
+                    "title": "Data Science Bootcamp",
+                    "startDate": "2025-02-01",
+                    "duration": "4 mois",
+                    "price": 3000,
+                    "spots": 15
+                }
+            ],
+            "createdAt": "2023-06-01T10:00:00Z",
+            "updatedAt": "2024-12-09T10:00:00Z"
+        },
+        {
+            "id": "rbk",
+            "name": "RBK Tunisia",
+            "description": "Formation intensive en développement web. Approche immersive et collaborative.",
+            "location": "Tunis, Lac 2",
+            "gradient": "from-blue-600 to-indigo-700",
+            "badge": "Bootcamp Intensif",
+            "logo": "RBK",
+            "sessions": [
+                {
+                    "id": "rbk-1",
+                    "title": "Software Engineering Immersive",
+                    "startDate": "2025-01-20",
+                    "duration": "12 semaines",
+                    "price": 4000,
+                    "spots": 25
+                }
+            ],
+            "createdAt": "2023-08-15T10:00:00Z",
+            "updatedAt": "2024-12-09T10:00:00Z"
+        },
+        {
+            "id": "3w",
+            "name": "3W Academy",
+            "description": "Expertise en design et développement web. Une pédagogie par la pratique.",
+            "location": "Tunis, Lac 1",
+            "gradient": "from-pink-600 to-rose-600",
+            "badge": "Design & Dev",
+            "logo": "3W",
+            "sessions": [
+                {
+                    "id": "3w-1",
+                    "title": "Web Designer",
+                    "startDate": "2025-01-10",
+                    "duration": "3 mois",
+                    "price": 2200,
+                    "spots": 18
+                },
+                {
+                    "id": "3w-2",
+                    "title": "Développeur Web",
+                    "startDate": "2025-02-05",
+                    "duration": "3 mois",
+                    "price": 2400,
+                    "spots": 20
+                }
+            ],
+            "createdAt": "2023-09-10T10:00:00Z",
+            "updatedAt": "2024-12-09T10:00:00Z"
+        },
+        {
+            "id": "coding-dojo",
+            "name": "Coding Dojo Tunisia",
+            "description": "Formation intensive en développement web. Devenez développeur Full Stack en 14 semaines.",
+            "location": "Tunis, Lac 2",
+            "gradient": "from-emerald-600 to-teal-600",
+            "badge": "Coding Bootcamp",
+            "logo": "CD",
+            "sessions": [
+                {
+                    "id": "cd-1",
+                    "title": "Full Stack Bootcamp",
+                    "startDate": "2025-01-25",
+                    "duration": "14 semaines",
+                    "price": 3500,
+                    "spots": 22
+                },
+                {
+                    "id": "cd-2",
+                    "title": "Python & Django",
+                    "startDate": "2025-02-10",
+                    "duration": "10 semaines",
+                    "price": 2800,
+                    "spots": 18
+                }
+            ],
+            "createdAt": "2024-01-05T10:00:00Z",
+            "updatedAt": "2024-12-09T10:00:00Z"
+        },
+        {
+            "id": "esprit-prepa",
+            "name": "ESPRIT Prepa",
+            "description": "Préparation aux concours d'ingénieurs. Excellence académique et accompagnement personnalisé.",
+            "location": "El Ghazala, Ariana",
+            "gradient": "from-blue-700 to-indigo-700",
+            "badge": "École d'Ingénieurs",
+            "logo": "EP",
+            "sessions": [
+                {
+                    "id": "ep-1",
+                    "title": "Prépa Math-Physique",
+                    "startDate": "2025-09-01",
+                    "duration": "1 an",
+                    "price": 5000,
+                    "spots": 30
+                },
+                {
+                    "id": "ep-2",
+                    "title": "Prépa Informatique",
+                    "startDate": "2025-09-01",
+                    "duration": "1 an",
+                    "price": 5200,
+                    "spots": 25
+                }
+            ],
+            "createdAt": "2023-12-01T10:00:00Z",
+            "updatedAt": "2024-12-09T10:00:00Z"
+        },
+        {
+            "id": "wall-street",
+            "name": "Wall Street English",
+            "description": "Leader mondial de l'enseignement de l'anglais. Méthode innovante et résultats garantis.",
+            "location": "Centre Ville, Tunis",
+            "gradient": "from-amber-600 to-orange-600",
+            "badge": "Langues",
+            "logo": "WSE",
+            "sessions": [
+                {
+                    "id": "wse-1",
+                    "title": "English for Professionals",
+                    "startDate": "2025-01-08",
+                    "duration": "6 mois",
+                    "price": 1800,
+                    "spots": 15
+                },
+                {
+                    "id": "wse-2",
+                    "title": "Business English",
+                    "startDate": "2025-02-01",
+                    "duration": "4 mois",
+                    "price": 1500,
+                    "spots": 12
+                }
+            ],
+            "createdAt": "2024-03-15T10:00:00Z",
+            "updatedAt": "2024-12-09T10:00:00Z"
+        }
+    ]
+}
