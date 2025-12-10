@@ -1,395 +1,268 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord Formateur - EduSpace</title>
-    <link rel="stylesheet" href="../../css/main.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
+
+    <!-- Tailwind CSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Outfit', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#4338ca',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: white;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+    </style>
 </head>
 
-<body>
-    <div class="dashboard-layout">
-        <div id="sidebar-container"></div>
-        <script src="../../js/components/sidebar-formateur.js"></script>
+<body class="bg-gray-50 text-gray-900">
 
-        <main class="main-content">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Placeholder (Will be loaded by JS if needed, or we can hardcode for consistency) -->
+        <!-- Pour l'instant, je garde le chargement dynamique du Sidebar pour ne pas casser la navigation globale, 
+             mais je vais styliser le conteneur -->
+        <div id="sidebar-container"
+            class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0 relative z-20"></div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden relative">
+
             <!-- Top Header -->
-            <header class="top-header">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button class="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-                        <i data-lucide="menu"></i>
+            <header
+                class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 z-10 sticky top-0">
+                <div class="flex items-center gap-4">
+                    <button id="mobile-menu-btn" class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
-                    <h1 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-900);">Tableau de Bord</h1>
+                    <h1
+                        class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                        Tableau de Bord
+                    </h1>
                 </div>
 
-                <div class="search-bar hidden md:flex">
-                    <i data-lucide="search" style="color: var(--gray-400); width: 20px;"></i>
-                    <input type="text" class="search-input" placeholder="Rechercher un cours, un étudiant...">
-                </div>
-
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div class="relative">
-                        <button style="padding: 0.5rem; border-radius: 50%; hover:bg-blue-50; color: var(--gray-500);">
-                            <i data-lucide="bell" style="width: 20px;"></i>
-                            <span
-                                style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--red-500); border-radius: 50%; border: 2px solid white;"></span>
-                        </button>
-                    </div>
-                    <div style="width: 1px; height: 24px; background: var(--gray-200);"></div>
+                <div class="flex items-center gap-6">
+                    <!-- Search with premium style -->
                     <div
-                        style="display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: var(--gray-50); border-radius: 2rem;">
-                        <div class="avatar" style="width: 2rem; height: 2rem; font-size: 0.75rem;">IN</div>
-                        <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Instructeur</span>
+                        class="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 w-64 focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-300 transition-all">
+                        <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                        <input type="text"
+                            class="bg-transparent border-none outline-none text-sm ml-2 w-full placeholder-gray-400 font-medium"
+                            placeholder="Rechercher...">
+                    </div>
+
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                        <i data-lucide="bell" class="w-6 h-6"></i>
+                        <span
+                            class="absolute top-1.5 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    </button>
+
+                    <!-- User Profile -->
+                    <div class="flex items-center gap-3 pl-6 border-l border-gray-100">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-bold text-gray-900">Ahmed Ben Ali</p>
+                            <p class="text-xs text-gray-500 font-medium">Formateur Principal</p>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
+                            alt="Profile"
+                            class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md cursor-pointer hover:scale-105 transition-transform">
                     </div>
                 </div>
             </header>
 
-            <!-- Analytics Section - Dynamic -->
-            <div id="statsContainer" class="grid-2" style="margin-bottom: 2rem;">
-                <!-- Stats will be loaded dynamically -->
-            </div>
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth">
+                <div class="max-w-7xl mx-auto space-y-10">
 
-            <div class="grid-2" style="margin-bottom: 2rem;">
-                <div class="stat-card">
-                    <div>
-                        <p
-                            style="color: var(--gray-500); font-weight: 500; font-size: 0.875rem; margin-bottom: 0.25rem;">
-                            Étudiants Connectés</p>
-                        <h3 id="stat-students-online"
-                            style="font-size: 1.875rem; font-weight: 700; color: var(--gray-900);">42</h3>
-                        <div
-                            style="display: flex; align-items: center; gap: 0.25rem; margin-top: 0.5rem; color: var(--green-600); font-size: 0.75rem; font-weight: 500;">
-                            <span
-                                style="width: 8px; height: 8px; background: var(--green-500); border-radius: 50%;"></span>
-                            En ligne maintenant
+                    <!-- Welcome Section -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-gray-900">Bonjour, Ahmed ! 👋</h2>
+                            <p class="text-gray-500 mt-1 font-medium">Voici ce qui se passe dans vos cours aujourd'hui.
+                            </p>
                         </div>
-                    </div>
-                    <div
-                        style="padding: 1rem; background: var(--green-50); color: var(--green-600); border-radius: 0.75rem;">
-                        <i data-lucide="users" style="width: 32px; height: 32px;"></i>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div>
-                        <p
-                            style="color: var(--gray-500); font-weight: 500; font-size: 0.875rem; margin-bottom: 0.25rem;">
-                            Total Étudiants</p>
-                        <h3 id="stat-students-total"
-                            style="font-size: 1.875rem; font-weight: 700; color: var(--gray-900);">128</h3>
-                        <div
-                            style="display: flex; align-items: center; gap: 0.25rem; margin-top: 0.5rem; color: var(--blue-600); font-size: 0.75rem; font-weight: 500;">
-                            <i data-lucide="trending-up" style="width: 12px;"></i>
-                            Inscrits dans vos classes
-                        </div>
-                    </div>
-                    <div
-                        style="padding: 1rem; background: var(--blue-50); color: var(--blue-600); border-radius: 0.75rem;">
-                        <i data-lucide="user-plus" style="width: 32px; height: 32px;"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hero Section -->
-            <div class="grid-3" style="margin-bottom: 2rem;">
-                <!-- Next Session -->
-                <div class="col-span-2 hero-card">
-                    <div class="hero-card-pattern"></div>
-                    <div style="position: relative; z-index: 10;">
-                        <div
-                            style="display: flex; align-items: center; gap: 0.5rem; opacity: 0.9; margin-bottom: 1rem;">
-                            <i data-lucide="video" style="width: 20px;"></i>
-                            <span
-                                style="text-transform: uppercase; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;">Prochain
-                                Cours</span>
-                        </div>
-
-                        <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem;">Mathématiques Avancées -
-                            Terminale</h2>
-
-                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                            <div class="countdown-box">
-                                <span class="countdown-number" id="hours">02</span>
-                                <span class="countdown-label">Heures</span>
-                            </div>
-                            <div class="countdown-box">
-                                <span class="countdown-number" id="minutes">45</span>
-                                <span class="countdown-label">Minutes</span>
-                            </div>
-                            <div class="countdown-box">
-                                <span class="countdown-number" id="seconds">10</span>
-                                <span class="countdown-label">Secondes</span>
-                            </div>
-                        </div>
-
-                        <button
-                            style="background: white; color: var(--blue-600); padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-lg);">
-                            <i data-lucide="video" style="width: 20px;"></i>
-                            Rejoindre le Live
+                        <button onclick="instructorDashboard.showCreateCourseModal()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all hover:-translate-y-1 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Nouveau Cours
                         </button>
                     </div>
-                </div>
 
-                <!-- Quick Actions -->
-                <div>
-                    <h3
-                        style="font-size: 0.75rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
-                        Actions Rapides</h3>
-
-                    <a href="paiements.html" class="action-card">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div
-                                style="padding: 0.5rem; background: var(--orange-50); color: orange; border-radius: 0.5rem;">
-                                <i data-lucide="dollar-sign" style="width: 20px;"></i>
-                            </div>
-                            <div>
-                                <h4 style="font-weight: 700; font-size: 0.875rem;">2 Paiements</h4>
-                                <p style="font-size: 0.75rem; color: var(--gray-500);">À vérifier</p>
-                            </div>
+                    <!-- Stats Container (Loaded Dynamically) -->
+                    <div id="statsContainer" class="animate-fade-in">
+                        <!-- Placeholder while loading -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse"></div>
+                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse delay-75"></div>
+                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse delay-150"></div>
+                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse delay-200"></div>
                         </div>
-                        <i data-lucide="arrow-right" style="width: 16px; color: var(--gray-400);"></i>
-                    </a>
-
-                    <a href="#messages-section" class="action-card">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div
-                                style="padding: 0.5rem; background: var(--blue-50); color: var(--blue-600); border-radius: 0.5rem;">
-                                <i data-lucide="message-circle" style="width: 20px;"></i>
-                            </div>
-                            <div>
-                                <h4 style="font-weight: 700; font-size: 0.875rem;">5 Messages</h4>
-                                <p style="font-size: 0.75rem; color: var(--gray-500);">Nouveaux</p>
-                            </div>
-                        </div>
-                        <i data-lucide="arrow-right" style="width: 16px; color: var(--gray-400);"></i>
-                    </a>
-
-                    <a href="paiements.html" class="action-card">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div
-                                style="padding: 0.5rem; background: var(--red-50); color: var(--red-600); border-radius: 0.5rem;">
-                                <i data-lucide="file-text" style="width: 20px;"></i>
-                            </div>
-                            <div>
-                                <h4 style="font-weight: 700; font-size: 0.875rem;">1 Facture</h4>
-                                <p style="font-size: 0.75rem; color: var(--gray-500);">Non réglée</p>
-                            </div>
-                        </div>
-                        <i data-lucide="arrow-right" style="width: 16px; color: var(--gray-400);"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Bottom Section -->
-            <div class="grid-3">
-                <!-- Schedule -->
-                <div class="col-span-2"
-                    style="background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-                        <i data-lucide="calendar" style="width: 20px; color: var(--blue-600);"></i>
-                        <h3 style="font-weight: 700; font-size: 1.125rem;">Aujourd'hui</h3>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <!-- Session Items -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                        <!-- Next Live Session Card (Premium) -->
                         <div
-                            style="display: flex; items-center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 0.75rem;">
-                            <i data-lucide="clock" style="color: var(--gray-400);"></i>
-                            <div style="flex: 1;">
-                                <h4 style="font-weight: 700; margin-bottom: 0.125rem;">Physique - Mécanique</h4>
-                                <p style="font-size: 0.875rem; color: var(--gray-500);">10:00 - 12:00</p>
+                            class="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200 group">
+                            <!-- Background blobs -->
+                            <div
+                                class="absolute top-0 right-0 p-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700">
                             </div>
-                            <span
-                                style="padding: 0.25rem 0.75rem; background: var(--green-100); color: var(--green-700); border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">Terminé</span>
-                        </div>
-
-                        <div
-                            style="display: flex; items-center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 0.75rem;">
-                            <i data-lucide="clock" style="color: var(--gray-400);"></i>
-                            <div style="flex: 1;">
-                                <h4 style="font-weight: 700; margin-bottom: 0.125rem;">Mathématiques Avancées</h4>
-                                <p style="font-size: 0.875rem; color: var(--gray-500);">14:00 - 16:00</p>
+                            <div class="absolute bottom-0 left-0 p-20 bg-black/10 rounded-full blur-2xl -ml-10 -mb-10">
                             </div>
-                            <span
-                                style="padding: 0.25rem 0.75rem; background: var(--blue-100); color: var(--blue-700); border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">À
-                                venir</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Messages -->
-                <div id="messages-section"
-                    style="background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-                        <i data-lucide="message-circle" style="width: 20px; color: var(--blue-600);"></i>
-                        <h3 style="font-weight: 700; font-size: 1.125rem;">Messages</h3>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        <div class="message-item">
-                            <div class="avatar" style="background: var(--blue-100); color: var(--blue-600);">AM</div>
-                            <div style="flex: 1; overflow: hidden;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.125rem;">
-                                    <h5 style="font-weight: 700; font-size: 0.875rem;">Amine Tounsi</h5>
-                                    <span style="font-size: 0.75rem; color: var(--gray-400);">10:30</span>
+                            <div class="relative z-10">
+                                <div
+                                    class="flex items-center gap-2 mb-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg inline-block text-xs font-bold uppercase tracking-wider">
+                                    <i data-lucide="video" class="w-3 h-3 inline"></i> En direct dans
                                 </div>
-                                <p
-                                    style="font-size: 0.875rem; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    Bonjour monsieur, pour le devoir...</p>
-                            </div>
-                        </div>
+                                <h3 class="text-2xl md:text-4xl font-extrabold mb-2">Mathématiques Avancées</h3>
+                                <p class="text-indigo-100 font-medium mb-8">Session de révision pour l'examen final •
+                                    Terminale S</p>
 
-                        <div class="message-item">
-                            <div class="avatar" style="background: var(--purple-100); color: var(--purple-600);">SB
-                            </div>
-                            <div style="flex: 1; overflow: hidden;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.125rem;">
-                                    <h5 style="font-weight: 700; font-size: 0.875rem;">Sarra Ben Ali</h5>
-                                    <span style="font-size: 0.75rem; color: var(--gray-400);">Hier</span>
+                                <div class="flex flex-wrap items-end gap-6">
+                                    <div class="flex gap-4">
+                                        <div
+                                            class="text-center bg-white/10 backdrop-blur-md rounded-xl p-3 min-w-[70px]">
+                                            <span class="block text-2xl font-bold">02</span>
+                                            <span class="text-[10px] uppercase font-bold text-indigo-200">Heures</span>
+                                        </div>
+                                        <div
+                                            class="text-center bg-white/10 backdrop-blur-md rounded-xl p-3 min-w-[70px]">
+                                            <span class="block text-2xl font-bold">45</span>
+                                            <span class="text-[10px] uppercase font-bold text-indigo-200">Minutes</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        class="bg-white text-indigo-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold shadow-lg transition-all hover:scale-105 flex items-center gap-2">
+                                        Lancer le Live <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                    </button>
                                 </div>
-                                <p
-                                    style="font-size: 0.875rem; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    Merci pour le cours !</p>
                             </div>
                         </div>
 
-                        <a href="#"
-                            style="display: block; text-align: center; padding: 0.75rem; font-weight: 700; font-size: 0.875rem; color: var(--blue-600); text-decoration: none; background: var(--blue-50); border-radius: 0.5rem; margin-top: 0.5rem;">
-                            Voir tous les messages
-                        </a>
-                    </div>
-                </div>
-            </div>
+                        <!-- Quick Actions & Mini Stats -->
+                        <div class="space-y-6">
+                            <!-- Active Students Card -->
+                            <div
+                                class="bg-white rounded-[1.5rem] p-6 border border-gray-100 shadow-xl shadow-gray-100 flex items-center justify-between hover:border-green-100 transition-colors">
+                                <div>
+                                    <p class="text-gray-500 font-medium text-sm mb-1">Étudiants en ligne</p>
+                                    <h4 class="text-3xl font-extrabold text-gray-900">42</h4>
+                                    <span class="text-xs font-bold text-green-500 flex items-center gap-1 mt-1">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Actifs
+                                        maintenant
+                                    </span>
+                                </div>
+                                <div
+                                    class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+                                    <i data-lucide="users" class="w-6 h-6"></i>
+                                </div>
+                            </div>
 
-            <!-- Mes Cours Section - Dynamic -->
-            <div
-                style="margin-top: 2rem; background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i data-lucide="book-open" style="width: 20px; color: var(--blue-600);"></i>
-                        <h3 style="font-weight: 700; font-size: 1.125rem;">Mes Cours</h3>
-                    </div>
-                    <button id="createCourseBtn"
-                        style="background: var(--indigo-600); color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
-                        <i data-lucide="plus" style="width: 16px;"></i> Créer un cours
-                    </button>
-                </div>
-                <div id="coursesContainer" class="grid-2" style="gap: 1rem;">
-                    <!-- Courses will be loaded dynamically -->
-                    <div style="text-center; padding: 2rem; color: var(--gray-500);">
-                        Chargement des cours...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mes Étudiants Section - Dynamic -->
-            <div
-                style="margin-top: 2rem; background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-                    <i data-lucide="users" style="width: 20px; color: var(--green-600);"></i>
-                    <h3 style="font-weight: 700; font-size: 1.125rem;">Mes Étudiants</h3>
-                </div>
-                <div id="studentsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <!-- Students will be loaded dynamically -->
-                    <div style="text-center; padding: 2rem; color: var(--gray-500);">
-                        Chargement des étudiants...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Financial Stats -->
-            <div
-                style="margin-top: 2rem; background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--gray-100);">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-                    <i data-lucide="dollar-sign" style="width: 20px; color: var(--green-600);"></i>
-                    <h3 style="font-weight: 700; font-size: 1.125rem;">Finances</h3>
-                </div>
-
-                <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                    <div
-                        style="padding: 1.25rem; background: var(--green-50); border-radius: 0.75rem; border: 1px solid var(--green-100);">
-                        <p
-                            style="font-size: 0.75rem; font-weight: 600; color: var(--green-600); margin-bottom: 0.25rem;">
-                            RECETTES TOTALES</p>
-                        <h4 style="font-size: 1.5rem; font-weight: 700; color: var(--green-700);">12,500 TND</h4>
+                            <!-- Messages Card -->
+                            <div class="bg-white rounded-[1.5rem] p-6 border border-gray-100 shadow-xl shadow-gray-100 flex items-center justify-between hover:border-blue-100 transition-colors cursor-pointer group"
+                                onclick="window.location.href='../etudiant/messages.html?role=formateur'">
+                                <div>
+                                    <p class="text-gray-500 font-medium text-sm mb-1">Messages non lus</p>
+                                    <h4 class="text-3xl font-extrabold text-gray-900">5</h4>
+                                    <span
+                                        class="text-xs font-bold text-blue-500 flex items-center gap-1 mt-1 group-hover:underline">
+                                        Voir les discussions
+                                    </span>
+                                </div>
+                                <div
+                                    class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                                    <i data-lucide="message-square" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div
-                        style="padding: 1.25rem; background: var(--purple-50); border-radius: 0.75rem; border: 1px solid var(--purple-100);">
-                        <p
-                            style="font-size: 0.75rem; font-weight: 600; color: var(--purple-600); margin-bottom: 0.25rem;">
-                            VENTES VIDÉOS</p>
-                        <h4 style="font-size: 1.5rem; font-weight: 700; color: var(--purple-700);">2,300 TND</h4>
+                    <!-- My Courses Section -->
+                    <div>
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-2xl font-bold text-gray-900">Mes Cours Récents</h3>
+                            <a href="classes.html"
+                                class="text-indigo-600 font-bold hover:text-indigo-700 flex items-center gap-1">
+                                Voir tout <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+
+                        <!-- Dynamic Courses Grid -->
+                        <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Loaded by JS -->
+                            <div class="col-span-full flex justify-center py-20">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div
-                        style="padding: 1.25rem; background: var(--blue-50); border-radius: 0.75rem; border: 1px solid var(--blue-100);">
-                        <p
-                            style="font-size: 0.75rem; font-weight: 600; color: var(--blue-600); margin-bottom: 0.25rem;">
-                            NET À PERCEVOIR</p>
-                        <h4 style="font-size: 1.5rem; font-weight: 700; color: var(--blue-700);">12,350 TND</h4>
-                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- Dynamic System Scripts -->
+    <!-- Scripts -->
     <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/components/sidebar-formateur.js"></script>
     <script src="../../js/pages/instructor-dashboard.js"></script>
-    <script src="../../js/main.js"></script>
+
     <script>
-        // Initialize Lucide icons
+        // Init Icons
         lucide.createIcons();
 
-        // Check auth
-        const user = window.eduspace.utils.getCurrentUser();
-        if (!user || user.role !== 'formateur') {
-            window.location.href = '../login-formateur.html';
+        // Mobile Menu Logic
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar-container');
+        const overlay = document.getElementById('mobile-menu-overlay');
+
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('h-full');
+                sidebar.classList.toggle('z-40');
+                overlay.classList.toggle('hidden');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+                overlay.classList.add('hidden');
+            });
         }
-
-        // Init Data Manager
-        DataManager.init();
-
-        // Update Stats
-        const classes = DataManager.getClasses();
-        const totalStudents = classes.reduce((acc, c) => acc + (c.students || 0), 0);
-
-        // Mock online students: random between 30 and 50
-        const onlineStudents = Math.floor(Math.random() * (50 - 30 + 1)) + 30;
-
-        document.getElementById('stat-students-online').textContent = onlineStudents;
-        document.getElementById('stat-students-total').textContent = totalStudents;
-
-        // Countdown Timer
-        function updateCountdown() {
-            const now = new Date();
-            // Target time: today at 14:00 (or next day if passed)
-            let target = new Date();
-            target.setHours(14, 0, 0, 0);
-
-            if (now > target) {
-                target.setDate(target.getDate() + 1);
-            }
-
-            const diff = target - now;
-
-            if (diff > 0) {
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
-            }
-        }
-
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
     </script>
 </body>
 
