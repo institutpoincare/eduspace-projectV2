@@ -197,12 +197,14 @@
         // Initialize state
         let currentDate = new Date();
         let classes = [];
+        let currentView = 'month'; // 'month' or 'week'
 
         // INIT
         document.addEventListener('DOMContentLoaded', async () => {
             if (window.dataManager) {
                 await dataManager.init();
                 classes = await dataManager.getAll('courses') || [];
+                console.log("Classes loaded:", classes);
             } else {
                 console.error("DataManager not found");
             }
@@ -210,6 +212,27 @@
             renderAgenda();
             lucide.createIcons();
         });
+
+        // --- VIEW SWITCHING ---
+        function setView(view) {
+            currentView = view;
+
+            const btnMonth = document.getElementById('btn-view-month');
+            const btnWeek = document.getElementById('btn-view-week');
+
+            if (view === 'month') {
+                btnMonth.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+                btnMonth.classList.remove('text-gray-500', 'font-medium');
+                btnWeek.classList.remove('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+                btnWeek.classList.add('text-gray-500', 'font-medium');
+            } else {
+                btnWeek.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+                btnWeek.classList.remove('text-gray-500', 'font-medium');
+                btnMonth.classList.remove('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+                btnMonth.classList.add('text-gray-500', 'font-medium');
+            }
+            renderCalendar();
+        }
 
         // --- CALENDAR LOGIC ---
 
@@ -225,6 +248,20 @@
             return days;
         }
 
+        function getDaysInWeek(date) {
+            const days = [];
+            const curr = new Date(date);
+            // Adjust to get current week (Sunday to Saturday for this simple view, or match calendar grid)
+            // The grid has DIM (0) as first col. So let's get last Sunday.
+            const first = curr.getDate() - curr.getDay();
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(new Date(curr).setDate(first + i));
+                days.push(d);
+            }
+            return days;
+        }
+
         function isSameDay(d1, d2) {
             return d1 && d2 &&
                 d1.getDate() === d2.getDate() &&
@@ -232,55 +269,69 @@
                 d1.getFullYear() === d2.getFullYear();
         }
 
-        // Generate actual session instances based on weekly slots
-        function generateSessions(classesList, targetDate, view = 'month') {
+        function normalizeDayName(name) {
+            if (!name) return -1;
+            const n = name.toLowerCase().trim()
+                .replace('é', 'e').replace('è', 'e');
+
+            if (n.includes('dim')) return 0;
+            if (n.includes('lun')) return 1;
+            if (n.includes('mar')) return 2;
+            if (n.includes('mer')) return 3;
+            if (n.includes('jeu')) return 4;
+            if (n.includes('ven')) return 5;
+            if (n.includes('sam')) return 6;
+            return -1;
+        }
+
+        function generateSessions(classesList, targetDate, view) {
             const sessions = [];
-            const year = targetDate.getFullYear();
-            const month = targetDate.getMonth();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            // Normalize Day Names to Index (handle case sensitivity)
-            const dayMap = { 'dimanche': 0, 'lundi': 1, 'mardi': 2, 'mercredi': 3, 'jeudi': 4, 'vendredi': 5, 'samedi': 6 };
+            // Define range to scan
+            let daysToScan = [];
+            if (view === 'week') {
+                daysToScan = getDaysInWeek(targetDate);
+            } else {
+                const year = targetDate.getFullYear();
+                const month = targetDate.getMonth();
+                const totalDays = new Date(year, month + 1, 0).getDate();
+                for (let i = 1; i <= totalDays; i++) daysToScan.push(new Date(year, month, i));
+            }
 
-            // For monthly view, check every day of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, month, day);
+            daysToScan.forEach(date => {
+                if (!date) return;
                 const dayIndex = date.getDay(); // 0-6
 
                 classesList.forEach(cls => {
-                    // Check if date is within course duration
-                    const startDate = cls.createdAt ? new Date(cls.createdAt) : new Date(); // Fallback to now if missing
-                    const durationWeeks = parseInt(cls.weeksDuration) || 52; // Default to 1 year if not specified
+                    // Start/End Dates Logic
+                    // FIX: If createdAt missing or null, fallback to far past so it shows up.
+                    const startDate = cls.createdAt ? new Date(cls.createdAt) : new Date('2023-01-01');
+                    const durationWeeks = parseInt(cls.weeksDuration) || 520; // Default 10 years if missing
                     const endDate = new Date(startDate);
                     endDate.setDate(startDate.getDate() + (durationWeeks * 7));
 
-                    // Only show if date is within range (ignoring time for simple comparison)
                     const checkDate = new Date(date).setHours(0, 0, 0, 0);
-                    // Allow sessions starting from startDate week
+
                     if (checkDate >= startDate.setHours(0, 0, 0, 0) && checkDate <= endDate.setHours(0, 0, 0, 0)) {
+                        const matchingSlots = (cls.slots || []).filter(s => normalizeDayName(s.day) === dayIndex);
 
-                        const activeSlots = (cls.slots || []).filter(s => {
-                            // Robust comparison (case insensitive, trim)
-                            const sDay = (s.day || '').toLowerCase().trim();
-                            return dayMap[sDay] === dayIndex;
-                        });
-
-                        activeSlots.forEach(slot => {
+                        matchingSlots.forEach(slot => {
                             sessions.push({
                                 id: cls.id,
                                 title: cls.name || cls.title,
                                 startTime: slot.start || slot.startTime,
                                 endTime: slot.end || slot.endTime,
-                                date: date,
+                                date: new Date(date),
                                 type: (cls.category === 'scolaire') ? 'blue' : 'purple',
                                 categoryLabel: cls.category || 'Cours',
-                                accessCode: cls.accessCode,
-                                link: (cls.contents && cls.contents.find(c => c.type === 'link')) ? cls.contents.find(c => c.type === 'link').value : null
+                                link: (cls.contents && cls.contents.find(c => c.type === 'link')) ? cls.contents.find(c => c.type === 'link').value : null,
+                                accessCode: cls.accessCode
                             });
                         });
                     }
                 });
-            }
+            });
+
             return sessions.sort((a, b) => a.startTime.localeCompare(b.startTime));
         }
 
@@ -290,17 +341,42 @@
 
             monthTitle.textContent = currentDate.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
 
-            const days = getDaysInMonth(currentDate);
-            const sessions = generateSessions(classes, currentDate);
+            let daysCells = [];
+            if (currentView === 'month') {
+                daysCells = getDaysInMonth(currentDate);
+            } else {
+                daysCells = getDaysInWeek(currentDate);
+            }
+
+            // Always use MONTHLY generation for the month view to fill all cells correctly, 
+            // but for week view we restrict.
+            // Actually simpler: just generate for the dates we display.
+            const sessions = generateSessions(classes, currentDate, currentView);
 
             grid.innerHTML = '';
 
-            days.forEach(day => {
+            // Adjust grid for week view
+            if (currentView === 'week') {
+                grid.style.display = 'flex';
+                grid.style.flexDirection = 'row';
+                grid.style.overflowX = 'hidden';
+            } else {
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            }
+
+            daysCells.forEach(day => {
                 const cell = document.createElement('div');
-                const isToday = isSameDay(day, new Date());
-                cell.className = `calendar-cell ${isToday ? 'today' : ''} flex flex-col gap-1`;
+                cell.className = 'calendar-cell flex flex-col gap-1 min-h-[120px] bg-white border-r border-gray-100 last:border-r-0';
+
+                if (currentView === 'week') {
+                    cell.style.flex = '1';
+                }
 
                 if (day) {
+                    const isToday = isSameDay(day, new Date());
+                    if (isToday) cell.classList.add('today', 'bg-blue-50/30');
+
                     const dayNum = document.createElement('span');
                     dayNum.className = `w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold mb-1 ${isToday ? 'bg-blue-600 text-white' : 'text-gray-700'}`;
                     dayNum.textContent = day.getDate();
@@ -311,9 +387,9 @@
                         const chip = document.createElement('div');
                         const colorClass = s.type === 'blue' ? 'bg-blue-50 border-blue-500 text-blue-700 hover:bg-blue-100' : 'bg-purple-50 border-purple-500 text-purple-700 hover:bg-purple-100';
                         chip.className = `px-2 py-1 rounded border-l-2 text-xs font-semibold truncate cursor-pointer transition-colors ${colorClass}`;
-
                         chip.textContent = `${s.startTime} ${s.title}`;
-                        chip.onclick = () => alert(`Session: ${s.title}\nHeure: ${s.startTime} - ${s.endTime}`);
+                        chip.title = `${s.title} (${s.startTime}-${s.endTime})`;
+                        chip.onclick = () => alert(`Session: ${s.title}\nHeure: ${s.startTime} - ${s.endTime}\nCode: ${s.accessCode}`);
                         cell.appendChild(chip);
                     });
                 } else {
@@ -326,14 +402,13 @@
 
         function renderAgenda() {
             const list = document.getElementById('agenda-list');
-            const today = new Date(); // Always show real today in sidebar
+            const today = new Date();
 
             document.getElementById('today-date-sidebar').textContent = today.toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-            // Generate sessions only for today
-            const sessions = generateSessions(classes, today).filter(s => isSameDay(s.date, today));
+            const todaySessions = generateSessions(classes, today, 'week').filter(s => isSameDay(s.date, today));
 
-            if (sessions.length === 0) {
+            if (todaySessions.length === 0) {
                 list.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-48 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                         <i data-lucide="coffee" class="w-10 h-10 mb-2 opacity-50"></i>
@@ -341,7 +416,7 @@
                     </div>
                 `;
             } else {
-                list.innerHTML = sessions.map(s => `
+                list.innerHTML = todaySessions.map(s => `
                     <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-blue-200 transition-colors group">
                         <p class="text-sm font-medium text-gray-500 mb-1 flex justify-between">
                             <span>${s.startTime} - ${s.endTime}</span>
@@ -359,7 +434,7 @@
 
         function joinSession(link) {
             if (link) window.open(link, '_blank');
-            else alert("Aucun lien de réunion configuré pour ce cours.");
+            else alert("Aucun lien de réunion configuré pour ce cours. Ajoutez un lien externe dans 'Modifier la Classe'.");
         }
 
         function changeMonth(delta) {
