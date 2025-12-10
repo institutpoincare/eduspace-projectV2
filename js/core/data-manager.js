@@ -16,28 +16,71 @@ class DataManager {
     async init() {
         if (this.initialized) return;
 
+        console.log('🔄 DataManager: Initialisation...');
+
         for (const entity of this.entities) {
             // Vérifier si les données existent déjà dans LocalStorage
-            const existingData = localStorage.getItem(entity);
+            let data = localStorage.getItem(entity);
 
-            if (!existingData) {
-                // Charger depuis le fichier JSON
-                try {
-                    const response = await fetch(`/data/${entity}.json`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        localStorage.setItem(entity, JSON.stringify(data));
-                        console.log(`✅ ${entity} chargé depuis JSON`);
+            if (!data || data === 'undefined' || data === '{}') {
+                console.log(`📥 Tentative de chargement de ${entity}...`);
+
+                // Essayer plusieurs chemins possibles pour trouver le fichier JSON
+                const paths = [
+                    `./data/${entity}.json`,       // Relatif standard
+                    `../../data/${entity}.json`,   // Si appelé depuis une sous-page
+                    `data/${entity}.json`          // Relatif simple
+                ];
+
+                let loaded = false;
+
+                for (const path of paths) {
+                    try {
+                        const response = await fetch(path);
+                        if (response.ok) {
+                            const jsonData = await response.json();
+                            // Vérifier que le format est correct (objet avec clé du nom de l'entité ou tableau direct)
+                            const items = jsonData[entity] || jsonData || [];
+                            localStorage.setItem(entity, JSON.stringify({ [entity]: items }));
+                            console.log(`✅ ${entity} chargé depuis ${path}`);
+                            loaded = true;
+                            break;
+                        }
+                    } catch (e) {
+                        // Continuer au prochain chemin
                     }
-                } catch (error) {
-                    console.warn(`⚠️ Impossible de charger ${entity}.json, initialisation vide`);
-                    localStorage.setItem(entity, JSON.stringify({ [entity]: [] }));
+                }
+
+                if (!loaded) {
+                    console.warn(`⚠️ Impossible de charger ${entity}.json. Utilisation de données vides/mock temporaires.`);
+                    // Injection de données de secours si échec total (pour éviter le chargement infini)
+                    const mockData = this.getFallbackData(entity);
+                    localStorage.setItem(entity, JSON.stringify({ [entity]: mockData }));
                 }
             }
         }
 
         this.initialized = true;
-        console.log('✅ DataManager initialisé');
+        console.log('✅ DataManager initialisé avec succès');
+    }
+
+    // Données de secours pour éviter l'écran blanc/chargement infini
+    getFallbackData(entity) {
+        if (entity === 'instructors') {
+            return [
+                { id: 'ahmed', name: 'Ahmed Ben Ali', specialty: 'Expert DevOps', rating: 4.9, students: '15k+', image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+                { id: 'sarah', name: 'Sarah M.', specialty: 'UX/UI Design', rating: 5.0, students: '8k+', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+                { id: 'karim', name: 'Karim S.', specialty: 'Dév Mobile iOS', rating: 4.7, students: '5k+', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+                { id: 'leila', name: 'Leila K.', specialty: 'Marketing Digital', rating: 4.8, students: '12k+', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
+            ];
+        }
+        if (entity === 'centers') {
+            return [
+                { id: 'c1', name: 'GoMyCode', category: 'Coding Bootcamp', location: 'Tunis', description: 'Le premier bootcamp de code en Tunisie.' },
+                { id: 'c2', name: 'GMC', category: 'Formation Pro', location: 'Sousse', description: 'Centre de formation accélérée.' }
+            ];
+        }
+        return [];
     }
 
     /**
