@@ -199,7 +199,7 @@
         // Initialize state
         let currentDate = new Date();
         let classes = [];
-        let currentView = 'month'; // 'month' or 'week'
+        let currentView = 'month'; // 'month', 'week', 'day'
 
         // INIT
         document.addEventListener('DOMContentLoaded', async () => {
@@ -221,18 +221,24 @@
 
             const btnMonth = document.getElementById('btn-view-month');
             const btnWeek = document.getElementById('btn-view-week');
+            const btnDay = document.getElementById('btn-view-day');
 
-            if (view === 'month') {
-                btnMonth.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
-                btnMonth.classList.remove('text-gray-500', 'font-medium');
-                btnWeek.classList.remove('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
-                btnWeek.classList.add('text-gray-500', 'font-medium');
-            } else {
-                btnWeek.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
-                btnWeek.classList.remove('text-gray-500', 'font-medium');
-                btnMonth.classList.remove('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
-                btnMonth.classList.add('text-gray-500', 'font-medium');
-            }
+            // Reset all
+            [btnMonth, btnWeek, btnDay].forEach(btn => {
+                btn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+                btn.classList.add('text-gray-500', 'font-medium');
+            });
+
+            // Active one
+            if (view === 'month') btnMonth.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+            if (view === 'week') btnWeek.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+            if (view === 'day') btnDay.classList.add('bg-white', 'shadow-sm', 'text-gray-900', 'font-bold');
+
+            // Remove inactive class from active
+            if (view === 'month') btnMonth.classList.remove('text-gray-500', 'font-medium');
+            if (view === 'week') btnWeek.classList.remove('text-gray-500', 'font-medium');
+            if (view === 'day') btnDay.classList.remove('text-gray-500', 'font-medium');
+
             renderCalendar();
         }
 
@@ -242,8 +248,7 @@
             const year = date.getFullYear();
             const month = date.getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sunday
-
+            const firstDayOfWeek = new Date(year, month, 1).getDay();
             const days = [];
             for (let i = 0; i < firstDayOfWeek; i++) days.push(null);
             for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
@@ -253,13 +258,9 @@
         function getDaysInWeek(date) {
             const days = [];
             const curr = new Date(date);
-            // Adjust to get current week (Sunday to Saturday for this simple view, or match calendar grid)
-            // The grid has DIM (0) as first col. So let's get last Sunday.
-            const first = curr.getDate() - curr.getDay();
-
+            const first = curr.getDate() - curr.getDay(); // Sunday
             for (let i = 0; i < 7; i++) {
-                const d = new Date(new Date(curr).setDate(first + i));
-                days.push(d);
+                days.push(new Date(new Date(curr).setDate(first + i)));
             }
             return days;
         }
@@ -291,7 +292,9 @@
 
             // Define range to scan
             let daysToScan = [];
-            if (view === 'week') {
+            if (view === 'day') {
+                daysToScan = [new Date(targetDate)]; // Just one day
+            } else if (view === 'week') {
                 daysToScan = getDaysInWeek(targetDate);
             } else {
                 const year = targetDate.getFullYear();
@@ -305,32 +308,26 @@
                 const dayIndex = date.getDay(); // 0-6
 
                 classesList.forEach(cls => {
-                    // Start/End Dates Logic
-                    // FIX: If createdAt missing or null, fallback to far past so it shows up.
-                    const startDate = cls.createdAt ? new Date(cls.createdAt) : new Date('2023-01-01');
-                    const durationWeeks = parseInt(cls.weeksDuration) || 520; // Default 10 years if missing
-                    const endDate = new Date(startDate);
-                    endDate.setDate(startDate.getDate() + (durationWeeks * 7));
+                    // FORCE DISPLAY: Remove strict date range checks for recurrence
+                    // If slot matches day index, we show it.
+                    // This assumes recurring sessions happen every week forever (until deleted) 
+                    // which is better for UX if dates are messy.
 
-                    const checkDate = new Date(date).setHours(0, 0, 0, 0);
+                    const matchingSlots = (cls.slots || []).filter(s => normalizeDayName(s.day) === dayIndex);
 
-                    if (checkDate >= startDate.setHours(0, 0, 0, 0) && checkDate <= endDate.setHours(0, 0, 0, 0)) {
-                        const matchingSlots = (cls.slots || []).filter(s => normalizeDayName(s.day) === dayIndex);
-
-                        matchingSlots.forEach(slot => {
-                            sessions.push({
-                                id: cls.id,
-                                title: cls.name || cls.title,
-                                startTime: slot.start || slot.startTime,
-                                endTime: slot.end || slot.endTime,
-                                date: new Date(date),
-                                type: (cls.category === 'scolaire') ? 'blue' : 'purple',
-                                categoryLabel: cls.category || 'Cours',
-                                link: (cls.contents && cls.contents.find(c => c.type === 'link')) ? cls.contents.find(c => c.type === 'link').value : null,
-                                accessCode: cls.accessCode
-                            });
+                    matchingSlots.forEach(slot => {
+                        sessions.push({
+                            id: cls.id,
+                            title: cls.name || cls.title,
+                            startTime: slot.start || slot.startTime,
+                            endTime: slot.end || slot.endTime,
+                            date: new Date(date),
+                            type: (cls.category === 'scolaire') ? 'blue' : 'purple',
+                            categoryLabel: cls.category || 'Cours',
+                            link: (cls.contents && cls.contents.find(c => c.type === 'link')) ? cls.contents.find(c => c.type === 'link').value : null,
+                            accessCode: cls.accessCode
                         });
-                    }
+                    });
                 });
             });
 
@@ -341,56 +338,86 @@
             const grid = document.getElementById('calendar-grid');
             const monthTitle = document.getElementById('current-month');
 
-            monthTitle.textContent = currentDate.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-
-            let daysCells = [];
-            if (currentView === 'month') {
-                daysCells = getDaysInMonth(currentDate);
+            if (currentView === 'day') {
+                monthTitle.textContent = currentDate.toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             } else {
-                daysCells = getDaysInWeek(currentDate);
+                monthTitle.textContent = currentDate.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
             }
 
-            // Always use MONTHLY generation for the month view to fill all cells correctly, 
-            // but for week view we restrict.
-            // Actually simpler: just generate for the dates we display.
+            let daysCells = [];
+            if (currentView === 'month') daysCells = getDaysInMonth(currentDate);
+            else if (currentView === 'week') daysCells = getDaysInWeek(currentDate);
+            else daysCells = [currentDate]; // Day View
+
             const sessions = generateSessions(classes, currentDate, currentView);
 
             grid.innerHTML = '';
+            grid.removeAttribute('style'); // Clear inline styles
 
-            // Adjust grid for week view
-            if (currentView === 'week') {
-                grid.style.display = 'flex';
-                grid.style.flexDirection = 'row';
-                grid.style.overflowX = 'hidden';
-            } else {
+            // GRID STYLES
+            if (currentView === 'month') {
+                grid.className = 'calendar-grid'; // Use CSS grid
                 grid.style.display = 'grid';
                 grid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            } else if (currentView === 'week') {
+                grid.className = 'flex flex-row overflow-x-auto';
+            } else { // Day
+                grid.className = 'flex flex-col';
             }
 
             daysCells.forEach(day => {
                 const cell = document.createElement('div');
-                cell.className = 'calendar-cell flex flex-col gap-1 min-h-[120px] bg-white border-r border-gray-100 last:border-r-0';
 
-                if (currentView === 'week') {
-                    cell.style.flex = '1';
+                if (currentView === 'month') {
+                    cell.className = 'calendar-cell flex flex-col gap-1 min-h-[120px] bg-white border-r border-gray-100 last:border-r-0';
+                } else if (currentView === 'week') {
+                    cell.className = 'flex-1 min-w-[140px] border-r border-gray-200 bg-white p-2 min-h-[600px] flex flex-col gap-2';
+                } else { // Day
+                    cell.className = 'w-full bg-white p-4 min-h-[600px] flex flex-col gap-3';
                 }
 
                 if (day) {
                     const isToday = isSameDay(day, new Date());
-                    if (isToday) cell.classList.add('today', 'bg-blue-50/30');
 
-                    const dayNum = document.createElement('span');
-                    dayNum.className = `w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold mb-1 ${isToday ? 'bg-blue-600 text-white' : 'text-gray-700'}`;
-                    dayNum.textContent = day.getDate();
+                    // Header of the cell
+                    const dayNum = document.createElement('div');
+                    if (currentView === 'month') {
+                        if (isToday) cell.classList.add('today');
+                        dayNum.className = `w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold mb-1 ${isToday ? 'bg-blue-600 text-white' : 'text-gray-700'}`;
+                        dayNum.textContent = day.getDate();
+                    } else {
+                        // Week/Day Header inside cell
+                        dayNum.className = `p-2 text-center font-bold mb-4 border-b border-gray-100 ${isToday ? 'text-blue-600' : 'text-gray-900'}`;
+                        dayNum.textContent = day.toLocaleString('fr-FR', { weekday: 'long', day: 'numeric' });
+                    }
                     cell.appendChild(dayNum);
 
                     const daySessions = sessions.filter(s => isSameDay(s.date, day));
+
+                    if (daySessions.length === 0 && currentView !== 'month') {
+                        const empty = document.createElement('div');
+                        empty.className = 'flex-1 flex items-center justify-center text-gray-300 text-sm italic';
+                        empty.textContent = 'Aucun cours';
+                        cell.appendChild(empty);
+                    }
+
                     daySessions.forEach(s => {
                         const chip = document.createElement('div');
                         const colorClass = s.type === 'blue' ? 'bg-blue-50 border-blue-500 text-blue-700 hover:bg-blue-100' : 'bg-purple-50 border-purple-500 text-purple-700 hover:bg-purple-100';
-                        chip.className = `px-2 py-1 rounded border-l-2 text-xs font-semibold truncate cursor-pointer transition-colors ${colorClass}`;
-                        chip.textContent = `${s.startTime} ${s.title}`;
-                        chip.title = `${s.title} (${s.startTime}-${s.endTime})`;
+
+                        if (currentView === 'month') {
+                            chip.className = `px-2 py-1 rounded border-l-2 text-xs font-semibold truncate cursor-pointer transition-colors ${colorClass}`;
+                            chip.textContent = `${s.startTime} ${s.title}`;
+                        } else {
+                            // Bigger cards for Week/Day
+                            chip.className = `p-3 rounded-lg border-l-4 shadow-sm cursor-pointer transition-transform hover:-translate-y-1 ${colorClass} mb-2`;
+                            chip.innerHTML = `
+                                <div class="font-bold text-sm">${s.startTime} - ${s.endTime}</div>
+                                <div class="font-bold text-base truncate">${s.title}</div>
+                                <div class="text-xs opacity-75 mt-1">${s.categoryLabel}</div>
+                             `;
+                        }
+
                         chip.onclick = () => alert(`Session: ${s.title}\nHeure: ${s.startTime} - ${s.endTime}\nCode: ${s.accessCode}`);
                         cell.appendChild(chip);
                     });
@@ -408,7 +435,7 @@
 
             document.getElementById('today-date-sidebar').textContent = today.toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-            const todaySessions = generateSessions(classes, today, 'week').filter(s => isSameDay(s.date, today));
+            const todaySessions = generateSessions(classes, today, 'day'); // Reuse day generation
 
             if (todaySessions.length === 0) {
                 list.innerHTML = `
@@ -440,7 +467,13 @@
         }
 
         function changeMonth(delta) {
-            currentDate.setMonth(currentDate.getMonth() + delta);
+            if (currentView === 'day') {
+                currentDate.setDate(currentDate.getDate() + delta);
+            } else if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() + (delta * 7));
+            } else {
+                currentDate.setMonth(currentDate.getMonth() + delta);
+            }
             renderCalendar();
         }
 
