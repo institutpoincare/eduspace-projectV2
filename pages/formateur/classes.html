@@ -830,10 +830,29 @@
 
         // --- Finish ---
         async function finishCreation() {
+            // Get currently checked students from UI
             const checkboxes = document.querySelectorAll('.student-checkbox:checked');
-            const selectedStudents = Array.from(checkboxes).map(cb => ({
-                id: cb.value, name: cb.dataset.name, email: cb.dataset.email, amountPaid: 0, payment: 'Non Payé'
-            }));
+
+            // Retrieve existing class data if editing to preserve payments
+            let existingStudentsData = [];
+            if (isEditing && editingId) {
+                const classes = await dataManager.getAll('courses');
+                const currentClass = classes.find(c => c.id === editingId);
+                if (currentClass) existingStudentsData = currentClass.studentIds || [];
+            }
+
+            const selectedStudents = Array.from(checkboxes).map(cb => {
+                // Check if student was already in the class to keep payment info
+                const existing = existingStudentsData.find(s => s.id === cb.value);
+                return {
+                    id: cb.value,
+                    name: cb.dataset.name,
+                    email: cb.dataset.email,
+                    amountPaid: existing ? (existing.amountPaid || 0) : 0,
+                    payment: existing ? (existing.payment || 'Non Payé') : 'Non Payé',
+                    paymentMethod: existing ? (existing.paymentMethod || '') : ''
+                };
+            });
 
             const classData = {
                 name: document.getElementById('w-name').value,
@@ -848,7 +867,7 @@
                 studentIds: selectedStudents,
                 status: 'active',
                 image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800',
-                createdAt: new Date().toISOString()
+                createdAt: isEditing ? (existingStudentsData.createdAt || new Date().toISOString()) : new Date().toISOString()
             };
             if (isEditing && editingId) {
                 await dataManager.update('courses', editingId, classData);
