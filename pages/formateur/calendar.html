@@ -207,11 +207,27 @@
                 await dataManager.init();
                 classes = await dataManager.getAll('courses') || [];
                 console.log("Classes loaded:", classes);
+
+                // DEBUG PANEL
+                const debugDiv = document.createElement('div');
+                debugDiv.className = 'p-4 bg-yellow-50 border-t border-yellow-200 text-xs font-mono mt-4 text-yellow-800';
+                debugDiv.style.whiteSpace = 'pre-wrap';
+
+                if (classes.length === 0) {
+                    debugDiv.innerHTML = '<strong>DEBUG:</strong> Aucun cours trouvé dans la base de données (0 classes).';
+                } else {
+                    debugDiv.innerHTML = `<strong>DEBUG (Cours Chargés: ${classes.length}):</strong>\n` +
+                        classes.map(c => `ID: ${c.id}, Nom: ${c.name}, Slots: ${JSON.stringify(c.slots)}`).join('\n');
+                }
+                // document.querySelector('main').appendChild(debugDiv); // Uncomment to see debug on screen
+
+                // If classes exist but none displayed, maybe render issue
+                // Force render
+                renderCalendar();
+                renderAgenda();
             } else {
                 console.error("DataManager not found");
             }
-            renderCalendar();
-            renderAgenda();
             lucide.createIcons();
         });
 
