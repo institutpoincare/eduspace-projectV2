@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
@@ -13,10 +13,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
+                fontFamily: {
+                    sans: ['Outfit', 'sans-serif'],
+                },
                 extend: {
                     colors: {
                         primary: '#4f46e5',
@@ -28,6 +35,10 @@
     </script>
 
     <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
         /* Custom Animations */
         @keyframes fadeIn {
             from {
@@ -52,40 +63,32 @@
             z-index: -1;
             pointer-events: none;
             overflow: hidden;
+            background: #f8fafc;
         }
 
         .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.2;
+            filter: blur(100px);
+            opacity: 0.4;
         }
 
         .blob-1 {
             top: -10%;
             left: -10%;
-            width: 40%;
-            height: 40%;
+            width: 50%;
+            height: 50%;
             background: #60a5fa;
-            animation: float 6s ease-in-out infinite;
+            animation: float 8s ease-in-out infinite;
         }
 
         .blob-2 {
             bottom: -10%;
             right: -5%;
-            width: 30%;
-            height: 30%;
+            width: 40%;
+            height: 40%;
             background: #a78bfa;
-            animation: float 6s ease-in-out infinite 2s;
-        }
-
-        .blob-3 {
-            top: 20%;
-            right: 10%;
-            width: 20%;
-            height: 20%;
-            background: rgba(99, 102, 241, 0.1);
-            animation: float 6s ease-in-out infinite 4s;
+            animation: float 10s ease-in-out infinite 2s;
         }
 
         @keyframes float {
@@ -94,7 +97,7 @@
             }
 
             50% {
-                transform: translate(0, 20px);
+                transform: translate(0, 30px);
             }
 
             100% {
@@ -102,172 +105,227 @@
             }
         }
 
-        .role-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .role-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .role-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            border-color: #4f46e5;
-        }
-
-        .role-card-icon {
-            color: #4f46e5;
-            margin-bottom: 1rem;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-900 font-sans">
+<body class="text-gray-900 overflow-x-hidden">
 
     <!-- Background Blobs -->
     <div class="bg-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
     </div>
 
     <!-- Navbar -->
-    <nav id="navbar" class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div class="container mx-auto px-6 h-20 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2">
+    <nav id="navbar"
+        class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3 group">
                 <div
-                    class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-200">
+                    class="w-12 h-12 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform">
                     E</div>
-                <span
-                    class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">EduSpace</span>
+                <div class="flex flex-col">
+                    <span
+                        class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">EduSpace</span>
+                    <span class="text-xs text-gray-500 font-medium tracking-wider">LEARNING PLATFORM</span>
+                </div>
             </a>
 
-            <div class="hidden md:flex items-center gap-8">
-                <a href="index.html" class="text-sm font-medium text-indigo-600">Accueil</a>
+            <div class="hidden lg:flex items-center gap-10">
+                <a href="index.html"
+                    class="text-base font-bold text-indigo-600 relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600">Accueil</a>
                 <a href="pages/etudiant/catalogue.html"
-                    class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Catalogue</a>
+                    class="text-base font-medium text-gray-600 hover:text-indigo-600 transition-colors">Catalogue</a>
                 <a href="pages/etudiant/dashboard.html"
-                    class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Tableau de
+                    class="text-base font-medium text-gray-600 hover:text-indigo-600 transition-colors">Tableau de
                     Bord</a>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 <a href="pages/login-etudiant.html"
-                    class="text-sm font-bold text-gray-600 hover:text-indigo-600 px-4 py-2">Connexion</a>
+                    class="hidden md:block text-base font-bold text-gray-600 hover:text-indigo-600 px-4 py-2">Connexion</a>
                 <a href="pages/entreprise/inscription.html"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full font-bold shadow-lg shadow-indigo-200 transition-all hover:scale-105 text-sm">Inscription</a>
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full font-bold shadow-xl shadow-indigo-200 transition-all hover:scale-105 hover:shadow-indigo-300 transform active:scale-95">
+                    Inscription
+                </a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="container mx-auto px-6 py-16 md:py-24 text-center">
-        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight fade-in">
-            Apprenez avec les meilleurs <br>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">formateurs
-                tunisiens</span>
+    <section class="max-w-7xl mx-auto px-6 py-20 lg:py-32 text-center relative">
+        <!-- Floating Elements Decoration -->
+        <div class="absolute top-20 left-10 animate-bounce delay-100 hidden xl:block">
+            <span class="text-6xl">🎓</span>
+        </div>
+        <div class="absolute bottom-20 right-10 animate-bounce delay-700 hidden xl:block">
+            <span class="text-6xl">🚀</span>
+        </div>
+
+        <span
+            class="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full font-bold text-sm tracking-wide uppercase inline-block mb-6 shadow-sm border border-indigo-100 fade-in">
+            🚀 La plateforme #1 en Tunisie
+        </span>
+
+        <h1
+            class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-gray-900 mb-8 leading-[1.1] tracking-tight fade-in">
+            Apprenez avec les <br>
+            <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 animate-gradient">Meilleurs
+                Experts</span>
         </h1>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-12 fade-in leading-relaxed" style="animation-delay: 0.1s">
-            La plateforme de formation en ligne qui connecte les meilleurs formateurs, étudiants et entreprises de
-            Tunisie.
+
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-16 fade-in leading-relaxed font-light"
+            style="animation-delay: 0.1s">
+            Connectez-vous avec des formateurs d'élite, rejoignez des classes virtuelles interactives et propulsez votre
+            carrière vers de nouveaux sommets.
         </p>
 
-        <div class="mb-16 fade-in" style="animation-delay: 0.2s">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24 fade-in"
+            style="animation-delay: 0.2s">
             <a href="pages/etudiant/catalogue.html"
-                class="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold shadow-lg shadow-indigo-200 transition-all hover:scale-105 mx-auto text-lg">
-                <i data-lucide="search" class="w-5 h-5"></i> Explorer le Catalogue
+                class="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 transition-all hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-3">
+                <i data-lucide="search" class="w-6 h-6"></i> Explorer le Catalogue
+            </a>
+            <a href="#roles"
+                class="w-full sm:w-auto px-10 py-5 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 flex items-center justify-center gap-3">
+                <i data-lucide="users" class="w-6 h-6"></i> Choisir mon Profil
             </a>
         </div>
 
         <!-- Role Cards -->
-        <div class="role-cards max-w-5xl mx-auto fade-in" style="animation-delay: 0.3s">
-            <a href="pages/formateur/dashboard.html" class="role-card group">
-                <div class="role-card-icon p-4 bg-indigo-50 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="video" class="w-8 h-8 text-indigo-600"></i>
+        <div id="roles"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto fade-in scroll-mt-32"
+            style="animation-delay: 0.3s">
+            <a href="pages/formateur/dashboard.html"
+                class="group glass-card p-8 rounded-[2rem] hover:bg-white hover:border-indigo-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-left relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-150 z-0">
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Formateur</h3>
-                <p class="text-gray-500 text-sm">Créez et partagez vos cours en direct ou enregistrés</p>
+                <div class="relative z-10">
+                    <div
+                        class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="video" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                        Formateur</h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">Créez des cours, animez des sessions live et
+                        monétisez votre expertise.</p>
+                </div>
             </a>
 
-            <a href="pages/etudiant/dashboard.html" class="role-card group">
-                <div class="role-card-icon p-4 bg-purple-50 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="graduation-cap" class="w-8 h-8 text-purple-600"></i>
+            <a href="pages/etudiant/dashboard.html"
+                class="group glass-card p-8 rounded-[2rem] hover:bg-white hover:border-purple-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-left relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-150 z-0">
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Étudiant</h3>
-                <p class="text-gray-500 text-sm">Apprenez à votre rythme avec nos formations de qualité</p>
+                <div class="relative z-10">
+                    <div
+                        class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
+                        Étudiant</h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">Accédez à des formations de qualité et obtenez
+                        des certifications reconnues.</p>
+                </div>
             </a>
 
-            <a href="pages/parent/dashboard.html" class="role-card group">
-                <div class="role-card-icon p-4 bg-pink-50 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="home" class="w-8 h-8 text-pink-600"></i>
+            <a href="pages/parent/dashboard.html"
+                class="group glass-card p-8 rounded-[2rem] hover:bg-white hover:border-pink-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-left relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-pink-50 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-150 z-0">
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Parent</h3>
-                <p class="text-gray-500 text-sm">Suivez la progression et la réussite de vos enfants</p>
+                <div class="relative z-10">
+                    <div
+                        class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-pink-600 mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="home" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition-colors">Parent
+                    </h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">Suivez les progrès de vos enfants et
+                        communiquez avec leurs tuteurs.</p>
+                </div>
             </a>
 
-            <a href="pages/entreprise/dashboard.html" class="role-card group">
-                <div class="role-card-icon p-4 bg-blue-50 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="briefcase" class="w-8 h-8 text-blue-600"></i>
+            <a href="pages/entreprise/dashboard.html"
+                class="group glass-card p-8 rounded-[2rem] hover:bg-white hover:border-blue-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-left relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-150 z-0">
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Entreprise</h3>
-                <p class="text-gray-500 text-sm">Formez vos équipes efficacement pour l'avenir</p>
+                <div class="relative z-10">
+                    <div
+                        class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="briefcase" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                        Entreprise</h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">Formez vos équipes et recrutez les meilleurs
+                        talents de demain.</p>
+                </div>
             </a>
         </div>
     </section>
 
     <!-- FEATURED SECTIONS -->
-    <main class="container mx-auto px-6 py-16 space-y-24">
+    <main class="max-w-7xl mx-auto px-6 py-20 lg:py-32 space-y-32">
 
         <!-- TOP FORMATEURS -->
         <section>
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nos Stars de l'Enseignement 🌟</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Découvrez les experts qui transforment
-                    l'apprentissage.</p>
-            </div>
-
-            <!-- Categories Tabs (Mock) -->
-            <div class="flex justify-center gap-4 mb-10 flex-wrap">
-                <button
-                    class="px-6 py-2 bg-indigo-600 text-white rounded-full font-bold shadow-lg shadow-indigo-200 transition-transform hover:scale-105">Les
-                    Plus Vendus 🔥</button>
-                <button
-                    class="px-6 py-2 bg-white text-gray-600 border border-gray-200 rounded-full font-bold hover:bg-gray-50 hover:text-indigo-600 transition-colors">Les
-                    Plus Renommés 🏆</button>
-                <button
-                    class="px-6 py-2 bg-white text-gray-600 border border-gray-200 rounded-full font-bold hover:bg-gray-50 hover:text-indigo-600 transition-colors">Les
-                    Mieux Notés ⭐</button>
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                <div>
+                    <span class="text-indigo-600 font-bold tracking-wider uppercase">Excellence Pédagogique</span>
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mt-2">Nos Stars de l'Enseignement 🌟
+                    </h2>
+                </div>
+                <!-- Categories Tabs -->
+                <div class="flex gap-3 bg-gray-100 p-1.5 rounded-xl self-start md:self-auto overflow-x-auto max-w-full">
+                    <button
+                        class="px-6 py-3 bg-white text-gray-900 rounded-lg font-bold shadow-sm hover:shadow-md transition-all whitespace-nowrap">Top
+                        Ventes 🔥</button>
+                    <button
+                        class="px-6 py-3 text-gray-500 hover:bg-white/50 hover:text-gray-900 rounded-lg font-bold transition-all whitespace-nowrap">Les
+                        Mieux Notés ⭐</button>
+                    <button
+                        class="px-6 py-3 text-gray-500 hover:bg-white/50 hover:text-gray-900 rounded-lg font-bold transition-all whitespace-nowrap">Nouveaux
+                        🆕</button>
+                </div>
             </div>
 
             <div id="instructorsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Les formateurs seront chargés dynamiquement ici par home.js -->
-                <div class="col-span-full flex flex-col items-center justify-center py-20">
-                    <div class="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin">
+                <div
+                    class="col-span-full flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border border-gray-100 shadow-sm">
+                    <div class="w-20 h-20 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin">
                     </div>
-                    <p class="text-gray-500 mt-4 font-medium">Recherche des meilleurs formateurs...</p>
+                    <p class="text-gray-400 mt-6 font-medium text-lg">Recherche des meilleurs talents...</p>
                 </div>
+            </div>
+
+            <div class="text-center mt-16">
+                <a href="pages/etudiant/catalogue.html"
+                    class="inline-flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-all text-lg">
+                    Voir tous les formateurs <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </a>
             </div>
         </section>
 
         <!-- TOP CENTERS -->
-        <section>
-            <div class="text-center mb-12">
-                <div class="w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full mb-8"></div>
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Centres de Formation d'Excellence 🏆</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Des institutions reconnues pour leur qualité
-                    d'enseignement.</p>
+        <section class="relative">
+            <div
+                class="absolute -inset-10 bg-gradient-to-r from-gray-50 to-indigo-50/30 rounded-[3rem] -z-10 transform -skew-y-1">
+            </div>
+
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">Centres de Formation d'Excellence 🏆
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Des partenariats exclusifs avec les meilleures
+                    institutions pour garantir votre réussite.</p>
             </div>
 
             <div id="centersGrid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -283,66 +341,99 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-16 mt-24">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                <div>
-                    <div class="flex items-center gap-2 mb-6">
+    <footer class="bg-gray-900 text-white pt-24 pb-12 rounded-t-[3rem] mt-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3">
                         <div
-                            class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                            class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white font-bold text-2xl backdrop-blur-sm">
                             E</div>
-                        <span class="text-2xl font-bold">EduSpace</span>
+                        <span class="text-3xl font-bold">EduSpace</span>
                     </div>
-                    <p class="text-gray-400 leading-relaxed">
-                        La première plateforme éducative en Tunisie qui connecte l'excellence pédagogique avec les
-                        outils numériques modernes.
+                    <p class="text-gray-400 leading-relaxed text-lg">
+                        Révolutionnez votre apprentissage avec la plateforme éducative la plus avancée de Tunisie.
                     </p>
+                    <div class="flex gap-4 pt-4">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-indigo-600 transition-colors"><i
+                                data-lucide="facebook" class="w-5 h-5"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-pink-600 transition-colors"><i
+                                data-lucide="instagram" class="w-5 h-5"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-colors"><i
+                                data-lucide="linkedin" class="w-5 h-5"></i></a>
+                    </div>
                 </div>
 
                 <div>
-                    <h4 class="text-lg font-bold mb-6">Liens Rapides</h4>
-                    <ul class="space-y-3">
-                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Accueil</a>
+                    <h4 class="text-xl font-bold mb-8 text-white">Navigation</h4>
+                    <ul class="space-y-4">
+                        <li><a href="index.html"
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2 flex items-center gap-2">Accueil</a>
                         </li>
                         <li><a href="pages/etudiant/catalogue.html"
-                                class="text-gray-400 hover:text-white transition-colors">Catalogue</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">À propos</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2 flex items-center gap-2">Catalogue</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2 flex items-center gap-2">À
+                                propos</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2 flex items-center gap-2">Carrières</a>
+                        </li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="text-lg font-bold mb-6">Rôles</h4>
-                    <ul class="space-y-3">
+                    <h4 class="text-xl font-bold mb-8 text-white">Espaces</h4>
+                    <ul class="space-y-4">
                         <li><a href="pages/formateur/dashboard.html"
-                                class="text-gray-400 hover:text-white transition-colors">Formateur</a></li>
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2">Espace Formateur</a>
+                        </li>
                         <li><a href="pages/etudiant/dashboard.html"
-                                class="text-gray-400 hover:text-white transition-colors">Étudiant</a></li>
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2">Espace Étudiant</a>
+                        </li>
                         <li><a href="pages/parent/dashboard.html"
-                                class="text-gray-400 hover:text-white transition-colors">Parent</a></li>
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2">Espace Parent</a>
+                        </li>
                         <li><a href="pages/entreprise/dashboard.html"
-                                class="text-gray-400 hover:text-white transition-colors">Entreprise</a></li>
+                                class="text-gray-400 hover:text-white transition-colors hover:pl-2">Espace
+                                Entreprise</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="text-lg font-bold mb-6">Contact</h4>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3 text-gray-400">
-                            <i data-lucide="mail" class="w-5 h-5"></i> contact@eduspace.tn
+                    <h4 class="text-xl font-bold mb-8 text-white">Contact</h4>
+                    <ul class="space-y-6">
+                        <li class="flex items-start gap-4 text-gray-400 group">
+                            <div class="p-2 bg-white/5 rounded-lg group-hover:bg-indigo-600 transition-colors"><i
+                                    data-lucide="mail" class="w-5 h-5"></i></div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-500 uppercase">Email</p>
+                                <p class="text-white hover:text-indigo-400 transition-colors">contact@eduspace.tn</p>
+                            </div>
                         </li>
-                        <li class="flex items-center gap-3 text-gray-400">
-                            <i data-lucide="phone" class="w-5 h-5"></i> +216 XX XXX XXX
-                        </li>
-                        <li class="flex items-center gap-3 text-gray-400">
-                            <i data-lucide="map-pin" class="w-5 h-5"></i> Tunis, Tunisie
+                        <li class="flex items-start gap-4 text-gray-400 group">
+                            <div class="p-2 bg-white/5 rounded-lg group-hover:bg-indigo-600 transition-colors"><i
+                                    data-lucide="phone" class="w-5 h-5"></i></div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-500 uppercase">Téléphone</p>
+                                <p class="text-white">+216 71 000 000</p>
+                            </div>
                         </li>
                     </ul>
                 </div>
             </div>
 
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-sm">
+            <div
+                class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <p>&copy; 2024 EduSpace. Tous droits réservés.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white">Confidentialité</a>
+                    <a href="#" class="hover:text-white">Conditions</a>
+                    <a href="#" class="hover:text-white">Cookies</a>
+                </div>
             </div>
         </div>
     </footer>
