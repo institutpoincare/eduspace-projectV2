@@ -149,20 +149,19 @@
                         <div
                             class="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
                             <div class="flex items-center gap-4">
-                                <span
-                                    class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">AT</span>
+                                <div
+                                    class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600">
+                                    SM</div>
                                 <div>
-                                    <p class="font-bold text-gray-900">Amine Tounsi</p>
-                                    <p class="text-sm text-gray-500">Souhaite rejoindre : <span
-                                            class="font-medium text-blue-600">Mathématiques Avancées</span></p>
-                                    <p class="text-xs text-gray-400 mt-1">Il y a 2 heures</p>
+                                    <p class="font-bold text-gray-900">Sami Mansour</p>
+                                    <p class="text-sm text-gray-500">Inscription: Masterclass Python</p>
                                 </div>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="acceptRequest('Amine Tounsi', 1)"
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 shadow-sm">Accepter</button>
+                                <button onclick="acceptRequest('Sami Mansour', 1)"
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Accepter</button>
                                 <button
-                                    class="px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg text-sm font-bold hover:bg-red-100">Refuser</button>
+                                    class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-200">Refuser</button>
                             </div>
                         </div>
                     </div>
@@ -172,19 +171,18 @@
                 <div id="content-payments" class="tab-content hidden animate-[fadeIn_0.3s_ease-out]">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead class="bg-gray-50 border-b border-gray-100">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Élève</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Classe</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Prix Total</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Payé</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Reste</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Statut</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase">Action
-                                    </th>
+                            <thead>
+                                <tr class="text-gray-400 text-sm border-b border-gray-100">
+                                    <th class="px-6 py-3 font-medium">Étudiant</th>
+                                    <th class="px-6 py-3 font-medium">Classe</th>
+                                    <th class="px-6 py-3 font-medium">Prix Total</th>
+                                    <th class="px-6 py-3 font-medium">Payé</th>
+                                    <th class="px-6 py-3 font-medium">Reste</th>
+                                    <th class="px-6 py-3 font-medium">Statut</th>
+                                    <th class="px-6 py-3 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="payments-list" class="divide-y divide-gray-100">
+                            <tbody id="payments-list" class="divide-y divide-gray-50">
                                 <!-- Payments injected here -->
                             </tbody>
                         </table>
@@ -194,11 +192,11 @@
         </main>
     </div>
 
-    <!-- Create Class Wizard Modal -->
+    <!-- Create Class Modal with 4 Steps -->
     <div id="create-modal"
-        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
         <div
-            class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out]">
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out]">
             <!-- Header -->
             <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-gray-900">Nouvelle Classe</h2>
@@ -206,24 +204,37 @@
                         data-lucide="x" class="w-6 h-6 text-gray-400"></i></button>
             </div>
 
-            <!-- Wizard Steps Header -->
+            <!-- Wizard Steps Header (4 Steps) -->
             <div class="px-8 py-4 bg-gray-50 border-b border-gray-100">
-                <div class="flex items-center justify-between max-w-lg mx-auto">
+                <div class="flex items-center justify-between max-w-2xl mx-auto">
+                    <!-- Step 1 -->
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step active w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm bg-blue-600 border-blue-600 text-white"
                             id="step-ind-1">1</div>
                         <span class="text-xs font-bold text-gray-500">Infos</span>
                     </div>
                     <div class="h-0.5 w-12 bg-gray-300"></div>
+
+                    <!-- Step 2 -->
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
                             id="step-ind-2">2</div>
                         <span class="text-xs font-bold text-gray-500">Planning</span>
                     </div>
                     <div class="h-0.5 w-12 bg-gray-300"></div>
+
+                    <!-- Step 3 (NEW) -->
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
                             id="step-ind-3">3</div>
+                        <span class="text-xs font-bold text-gray-500">Contenu</span>
+                    </div>
+                    <div class="h-0.5 w-12 bg-gray-300"></div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
+                            id="step-ind-4">4</div>
                         <span class="text-xs font-bold text-gray-500">Accès</span>
                     </div>
                 </div>
@@ -232,7 +243,7 @@
             <!-- Content -->
             <div class="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
                 <form id="wizard-form" onsubmit="return false;">
-                    <!-- Step 1 -->
+                    <!-- Step 1: Infos -->
                     <div id="step-1" class="space-y-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Nom de la classe</label>
@@ -265,7 +276,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 2 -->
+                    <!-- Step 2: Planning -->
                     <div id="step-2" class="hidden space-y-6">
                         <div
                             class="bg-blue-50 p-4 rounded-xl flex items-center gap-4 text-blue-800 border border-blue-100">
@@ -302,8 +313,31 @@
                         </div>
                     </div>
 
-                    <!-- Step 3 -->
-                    <div id="step-3" class="hidden text-center space-y-8 py-8">
+                    <!-- Step 3: Contenu (NEW) -->
+                    <div id="step-3" class="hidden space-y-6">
+                        <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:bg-gray-100 transition-colors cursor-pointer"
+                            onclick="document.getElementById('file-upload').click()">
+                            <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-gray-400 mb-2"></i>
+                            <p class="font-bold text-gray-700">Déposer vos fichiers ici</p>
+                            <p class="text-sm text-gray-500">PDF, Slides, Vidéos MP4 (Max 100MB)</p>
+                            <input type="file" id="file-upload" class="hidden" multiple
+                                onchange="alert('Fichiers ajoutés (simulation)')">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Liens Externes (Google Meet,
+                                Drive...)</label>
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="https://..."
+                                    class="flex-1 p-3 border border-gray-200 rounded-xl outline-none">
+                                <button
+                                    class="px-4 py-2 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200">Ajouter</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Accès -->
+                    <div id="step-4" class="hidden text-center space-y-8 py-8">
                         <div
                             class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 animate-bounce">
                             <i data-lucide="check" class="w-10 h-10"></i>
@@ -353,7 +387,7 @@
 
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
-    <script src="../../js/components/sidebar-formateur.js"></script>
+    <script src="../../js/components/sidebar-formateur.js?v=2"></script>
     <script>
         // --- State ---
         let currentTab = 'classes';
@@ -362,10 +396,18 @@
         let currentPaymentStudent = null;
         let currentPaymentClass = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadClasses();
+        document.addEventListener('DOMContentLoaded', async () => {
+            // DataManager est déjà instancié par le script data-manager.js (const dataManager = new DataManager())
+            // On s'assure qu'il est initialisé
+            if (window.dataManager) {
+                await dataManager.init();
+            } else {
+                console.error("DataManager not loaded!");
+            }
+
+            await loadClasses();
             lucide.createIcons();
-            updateStats();
+            await updateStats();
         });
 
         // --- Tabs ---
@@ -379,27 +421,28 @@
         }
 
         // --- Data Loading ---
-        function loadClasses() {
-            const classes = DataManager.getClasses();
+        async function loadClasses() {
+            // FIX: Utilisation de l'instance dataManager et de getAll()
+            const classes = await dataManager.getAll('courses');
             const container = document.getElementById('classes-list');
             const paymentsContainer = document.getElementById('payments-list');
 
             // Render Classes Grid
-            if (classes.length === 0) {
+            if (!classes || classes.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500"><p>Aucune classe. Créez-en une !</p></div>`;
             } else {
                 container.innerHTML = classes.map(cls => `
                     <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1 group">
                         <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold ${cls.category === 'scolaire' ? 'bg-blue-100 text-blue-700' : cls.category === 'superieur' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-wide">${cls.category}</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${cls.category === 'scolaire' ? 'bg-blue-100 text-blue-700' : cls.category === 'superieur' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-wide">${cls.category || 'Formation'}</span>
                             <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></div>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-1">${cls.name}</h3>
-                        <p class="text-sm text-gray-500 mb-4">${cls.level}</p>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">${cls.name || cls.title}</h3>
+                        <p class="text-sm text-gray-500 mb-4">${cls.level || 'Tous niveaux'}</p>
                         
                         <div class="flex items-center gap-4 text-sm text-gray-600 mb-6 border-b border-gray-50 pb-4">
                             <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i> ${cls.studentIds ? cls.studentIds.length : 0} Élèves</span>
-                            <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4"></i> ${cls.weeksDuration} Sem.</span>
+                            <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4"></i> ${cls.weeksDuration || 4} Sem.</span>
                         </div>
 
                         <div class="flex justify-between items-center">
@@ -412,9 +455,11 @@
 
             // Render Payments Table
             const allStudents = [];
-            classes.forEach(c => {
-                (c.studentIds || []).forEach(s => allStudents.push({ ...s, className: c.name, classPrice: c.price, classId: c.id }));
-            });
+            if (classes) {
+                classes.forEach(c => {
+                    (c.studentIds || []).forEach(s => allStudents.push({ ...s, className: c.name || c.title, classPrice: c.price, classId: c.id }));
+                });
+            }
 
             if (allStudents.length === 0) {
                 paymentsContainer.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Aucune inscription pour le moment.</td></tr>`;
@@ -440,7 +485,7 @@
                             <td class="px-6 py-4 font-bold text-red-500">${remaining} TND</td>
                             <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span></td>
                             <td class="px-6 py-4 text-right">
-                                <button onclick="openPaymentModal(${s.classId}, ${s.id})" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">Gérer</button>
+                                <button onclick="openPaymentModal('${s.classId}', '${s.id}')" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">Gérer</button>
                             </td>
                         </tr>
                     `;
@@ -449,8 +494,9 @@
             lucide.createIcons();
         }
 
-        function updateStats() {
-            const classes = DataManager.getClasses();
+        async function updateStats() {
+            const classes = await dataManager.getAll('courses');
+
             document.getElementById('stat-total-classes').innerText = classes.length;
 
             let totalStudents = 0;
@@ -489,9 +535,10 @@
             document.getElementById('create-modal').classList.add('hidden');
         }
 
-        function nextStep() {
-            if (wizStep === 3) {
-                finishCreation();
+        async function nextStep() {
+            // Si on est à la dernière étape (4), on termine
+            if (wizStep === 4) {
+                await finishCreation();
                 return;
             }
             // Validation step 1
@@ -499,29 +546,47 @@
                 if (!document.getElementById('w-name').value) return alert("Nom requis");
                 if (!document.getElementById('w-price').value) return alert("Prix requis");
             }
+
             wizStep++;
-            if (wizStep === 3) {
+
+            // Si on arrive à l'étape finale (4)
+            if (wizStep === 4) {
                 document.getElementById('generated-code').innerText = 'CLASS-' + Math.floor(1000 + Math.random() * 9000);
                 document.getElementById('btn-next').innerText = "Terminer";
                 document.getElementById('btn-next').classList.add('bg-green-600', 'hover:bg-green-700');
                 document.getElementById('btn-next').classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                document.getElementById('btn-next').innerText = "Suivant";
+                document.getElementById('btn-next').classList.remove('bg-green-600', 'hover:bg-green-700');
+                document.getElementById('btn-next').classList.add('bg-blue-600', 'hover:bg-blue-700');
             }
+
             updateWizardUI();
         }
 
         function prevStep() {
             if (wizStep > 1) wizStep--;
-            document.getElementById('btn-next').innerText = "Suivant";
-            document.getElementById('btn-next').classList.remove('bg-green-600', 'hover:bg-green-700');
-            document.getElementById('btn-next').classList.add('bg-blue-600', 'hover:bg-blue-700');
+
+            // Reset button style if leaving last step
+            if (wizStep < 4) {
+                document.getElementById('btn-next').innerText = "Suivant";
+                document.getElementById('btn-next').classList.remove('bg-green-600', 'hover:bg-green-700');
+                document.getElementById('btn-next').classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+
             updateWizardUI();
         }
 
         function updateWizardUI() {
+            const maxSteps = 4;
+
             // Steps Indication
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= maxSteps; i++) {
                 const el = document.getElementById(`step-ind-${i}`);
-                el.classList.remove('active', 'completed', 'bg-blue-600', 'border-blue-600', 'text-white', 'border-gray-300', 'text-gray-500');
+                if (!el) continue;
+
+                el.classList.remove('active', 'completed', 'bg-blue-600', 'border-blue-600', 'text-white', 'border-gray-300', 'text-gray-500', 'bg-green-500', 'border-green-500');
+
                 if (i === wizStep) {
                     el.classList.add('active', 'bg-blue-600', 'border-blue-600', 'text-white');
                 } else if (i < wizStep) {
@@ -534,7 +599,10 @@
             }
 
             // Content Visibility
-            [1, 2, 3].forEach(i => document.getElementById(`step-${i}`).classList.add('hidden'));
+            for (let i = 1; i <= maxSteps; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (el) el.classList.add('hidden');
+            }
             document.getElementById(`step-${wizStep}`).classList.remove('hidden');
 
             document.getElementById('btn-prev').disabled = wizStep === 1;
@@ -559,28 +627,43 @@
             `).join('');
         }
 
-        function finishCreation() {
+        async function finishCreation() {
             const newClass = {
+                id: 'course_' + Date.now(),
                 name: document.getElementById('w-name').value,
                 category: document.getElementById('w-category').value,
                 level: document.getElementById('w-level').value,
-                price: document.getElementById('w-price').value,
+                price: parseFloat(document.getElementById('w-price').value),
                 weeksDuration: document.getElementById('w-weeks').value,
                 slots: tempSlots,
                 accessCode: document.getElementById('generated-code').innerText,
-                studentIds: []
+                studentIds: [],
+                status: 'active',
+                image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800',
+                createdAt: new Date().toISOString()
             };
-            DataManager.saveClass(newClass);
+
+            // FIX: Utilisation de la méthode create() de l'instance dataManager
+            await dataManager.create('courses', newClass);
+
             closeModal();
-            loadClasses();
-            updateStats();
+            const btn = document.getElementById('btn-next');
+            btn.innerText = "Suivant"; // Reset button text for next time
+
+            await loadClasses();
+            await updateStats();
+
+            alert("Classe créée avec succès !");
         }
 
         // --- Payment Logic ---
-        function openPaymentModal(classId, studentId) {
-            const classes = DataManager.getClasses();
+        async function openPaymentModal(classId, studentId) {
+            const classes = await dataManager.getAll('courses');
             const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+
             const student = cls.studentIds.find(s => s.id === studentId);
+            if (!student) return;
 
             currentPaymentClass = cls;
             currentPaymentStudent = student;
@@ -613,34 +696,31 @@
             `;
         }
 
-        function savePayment() {
+        async function savePayment() {
             const amount = parseFloat(document.getElementById('pay-amount').value);
             const method = document.getElementById('pay-method').value;
             const price = parseFloat(currentPaymentClass.price);
 
-            let status = 'Non Payé';
-            if (amount >= price) status = 'Payé';
-            else if (amount > 0) status = 'En attente'; // Partial
+            // Update local object
+            currentPaymentStudent.amountPaid = amount;
+            currentPaymentStudent.paymentMethod = method;
 
-            DataManager.updateClassStudent(currentPaymentClass.id, currentPaymentStudent.id, {
-                amountPaid: amount,
-                paymentMethod: method,
-                payment: status
-            });
+            // Update in DB (Update the whole class or complex update)
+            // Pour simplifier ici, on met à jour toute la classe dans courses
+            await dataManager.update('courses', currentPaymentClass.id, currentPaymentClass);
 
             document.getElementById('payment-modal').classList.add('hidden');
-            loadClasses(); // Refresh
-            updateStats(); // Refresh stats
+            await loadClasses(); // Refresh
+            await updateStats(); // Refresh stats
             alert("Paiement mis à jour !");
         }
 
         // Mock Request Accept
-        function acceptRequest(studentName, reqId) {
-            // Mock add student to first class for demo
-            const classes = DataManager.getClasses();
+        async function acceptRequest(studentName, reqId) {
+            const classes = await dataManager.getAll('courses');
             if (classes.length > 0) {
                 const newStudent = {
-                    id: Date.now(),
+                    id: 'student_' + Date.now(),
                     name: studentName,
                     email: 'student@demo.net',
                     amountPaid: 0,
@@ -649,15 +729,16 @@
                 // Add to first class
                 const updatedClass = classes[0];
                 updatedClass.studentIds = [...(updatedClass.studentIds || []), newStudent];
-                DataManager.saveClass(updatedClass);
+
+                await dataManager.update('courses', updatedClass.id, updatedClass);
 
                 // Remove from UI (mock)
                 const reqEl = document.querySelector('#content-requests .space-y-3 div');
                 if (reqEl) reqEl.remove();
 
                 // Refresh
-                loadClasses();
-                updateStats();
+                await loadClasses();
+                await updateStats();
                 alert(`Ajouté à ${updatedClass.name}`);
             } else {
                 alert("Créez d'abord une classe !");
