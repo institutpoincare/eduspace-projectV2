@@ -16,14 +16,95 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadDynamicContent() {
-    // Charger les formateurs et centres en parallèle
-    const [instructors, centers] = await Promise.all([
-        dataManager.getAll('instructors'),
-        dataManager.getAll('centers')
-    ]);
+    console.log("🚀 Démarrage du chargement du contenu...");
 
-    renderInstructors(instructors);
-    renderCenters(centers);
+    // Données de secours GARANTIES (Hardcoded) pour affichage immédiat
+    const HARDCODED_INSTRUCTORS = [
+        {
+            id: 'ahmed',
+            name: 'Ahmed Ben Ali',
+            specialty: 'Expert DevOps & Cloud',
+            rating: 4.9,
+            students: '15k+',
+            image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            bio: 'Formateur certifié AWS et Kubernetes avec 10 ans d\'expérience.'
+        },
+        {
+            id: 'sarah',
+            name: 'Sarah M.',
+            specialty: 'Design UX/UI',
+            rating: 5.0,
+            students: '8k+',
+            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            bio: 'Expert en design système et prototypage interactif.'
+        },
+        {
+            id: 'karim',
+            name: 'Karim S.',
+            specialty: 'Dév Mobile iOS',
+            rating: 4.7,
+            students: '5k+',
+            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            bio: 'Développeur senior Swift et SwiftUI.'
+        },
+        {
+            id: 'leila',
+            name: 'Leila K.',
+            specialty: 'Marketing Digital',
+            rating: 4.8,
+            students: '12k+',
+            image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            bio: 'Spécialiste SEO et Growth Hacking.'
+        }
+    ];
+
+    const HARDCODED_CENTERS = [
+        {
+            id: 'c1',
+            name: 'GoMyCode',
+            category: 'Coding Bootcamp',
+            location: 'Tunis',
+            description: 'Le premier bootcamp de code en Tunisie, formant la prochaine génération de développeurs.',
+            image: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        },
+        {
+            id: 'c2',
+            name: 'RBK Tunisia',
+            category: 'Fullstack JS',
+            location: 'Ariana',
+            description: 'Formation intensive en développement logiciel pour changer de carrière en 4 mois.',
+            image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        },
+        {
+            id: 'c3',
+            name: 'GMC Sousse',
+            category: 'Tech Hub',
+            location: 'Sousse',
+            description: 'Un espace d\'innovation et d\'apprentissage au cœur du Sahel.',
+            image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        }
+    ];
+
+    try {
+        // Tenter de charger depuis le DataManager
+        const [instructors, centers] = await Promise.all([
+            dataManager.getAll('instructors'),
+            dataManager.getAll('centers')
+        ]);
+
+        // Si DataManager renvoie vide, utiliser les données en dur
+        const finalInstructors = (instructors && instructors.length > 0) ? instructors : HARDCODED_INSTRUCTORS;
+        const finalCenters = (centers && centers.length > 0) ? centers : HARDCODED_CENTERS;
+
+        renderInstructors(finalInstructors);
+        renderCenters(finalCenters);
+
+    } catch (error) {
+        console.error("⚠️ Erreur chargement, utilisation des données de secours", error);
+        // En cas d'erreur fatale, afficher les données en dur DIRECTEMENT
+        renderInstructors(HARDCODED_INSTRUCTORS);
+        renderCenters(HARDCODED_CENTERS);
+    }
 }
 
 function renderInstructors(instructors) {
