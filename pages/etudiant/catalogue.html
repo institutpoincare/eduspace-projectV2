@@ -451,9 +451,57 @@
         </main>
     </div>
 
+    <!-- Dynamic System Scripts -->
+    <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-etudiant.js"></script>
     <script>
         lucide.createIcons();
+
+        // Load instructors dynamically
+        document.addEventListener('DOMContentLoaded', async () => {
+            await dataManager.init();
+            const instructors = await dataManager.getAll('instructors');
+            const container = document.querySelector('.grid.grid-cols-1.xl\\:grid-cols-2');
+
+            if (container && instructors.length > 0) {
+                container.innerHTML = instructors.map(instructor => `
+                    <div class="group bg-white rounded-[2rem] border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2">
+                        <div class="relative p-6 z-10 flex flex-col h-full bg-white">
+                            <div class="flex items-start justify-between mb-6">
+                                <div class="flex gap-5 items-center">
+                                    <div class="relative w-20 h-20">
+                                        <img src="${instructor.image}" class="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10 border-2 border-white">
+                                        <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm flex items-center gap-1 z-20">
+                                            <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> Live
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-xl text-gray-900 group-hover:text-indigo-600 transition-colors">${instructor.name}</h3>
+                                        <p class="text-gray-500 font-medium">${instructor.specialty}</p>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <div class="flex text-yellow-400">
+                                                ${Array(5).fill('<i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>').join('')}
+                                            </div>
+                                            <span class="text-xs font-bold text-gray-400">(${instructor.students}+ élèves)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-6 leading-relaxed">${instructor.cv.experience[0]?.description || 'Expert dans son domaine'}</p>
+                            <div class="mt-auto flex gap-3">
+                                <button onclick="window.location.href='../formateur/profil.html?id=${instructor.id}'" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2">
+                                    Voir Profil <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="startChat('${instructor.id}', 'instructor')" class="px-5 py-3 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors">
+                                    Discuter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        });
     </script>
 </body>
 
