@@ -1,0 +1,88 @@
+{
+    "messages": [
+        {
+            "id": "msg-1",
+            "conversationId": "conv-1",
+            "senderId": "user-1",
+            "receiverId": "ahmed",
+            "content": "Bonjour, j'ai une question sur le chapitre 2 du cours DevOps",
+            "read": true,
+            "sentAt": "2024-12-08T14:30:00Z"
+        },
+        {
+            "id": "msg-2",
+            "conversationId": "conv-1",
+            "senderId": "ahmed",
+            "receiverId": "user-1",
+            "content": "Bonjour Mohamed! Bien sûr, quelle est votre question?",
+            "read": true,
+            "sentAt": "2024-12-08T15:00:00Z"
+        },
+        {
+            "id": "msg-3",
+            "conversationId": "conv-1",
+            "senderId": "user-1",
+            "receiverId": "ahmed",
+            "content": "Je ne comprends pas bien la différence entre Docker et Kubernetes",
+            "read": true,
+            "sentAt": "2024-12-08T15:15:00Z"
+        },
+        {
+            "id": "msg-4",
+            "conversationId": "conv-1",
+            "senderId": "ahmed",
+            "receiverId": "user-1",
+            "content": "Excellente question! Docker est pour créer des conteneurs, Kubernetes est pour les orchestrer à grande échelle. Je vais préparer une vidéo explicative.",
+            "read": false,
+            "sentAt": "2024-12-08T15:30:00Z"
+        },
+        {
+            "id": "msg-5",
+            "conversationId": "conv-2",
+            "senderId": "user-2",
+            "receiverId": "sarah",
+            "content": "Merci pour le cours UX/UI, c'était excellent!",
+            "read": true,
+            "sentAt": "2024-12-07T10:00:00Z"
+        },
+        {
+            "id": "msg-6",
+            "conversationId": "conv-2",
+            "senderId": "sarah",
+            "receiverId": "user-2",
+            "content": "Merci beaucoup Amina! Ravie que ça vous ait plu. N'hésitez pas si vous avez des questions.",
+            "read": true,
+            "sentAt": "2024-12-07T11:00:00Z"
+        }
+    ],
+    "conversations": [
+        {
+            "id": "conv-1",
+            "participants": [
+                "user-1",
+                "ahmed"
+            ],
+            "lastMessage": "msg-4",
+            "lastMessageAt": "2024-12-08T15:30:00Z",
+            "unreadCount": {
+                "user-1": 1,
+                "ahmed": 0
+            },
+            "createdAt": "2024-12-08T14:30:00Z"
+        },
+        {
+            "id": "conv-2",
+            "participants": [
+                "user-2",
+                "sarah"
+            ],
+            "lastMessage": "msg-6",
+            "lastMessageAt": "2024-12-07T11:00:00Z",
+            "unreadCount": {
+                "user-2": 0,
+                "sarah": 0
+            },
+            "createdAt": "2024-12-07T10:00:00Z"
+        }
+    ]
+}
