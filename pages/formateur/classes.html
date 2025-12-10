@@ -14,14 +14,23 @@
                     colors: {
                         blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
                         gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 500: '#6b7280', 700: '#374151', 900: '#111827' }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <!-- Font Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../css/main.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -52,33 +61,59 @@
             color: white;
             border-color: #22c55e;
         }
+
+        /* Transitions sidebar */
+        #main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        #sidebar-container {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar-hidden #sidebar-container {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-hidden #main-content {
+            margin-left: 0;
+        }
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-900">
-    <div class="flex min-h-screen">
-        <!-- Sidebar Container -->
-        <div id="sidebar-container"></div>
+<body class="bg-gray-50 text-gray-900 overflow-x-hidden">
+    <div class="flex min-h-screen relative">
+        <!-- Sidebar Container (Fixed) -->
+        <div id="sidebar-container" class="fixed top-0 left-0 h-full w-[280px] z-30 transition-transform duration-300">
+        </div>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8 ml-[280px]">
+        <main id="main-content" class="flex-1 p-6 ml-[280px] min-h-screen flex flex-col transition-all duration-300">
             <!-- Header -->
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Gestion des Classes</h1>
-                    <p class="text-gray-500 mt-1">Gérez vos classes, inscriptions et paiements</p>
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()"
+                        class="p-2 hover:bg-gray-200 rounded-lg text-gray-600 transition-colors"
+                        title="Afficher/Masquer le menu">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Gestion des Classes</h1>
+                        <p class="text-gray-500 mt-1">Gérez vos classes, inscriptions et paiements</p>
+                    </div>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="openCreateModal()"
-                        class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center gap-2 font-medium shadow-lg transition-all hover:scale-105">
+                        class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center gap-2 font-medium shadow-lg transition-all hover:scale-105 active:scale-95">
                         <i data-lucide="plus" class="w-5 h-5"></i> Créer une Classe
                     </button>
                 </div>
             </header>
 
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+            <!-- Stats Overview - Full Width -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 w-full">
+                <div
+                    class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start hover:shadow-md transition-shadow">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Total Classes</p>
                         <h3 class="text-2xl font-bold text-gray-900" id="stat-total-classes">0</h3>
@@ -87,7 +122,8 @@
                     <div class="p-3 bg-blue-50 rounded-xl text-blue-600"><i data-lucide="book-open" class="w-5 h-5"></i>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                <div
+                    class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start hover:shadow-md transition-shadow">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Inscriptions</p>
                         <h3 class="text-2xl font-bold text-gray-900" id="stat-total-students">0</h3>
@@ -96,7 +132,8 @@
                     <div class="p-3 bg-green-50 rounded-xl text-green-600"><i data-lucide="users" class="w-5 h-5"></i>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                <div
+                    class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start hover:shadow-md transition-shadow">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Revenus (Est.)</p>
                         <h3 class="text-2xl font-bold text-gray-900" id="stat-revenue">0 TND</h3>
@@ -105,7 +142,8 @@
                     <div class="p-3 bg-purple-50 rounded-xl text-purple-600"><i data-lucide="dollar-sign"
                             class="w-5 h-5"></i></div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start">
+                <div
+                    class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-start hover:shadow-md transition-shadow">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Taux de Paiement</p>
                         <h3 class="text-2xl font-bold text-gray-900" id="stat-payment-rate">0%</h3>
@@ -116,35 +154,35 @@
                 </div>
             </div>
 
-            <!-- Main Content Area with Tabs -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 min-h-[500px]">
+            <!-- Main Content Area with Tabs - Full Width and Height -->
+            <div
+                class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 flex-1 w-full flex flex-col">
                 <!-- Tabs Header -->
-                <div class="border-b border-gray-200 mb-6 flex gap-8 overflow-x-auto">
+                <div class="border-b border-gray-200 mb-6 flex gap-8 overflow-x-auto shrink-0">
                     <button onclick="switchTab('classes')" id="tab-classes"
-                        class="tab-btn active pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors">
+                        class="tab-btn active pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors whitespace-nowrap">
                         Mes Classes
                     </button>
                     <button onclick="switchTab('requests')" id="tab-requests"
-                        class="tab-btn pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors">
+                        class="tab-btn pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors whitespace-nowrap">
                         Demandes <span
                             class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full ml-1 font-bold">1</span>
                     </button>
                     <button onclick="switchTab('payments')" id="tab-payments"
-                        class="tab-btn pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors">
+                        class="tab-btn pb-3 text-gray-500 border-transparent hover:text-gray-700 transition-colors whitespace-nowrap">
                         Paiements
                     </button>
                 </div>
 
                 <!-- Tab Content: Classes -->
-                <div id="content-classes" class="tab-content block animate-[fadeIn_0.3s_ease-out]">
-                    <div id="classes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div id="content-classes" class="tab-content block animate-[fadeIn_0.3s_ease-out] flex-1">
+                    <div id="classes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                         <!-- Classes injected here -->
                     </div>
                 </div>
 
                 <!-- Tab Content: Requests -->
-                <div id="content-requests" class="tab-content hidden animate-[fadeIn_0.3s_ease-out]">
-                    <!-- Requests List (Mocked for now) -->
+                <div id="content-requests" class="tab-content hidden animate-[fadeIn_0.3s_ease-out] flex-1">
                     <div class="space-y-3">
                         <div
                             class="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
@@ -168,9 +206,9 @@
                 </div>
 
                 <!-- Tab Content: Payments -->
-                <div id="content-payments" class="tab-content hidden animate-[fadeIn_0.3s_ease-out]">
+                <div id="content-payments" class="tab-content hidden animate-[fadeIn_0.3s_ease-out] flex-1">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left">
+                        <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="text-gray-400 text-sm border-b border-gray-100">
                                     <th class="px-6 py-3 font-medium">Étudiant</th>
@@ -192,20 +230,20 @@
         </main>
     </div>
 
-    <!-- Create Class Modal with 4 Steps -->
+    <!-- Create/Edit Class Modal with 4 Steps -->
     <div id="create-modal"
-        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div
             class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out]">
             <!-- Header -->
-            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center shrink-0">
                 <h2 class="text-2xl font-bold text-gray-900">Nouvelle Classe</h2>
                 <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors"><i
                         data-lucide="x" class="w-6 h-6 text-gray-400"></i></button>
             </div>
 
-            <!-- Wizard Steps Header (4 Steps) -->
-            <div class="px-8 py-4 bg-gray-50 border-b border-gray-100">
+            <!-- Wizard Steps Header -->
+            <div class="px-8 py-4 bg-gray-50 border-b border-gray-100 shrink-0">
                 <div class="flex items-center justify-between max-w-2xl mx-auto">
                     <!-- Step 1 -->
                     <div class="flex flex-col items-center gap-2">
@@ -214,7 +252,6 @@
                         <span class="text-xs font-bold text-gray-500">Infos</span>
                     </div>
                     <div class="h-0.5 w-12 bg-gray-300"></div>
-
                     <!-- Step 2 -->
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
@@ -222,15 +259,13 @@
                         <span class="text-xs font-bold text-gray-500">Planning</span>
                     </div>
                     <div class="h-0.5 w-12 bg-gray-300"></div>
-
-                    <!-- Step 3 (NEW) -->
+                    <!-- Step 3 -->
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
                             id="step-ind-3">3</div>
                         <span class="text-xs font-bold text-gray-500">Contenu</span>
                     </div>
                     <div class="h-0.5 w-12 bg-gray-300"></div>
-
                     <!-- Step 4 -->
                     <div class="flex flex-col items-center gap-2">
                         <div class="wizard-step w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm text-gray-500"
@@ -313,7 +348,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 3: Contenu (NEW) -->
+                    <!-- Step 3: Contenu -->
                     <div id="step-3" class="hidden space-y-6">
                         <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:bg-gray-100 transition-colors cursor-pointer"
                             onclick="document.getElementById('file-upload').click()">
@@ -323,10 +358,8 @@
                             <input type="file" id="file-upload" class="hidden" multiple
                                 onchange="alert('Fichiers ajoutés (simulation)')">
                         </div>
-
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Liens Externes (Google Meet,
-                                Drive...)</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Liens Externes</label>
                             <div class="flex gap-2">
                                 <input type="text" placeholder="https://..."
                                     class="flex-1 p-3 border border-gray-200 rounded-xl outline-none">
@@ -356,7 +389,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="px-8 py-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-between">
+            <div class="px-8 py-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-between shrink-0">
                 <button onclick="prevStep()" id="btn-prev"
                     class="px-6 py-2 text-gray-500 font-bold hover:text-gray-900 disabled:opacity-50"
                     disabled>Retour</button>
@@ -368,24 +401,20 @@
 
     <!-- Payment Modal -->
     <div id="payment-modal"
-        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
+        class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-[scaleIn_0.2s_ease-out]">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold">Gérer Paiement</h3>
                 <button onclick="document.getElementById('payment-modal').classList.add('hidden')"
                     class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-
-            <div id="payment-modal-content" class="space-y-6">
-                <!-- Content injected via JS -->
-            </div>
-
+            <div id="payment-modal-content" class="space-y-6"></div>
             <button onclick="savePayment()"
                 class="w-full mt-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-lg">Enregistrer</button>
         </div>
     </div>
 
-    <!-- Dynamic System Scripts -->
+    <!-- Scripts -->
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js?v=2"></script>
     <script>
@@ -395,20 +424,22 @@
         let tempSlots = [];
         let currentPaymentStudent = null;
         let currentPaymentClass = null;
+        let isEditing = false;
+        let editingId = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // DataManager est déjà instancié par le script data-manager.js (const dataManager = new DataManager())
-            // On s'assure qu'il est initialisé
             if (window.dataManager) {
                 await dataManager.init();
-            } else {
-                console.error("DataManager not loaded!");
             }
-
             await loadClasses();
             lucide.createIcons();
             await updateStats();
         });
+
+        // --- Sidebar Toggle ---
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-hidden');
+        }
 
         // --- Tabs ---
         function switchTab(tab) {
@@ -418,20 +449,257 @@
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`content-${tab}`).classList.remove('hidden');
             currentTab = tab;
-            if (!cls) return;
+        }
 
+        // --- CRUD Logic ---
+        async function loadClasses() {
+            const classes = await dataManager.getAll('courses');
+            const container = document.getElementById('classes-list');
+            const paymentsContainer = document.getElementById('payments-list');
+
+            if (!classes || classes.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500"><p>Aucune classe. Créez-en une !</p></div>`;
+            } else {
+                container.innerHTML = classes.map(cls => `
+                    <div class="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg transition-all hover:-translate-y-1 group flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${cls.category === 'scolaire' ? 'bg-blue-100 text-blue-700' : cls.category === 'superieur' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-wide">${cls.category || 'Formation'}</span>
+                            <div class="text-lg font-bold text-blue-600">${cls.price} TND</div>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 leading-tight line-clamp-2">${cls.name || cls.title}</h3>
+                        <p class="text-sm text-gray-500 mb-4">${cls.level || 'Tous niveaux'}</p>
+                        
+                        <div class="flex-1">
+                            <div class="flex items-center gap-4 text-xs font-bold text-gray-500 mb-4 bg-gray-50 p-2 rounded-lg">
+                                <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> ${cls.studentIds ? cls.studentIds.length : 0} Élèves</span>
+                                <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3 h-3"></i> ${cls.weeksDuration || 4} Sem.</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions Buttons -->
+                        <div class="grid grid-cols-2 gap-2 border-t border-gray-100 pt-4 mt-2">
+                             <a href="class-details.html?id=${cls.id}" class="col-span-2 flex items-center justify-center gap-2 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm mb-1">
+                                <i data-lucide="eye" class="w-4 h-4"></i> Gérer
+                            </a>
+                            <button onclick="editClass('${cls.id}')" class="flex items-center justify-center gap-1 py-2 bg-gray-50 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors">
+                                <i data-lucide="edit-3" class="w-3 h-3"></i> Modifier
+                            </button>
+                            <button onclick="deleteClass('${cls.id}')" class="flex items-center justify-center gap-1 py-2 bg-white text-red-600 rounded-lg text-xs font-bold hover:bg-red-50 border border-gray-200 transition-colors">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            // Payments
+            const allStudents = [];
+            if (classes) {
+                classes.forEach(c => {
+                    (c.studentIds || []).forEach(s => allStudents.push({ ...s, className: c.name || c.title, classPrice: c.price, classId: c.id }));
+                });
+            }
+            if (allStudents.length === 0) {
+                paymentsContainer.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Aucune inscription pour le moment.</td></tr>`;
+            } else {
+                paymentsContainer.innerHTML = allStudents.map(s => {
+                    const paid = s.amountPaid || 0;
+                    const price = parseFloat(s.classPrice);
+                    const remaining = Math.max(0, price - paid);
+                    let statusColor = 'bg-red-100 text-red-600';
+                    let statusText = 'Non Payé';
+                    if (paid >= price) { statusColor = 'bg-green-100 text-green-700'; statusText = 'Payé'; }
+                    else if (paid > 0) { statusColor = 'bg-yellow-100 text-yellow-700'; statusText = 'Partiel'; }
+
+                    return `
+                        <tr class="hover:bg-gray-50 group transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-900">${s.name}</div>
+                                <div class="text-xs text-gray-500">${s.email || 'N/A'}</div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-600">${s.className}</td>
+                            <td class="px-6 py-4 font-bold text-gray-900">${price} TND</td>
+                            <td class="px-6 py-4 font-bold text-green-600">${paid} TND</td>
+                            <td class="px-6 py-4 font-bold text-red-500">${remaining} TND</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span></td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="openPaymentModal('${s.classId}', '${s.id}')" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">Gérer</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            lucide.createIcons();
+        }
+
+        async function updateStats() {
+            const classes = await dataManager.getAll('courses');
+            document.getElementById('stat-total-classes').innerText = classes.length;
+            let totalStudents = 0;
+            let totalRevenue = 0;
+            let totalPaid = 0;
+            let totalDue = 0;
+            classes.forEach(c => {
+                totalStudents += (c.studentIds?.length || 0);
+                (c.studentIds || []).forEach(s => {
+                    totalPaid += (s.amountPaid || 0);
+                    totalDue += parseFloat(c.price);
+                });
+            });
+            document.getElementById('stat-total-students').innerText = totalStudents;
+            document.getElementById('stat-revenue').innerText = `${totalPaid} TND`;
+            const rate = totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0;
+            document.getElementById('stat-payment-rate').innerText = `${rate}%`;
+        }
+
+        // --- Wizard Functions ---
+        function openCreateModal() {
+            isEditing = false;
+            editingId = null;
+            document.getElementById('create-modal').classList.remove('hidden');
+            document.getElementById('wizard-form').reset();
+            document.getElementById('generated-code').innerText = 'CLASS-XXXX';
+            wizStep = 1;
+            updateWizardUI();
+            tempSlots = [];
+            renderSlots();
+        }
+
+        function closeModal() {
+            document.getElementById('create-modal').classList.add('hidden');
+        }
+
+        async function editClass(id) {
+            const classes = await dataManager.getAll('courses');
+            const cls = classes.find(c => c.id === id);
+            if (!cls) return;
+            isEditing = true;
+            editingId = id;
+            document.getElementById('w-name').value = cls.name || cls.title;
+            document.getElementById('w-category').value = cls.category;
+            document.getElementById('w-level').value = cls.level;
+            document.getElementById('w-price').value = cls.price;
+            document.getElementById('w-weeks').value = cls.weeksDuration;
+            tempSlots = cls.slots || [];
+            document.getElementById('create-modal').classList.remove('hidden');
+            wizStep = 1;
+            updateWizardUI();
+            renderSlots();
+        }
+
+        async function deleteClass(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cette classe ?")) {
+                await dataManager.delete('courses', id);
+                await loadClasses();
+                await updateStats();
+            }
+        }
+
+        async function nextStep() {
+            if (wizStep === 4) { await finishCreation(); return; }
+            if (wizStep === 1) {
+                if (!document.getElementById('w-name').value) return alert("Nom requis");
+                if (!document.getElementById('w-price').value) return alert("Prix requis");
+            }
+            wizStep++;
+            if (wizStep === 4) {
+                if (!isEditing) document.getElementById('generated-code').innerText = 'CLASS-' + Math.floor(1000 + Math.random() * 9000);
+                else document.getElementById('generated-code').innerText = 'CLASS-EDITED';
+
+                const btn = document.getElementById('btn-next');
+                btn.innerText = isEditing ? "Sauvegarder" : "Terminer";
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                const btn = document.getElementById('btn-next');
+                btn.innerText = "Suivant";
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+            updateWizardUI();
+        }
+
+        function prevStep() {
+            if (wizStep > 1) wizStep--;
+            if (wizStep < 4) {
+                const btn = document.getElementById('btn-next');
+                btn.innerText = "Suivant";
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+            updateWizardUI();
+        }
+
+        function updateWizardUI() {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`step-ind-${i}`);
+                if (!el) continue;
+                el.classList.remove('active', 'completed', 'bg-blue-600', 'border-blue-600', 'text-white', 'border-gray-300', 'text-gray-500', 'bg-green-500', 'border-green-500');
+                if (i === wizStep) el.classList.add('active', 'bg-blue-600', 'border-blue-600', 'text-white');
+                else if (i < wizStep) { el.classList.add('completed', 'bg-green-500', 'border-green-500', 'text-white'); el.innerText = '✓'; }
+                else { el.classList.add('border-gray-300', 'text-gray-500'); el.innerText = i; }
+                const content = document.getElementById(`step-${i}`);
+                if (content) content.classList.add('hidden');
+            }
+            document.getElementById(`step-${wizStep}`).classList.remove('hidden');
+            document.getElementById('btn-prev').disabled = wizStep === 1;
+        }
+
+        function addSlot() {
+            tempSlots.push({
+                day: document.getElementById('w-slot-day').value,
+                start: document.getElementById('w-slot-start').value,
+                end: document.getElementById('w-slot-end').value
+            });
+            renderSlots();
+        }
+
+        function renderSlots() {
+            document.getElementById('slots-container').innerHTML = tempSlots.map((s, i) => `
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold flex items-center gap-2">
+                    ${s.day} ${s.start}-${s.end} <button onclick="tempSlots.splice(${i},1);renderSlots()" class="hover:text-red-500">×</button>
+                </span>
+            `).join('');
+        }
+
+        async function finishCreation() {
+            const classData = {
+                name: document.getElementById('w-name').value,
+                category: document.getElementById('w-category').value,
+                level: document.getElementById('w-level').value,
+                price: parseFloat(document.getElementById('w-price').value),
+                weeksDuration: document.getElementById('w-weeks').value,
+                slots: tempSlots,
+                accessCode: document.getElementById('generated-code').innerText,
+                studentIds: isEditing ? undefined : [],
+                status: 'active',
+                image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800',
+                createdAt: new Date().toISOString()
+            };
+            if (isEditing && editingId) {
+                await dataManager.update('courses', editingId, classData);
+                alert("Classe modifiée !");
+            } else {
+                classData.id = 'course_' + Date.now();
+                await dataManager.create('courses', classData);
+                alert("Classe créée !");
+            }
+            closeModal();
+            document.getElementById('btn-next').innerText = "Suivant";
+            await loadClasses();
+            await updateStats();
+        }
+
+        async function openPaymentModal(classId, studentId) {
+            const classes = await dataManager.getAll('courses');
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
             const student = cls.studentIds.find(s => s.id === studentId);
             if (!student) return;
-
             currentPaymentClass = cls;
             currentPaymentStudent = student;
-
-            const modal = document.getElementById('payment-modal');
-            const content = document.getElementById('payment-modal-content');
-
-            modal.classList.remove('hidden');
-
-            content.innerHTML = `
+            document.getElementById('payment-modal').classList.remove('hidden');
+            document.getElementById('payment-modal-content').innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-xl mb-4">
                     <p class="text-sm font-bold text-gray-500 mb-1">Détails</p>
                     <div class="flex justify-between">
@@ -457,50 +725,27 @@
         async function savePayment() {
             const amount = parseFloat(document.getElementById('pay-amount').value);
             const method = document.getElementById('pay-method').value;
-            const price = parseFloat(currentPaymentClass.price);
-
-            // Update local object
             currentPaymentStudent.amountPaid = amount;
             currentPaymentStudent.paymentMethod = method;
-
-            // Update in DB (Update the whole class or complex update)
-            // Pour simplifier ici, on met à jour toute la classe dans courses
             await dataManager.update('courses', currentPaymentClass.id, currentPaymentClass);
-
             document.getElementById('payment-modal').classList.add('hidden');
-            await loadClasses(); // Refresh
-            await updateStats(); // Refresh stats
+            await loadClasses();
+            await updateStats();
             alert("Paiement mis à jour !");
         }
 
-        // Mock Request Accept
         async function acceptRequest(studentName, reqId) {
             const classes = await dataManager.getAll('courses');
             if (classes.length > 0) {
-                const newStudent = {
-                    id: 'student_' + Date.now(),
-                    name: studentName,
-                    email: 'student@demo.net',
-                    amountPaid: 0,
-                    payment: 'Non Payé'
-                };
-                // Add to first class
+                const newStudent = { id: 'student_' + Date.now(), name: studentName, email: 'student@demo.net', amountPaid: 0, payment: 'Non Payé' };
                 const updatedClass = classes[0];
                 updatedClass.studentIds = [...(updatedClass.studentIds || []), newStudent];
-
                 await dataManager.update('courses', updatedClass.id, updatedClass);
-
-                // Remove from UI (mock)
-                const reqEl = document.querySelector('#content-requests .space-y-3 div');
-                if (reqEl) reqEl.remove();
-
-                // Refresh
+                document.querySelector('#content-requests .space-y-3 div')?.remove();
                 await loadClasses();
                 await updateStats();
                 alert(`Ajouté à ${updatedClass.name}`);
-            } else {
-                alert("Créez d'abord une classe !");
-            }
+            } else { alert("Créez d'abord une classe !"); }
         }
     </script>
 </body>
