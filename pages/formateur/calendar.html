@@ -418,7 +418,8 @@
                              `;
                         }
 
-                        chip.onclick = () => alert(`Session: ${s.title}\nHeure: ${s.startTime} - ${s.endTime}\nCode: ${s.accessCode}`);
+                        // CLICK ACTION: Navigate to details instead of alert
+                        chip.onclick = () => window.location.href = `class-details.html?id=${s.id}`;
                         cell.appendChild(chip);
                     });
                 } else {
@@ -452,8 +453,8 @@
                             <span class="text-xs bg-white px-2 py-0.5 rounded border border-gray-200 uppercase">${s.categoryLabel}</span>
                         </p>
                         <h4 class="font-bold text-gray-900 text-base mb-4 line-clamp-2">${s.title}</h4>
-                        <button onclick="joinSession('${s.link || ''}')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                             ${s.link ? 'Rejoindre Meet' : 'Pas de lien'}
+                        <button onclick="window.location.href='class-details.html?id=${s.id}'" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                             Gérer le Cours
                         </button>
                     </div>
                 `).join('');
