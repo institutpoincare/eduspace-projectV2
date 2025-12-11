@@ -135,19 +135,13 @@
 
         // INIT
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                if (window.dataManager) {
-                    await dataManager.init();
-                    classes = await dataManager.getAll('courses') || [];
-                    console.log("Classes:", classes);
-                }
-                renderCalendar();
-                renderAgenda();
-                lucide.createIcons();
-            } catch (e) {
-                console.error("Calendar crash:", e);
-                alert("Erreur chargement calendrier: " + e.message);
+            if (window.dataManager) {
+                await dataManager.init();
+                classes = await dataManager.getAll('courses') || [];
             }
+            renderCalendar();
+            renderAgenda();
+            lucide.createIcons();
         });
 
         // VIEW UTILS

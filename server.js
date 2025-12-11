@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 // CONFIGURATION
-const PORT = 3000;
+const PORT = 3001;
 const DATA_DIR = path.join(__dirname, 'data');
 const SENSITIVE_FIELDS = ['password', 'email', 'phone', 'amountPaid']; // Champs à crypter
 

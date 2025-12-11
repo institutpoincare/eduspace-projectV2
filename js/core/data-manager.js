@@ -4,7 +4,7 @@
  * Remplace tout usage de localStorage par des appels API
  */
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'http://localhost:3001/api';
 
 class DataManager {
     constructor() {
