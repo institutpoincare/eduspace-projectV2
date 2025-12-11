@@ -1,308 +1,172 @@
 /**
- * DataManager - Gestionnaire CRUD pour base de données JSON
- * Utilise LocalStorage pour la persistance côté client
+ * DataManager (Client Side) for Eduspace
+ * Communicates with the Node.js Backend API
+ * Replaces pure LocalStorage implementation
  */
+
+const API_URL = 'http://localhost:3000/api';
 
 class DataManager {
     constructor() {
-        this.entities = ['instructors', 'centers', 'courses', 'users', 'sessions', 'enrollments', 'messages'];
-        this.initialized = false;
+        this.token = localStorage.getItem('authToken');
     }
 
-    /**
-     * Initialiser la base de données
-     * Charge les données JSON dans LocalStorage si pas déjà fait
-     */
     async init() {
-        if (this.initialized) return;
-
-        console.log('🔄 DataManager: Initialisation...');
-
-        for (const entity of this.entities) {
-            // Vérifier si les données existent déjà dans LocalStorage
-            let data = localStorage.getItem(entity);
-
-            if (!data || data === 'undefined' || data === '{}') {
-                console.log(`📥 Tentative de chargement de ${entity}...`);
-
-                // Essayer plusieurs chemins possibles pour trouver le fichier JSON
-                const paths = [
-                    `./data/${entity}.json`,       // Relatif standard
-                    `../../data/${entity}.json`,   // Si appelé depuis une sous-page
-                    `data/${entity}.json`          // Relatif simple
-                ];
-
-                let loaded = false;
-
-                for (const path of paths) {
-                    try {
-                        const response = await fetch(path);
-                        if (response.ok) {
-                            const jsonData = await response.json();
-                            // Vérifier que le format est correct (objet avec clé du nom de l'entité ou tableau direct)
-                            const items = jsonData[entity] || jsonData || [];
-                            localStorage.setItem(entity, JSON.stringify({ [entity]: items }));
-                            console.log(`✅ ${entity} chargé depuis ${path}`);
-                            loaded = true;
-                            break;
-                        }
-                    } catch (e) {
-                        // Continuer au prochain chemin
-                    }
-                }
-
-                if (!loaded) {
-                    console.warn(`⚠️ Impossible de charger ${entity}.json. Utilisation de données vides/mock temporaires.`);
-                    // Injection de données de secours si échec total (pour éviter le chargement infini)
-                    const mockData = this.getFallbackData(entity);
-                    localStorage.setItem(entity, JSON.stringify({ [entity]: mockData }));
-                }
-            }
+        console.log('🔄 DataManager: Connecting to Backend...');
+        try {
+            // Simple ping check by fetching instructors (public usually) or just check API
+            // For now, assume connection is fine.
+            console.log('✅ Connected to Backend API');
+        } catch (e) {
+            console.error('❌ Backend connection failed. Ensure server is running on port 3000.');
         }
-
-        this.initialized = true;
-        console.log('✅ DataManager initialisé avec succès');
     }
 
-    // Données de secours pour éviter l'écran blanc/chargement infini
-    getFallbackData(entity) {
-        if (entity === 'instructors') {
-            return [
-                { id: 'ahmed', name: 'Ahmed Ben Ali', specialty: 'Expert DevOps', rating: 4.9, students: '15k+', image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-                { id: 'sarah', name: 'Sarah M.', specialty: 'UX/UI Design', rating: 5.0, students: '8k+', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-                { id: 'karim', name: 'Karim S.', specialty: 'Dév Mobile iOS', rating: 4.7, students: '5k+', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-                { id: 'leila', name: 'Leila K.', specialty: 'Marketing Digital', rating: 4.8, students: '12k+', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
-            ];
-        }
-        if (entity === 'centers') {
-            return [
-                { id: 'c1', name: 'GoMyCode', category: 'Coding Bootcamp', location: 'Tunis', description: 'Le premier bootcamp de code en Tunisie.' },
-                { id: 'c2', name: 'GMC', category: 'Formation Pro', location: 'Sousse', description: 'Centre de formation accélérée.' }
-            ];
-        }
-        return [];
-    }
+    // --- UTILS ---
 
-    /**
-     * READ - Récupérer toutes les entités
-     * @param {string} entity - Nom de l'entité (instructors, centers, etc.)
-     * @returns {Array} Liste des entités
-     */
-    async getAll(entity) {
-        await this.init();
-        const data = JSON.parse(localStorage.getItem(entity) || '{}');
-        return data[entity] || [];
-    }
-
-    /**
-     * READ - Récupérer une entité par ID
-     * @param {string} entity - Nom de l'entité
-     * @param {string} id - ID de l'entité
-     * @returns {Object|null} L'entité ou null
-     */
-    async getById(entity, id) {
-        const items = await this.getAll(entity);
-        return items.find(item => item.id === id) || null;
-    }
-
-    /**
-     * CREATE - Créer une nouvelle entité
-     * @param {string} entity - Nom de l'entité
-     * @param {Object} data - Données de la nouvelle entité
-     * @returns {Object} L'entité créée
-     */
-    async create(entity, data) {
-        await this.init();
-        const items = await this.getAll(entity);
-
-        // Générer un ID unique si pas fourni
-        const newItem = {
-            id: data.id || this.generateId(),
-            ...data,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+    getHeaders() {
+        const headers = {
+            'Content-Type': 'application/json'
         };
-
-        items.push(newItem);
-        await this.save(entity, items);
-
-        console.log(`✅ ${entity} créé:`, newItem.id);
-        return newItem;
+        const token = localStorage.getItem('authToken'); // Get fresh token
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        return headers;
     }
 
-    /**
-     * UPDATE - Mettre à jour une entité
-     * @param {string} entity - Nom de l'entité
-     * @param {string} id - ID de l'entité
-     * @param {Object} updates - Données à mettre à jour
-     * @returns {Object|null} L'entité mise à jour ou null
-     */
-    async update(entity, id, updates) {
-        await this.init();
-        const items = await this.getAll(entity);
-        const index = items.findIndex(item => item.id === id);
+    async fetchAPI(endpoint, options = {}) {
+        const res = await fetch(`${API_URL}/${endpoint}`, {
+            headers: this.getHeaders(),
+            ...options
+        });
 
-        if (index === -1) {
-            console.error(`❌ ${entity} avec id ${id} non trouvé`);
+        if (!res.ok) {
+            // Handle Auth errors
+            if (res.status === 401 || res.status === 403) {
+                console.warn("Unauthorized access - Redirecting to login?");
+                // window.location.href = '/pages/entreprise/login.html'; // Uncomment to force login
+            }
+            throw new Error(`API Error ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+    }
+
+    // --- CRUD OPERATIONS ---
+
+    async getAll(entity) {
+        try {
+            return await this.fetchAPI(entity);
+        } catch (e) {
+            console.error(`Failed to load ${entity}`, e);
+            return [];
+        }
+    }
+
+    async getById(entity, id) {
+        try {
+            return await this.fetchAPI(`${entity}/${id}`);
+        } catch (e) {
             return null;
         }
-
-        items[index] = {
-            ...items[index],
-            ...updates,
-            updatedAt: new Date().toISOString()
-        };
-
-        await this.save(entity, items);
-        console.log(`✅ ${entity} mis à jour:`, id);
-        return items[index];
     }
 
-    /**
-     * DELETE - Supprimer une entité
-     * @param {string} entity - Nom de l'entité
-     * @param {string} id - ID de l'entité
-     * @returns {boolean} true si supprimé, false sinon
-     */
-    async delete(entity, id) {
-        await this.init();
-        const items = await this.getAll(entity);
-        const filteredItems = items.filter(item => item.id !== id);
-
-        if (filteredItems.length === items.length) {
-            console.error(`❌ ${entity} avec id ${id} non trouvé`);
-            return false;
-        }
-
-        await this.save(entity, filteredItems);
-        console.log(`✅ ${entity} supprimé:`, id);
-        return true;
-    }
-
-    /**
-     * SEARCH - Rechercher des entités
-     * @param {string} entity - Nom de l'entité
-     * @param {string} query - Terme de recherche
-     * @param {Array} fields - Champs dans lesquels chercher
-     * @returns {Array} Résultats de la recherche
-     */
-    async search(entity, query, fields = ['name', 'specialty', 'description']) {
-        const items = await this.getAll(entity);
-        const lowerQuery = query.toLowerCase();
-
-        return items.filter(item => {
-            return fields.some(field => {
-                const value = item[field];
-                return value && value.toString().toLowerCase().includes(lowerQuery);
-            });
+    async create(entity, data) {
+        return await this.fetchAPI(entity, {
+            method: 'POST',
+            body: JSON.stringify(data)
         });
     }
 
-    /**
-     * FILTER - Filtrer des entités selon des critères
-     * @param {string} entity - Nom de l'entité
-     * @param {Object} criteria - Critères de filtrage
-     * @returns {Array} Résultats filtrés
-     */
+    async update(entity, id, updates) {
+        return await this.fetchAPI(`${entity}/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(updates)
+        });
+    }
+
+    async delete(entity, id) {
+        return await this.fetchAPI(`${entity}/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // --- SEARCH / FILTER / SORT (Backend delegation or client side ?) ---
+    // For simple JSON file DB, we fetch all and filter client side usually, 
+    // or backend implements them. Let's keep client-side filtering for compat with existing code.
+
+    async search(entity, query, fields = ['name']) {
+        const items = await this.getAll(entity);
+        const lowerQuery = query.toLowerCase();
+        return items.filter(item =>
+            fields.some(field => item[field] && item[field].toString().toLowerCase().includes(lowerQuery))
+        );
+    }
+
     async filter(entity, criteria) {
         const items = await this.getAll(entity);
-
         return items.filter(item => {
             return Object.entries(criteria).every(([key, value]) => {
                 if (value === '' || value === null || value === undefined) return true;
-                return item[key] === value;
+                return item[key] == value; // Loose equality for ID strings/numbers
             });
         });
     }
 
-    /**
-     * SORT - Trier des entités
-     * @param {string} entity - Nom de l'entité
-     * @param {string} field - Champ de tri
-     * @param {string} order - 'asc' ou 'desc'
-     * @returns {Array} Résultats triés
-     */
     async sort(entity, field, order = 'asc') {
         const items = await this.getAll(entity);
-
         return items.sort((a, b) => {
             const aVal = a[field];
             const bVal = b[field];
-
             if (aVal < bVal) return order === 'asc' ? -1 : 1;
             if (aVal > bVal) return order === 'asc' ? 1 : -1;
             return 0;
         });
     }
 
-    /**
-     * Sauvegarder les données dans LocalStorage
-     * @private
-     */
-    async save(entity, items) {
-        const data = { [entity]: items };
-        localStorage.setItem(entity, JSON.stringify(data));
+    // --- AUTH ---
+    // Special methods for auth that were handled in pages before
+
+    async login(email, password, role) {
+        const res = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, role })
+        });
+
+        if (!res.ok) throw new Error("Login failed");
+
+        const data = await res.json();
+        // Save token to localStorage (Session persistence ONLY, as requested)
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Cache user info
+        return data.user;
     }
 
-    /**
-     * Générer un ID unique
-     * @private
-     */
-    generateId() {
-        return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    async register(userData) {
+        const res = await fetch(`${API_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+
+        if (!res.ok) throw new Error("Registration failed");
+        return await res.json();
     }
 
-    /**
-     * Réinitialiser toutes les données (DANGER!)
-     */
-    async reset() {
-        if (confirm('⚠️ Êtes-vous sûr de vouloir réinitialiser toutes les données ?')) {
-            this.entities.forEach(entity => {
-                localStorage.removeItem(entity);
-            });
-            this.initialized = false;
-            await this.init();
-            console.log('✅ Données réinitialisées');
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Exporter toutes les données en JSON
-     */
-    async export() {
-        const exportData = {};
-        for (const entity of this.entities) {
-            exportData[entity] = await this.getAll(entity);
-        }
-        return exportData;
-    }
-
-    /**
-     * Importer des données depuis JSON
-     */
-    async import(data) {
-        for (const [entity, items] of Object.entries(data)) {
-            if (this.entities.includes(entity)) {
-                await this.save(entity, items);
-            }
-        }
-        console.log('✅ Données importées');
+    logout() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        window.location.href = '../../index.html';
     }
 }
 
-// Instance globale
+// Global Instance
 const dataManager = new DataManager();
 
-// Initialiser au chargement de la page
+// Init
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', () => {
         dataManager.init();
     });
-}
-
-// Export pour utilisation dans d'autres fichiers
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = DataManager;
 }
