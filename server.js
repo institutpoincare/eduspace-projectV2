@@ -107,7 +107,9 @@ const server = http.createServer((req, res) => {
     }
 
     // 3. STATIC FILE SERVING (Frontend)
-    let filePath = '.' + req.url;
+    // Retirer les paramètres d'URL (ex: ?role=admin) pour trouver le fichier
+    const urlPath = req.url.split('?')[0];
+    let filePath = '.' + urlPath;
     if (filePath === './') filePath = './index.html';
 
     // Prevent directory traversal
