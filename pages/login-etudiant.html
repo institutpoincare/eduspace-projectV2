@@ -6,329 +6,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion Étudiant - EduSpace</title>
     <link rel="stylesheet" href="../css/main.css">
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
-            background: linear-gradient(to bottom right, var(--blue-50), white, var(--purple-50));
+            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-        }
-
-        .login-container {
-            max-width: 28rem;
-            width: 100%;
-        }
-
-        .back-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--gray-500);
-            text-decoration: none;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-            transition: color 0.3s;
-        }
-
-        .back-link:hover {
-            color: var(--blue-600);
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 4rem;
-            height: 4rem;
-            background: var(--blue-600);
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .login-header h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-        }
-
-        .login-header p {
-            color: var(--gray-600);
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--gray-100);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            margin-bottom: 0.5rem;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 3rem 0.75rem 1rem;
-            border: 1px solid var(--gray-200);
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            transition: all 0.3s;
-            text-align: right;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--blue-500);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            background: var(--blue-600);
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-submit:hover {
-            background: var(--blue-700);
-            transform: translateY(-2px);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .error-message {
-            display: none;
-            padding: 1rem;
-            background: var(--red-50);
-            border: 1px solid var(--red-200);
-            border-radius: 0.75rem;
-            color: var(--red-700);
-            font-size: 0.875rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .error-message.show {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .test-credentials {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: var(--blue-50);
-            border: 1px solid var(--blue-100);
-            border-radius: 0.75rem;
-        }
-
-        .test-credentials p {
-            font-size: 0.875rem;
-            color: var(--blue-800);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .test-credentials .credentials {
-            font-size: 0.75rem;
-            color: var(--blue-600);
-        }
-
-        .footer-text {
-            text-align: center;
-            color: var(--gray-500);
-            font-size: 0.875rem;
-            margin-top: 1.5rem;
-        }
-
-        .spinner {
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid white;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <a href="../index.html" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Retour à l'accueil
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative overflow-hidden">
+
+        <a href="../index.html" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-6 h-6"></i>
         </a>
 
-        <div class="login-header">
-            <div class="login-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                </svg>
+        <div class="text-center mb-8 pt-6">
+            <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="graduation-cap" class="w-8 h-8 text-purple-600"></i>
             </div>
-            <h1>Espace Étudiant</h1>
-            <p>Accédez à vos cours et formations</p>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Espace Étudiant</h1>
+            <p class="text-sm text-gray-500">Accédez à vos cours et suivez votre progression.</p>
         </div>
 
-        <div class="login-card">
-            <div class="error-message" id="errorMessage">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <span id="errorText"></span>
-            </div>
-
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Adresse Email</label>
-                    <div class="input-wrapper">
-                        <input type="email" class="form-input" id="email" placeholder="exemple@email.com"
-                            value="student@eduspace.tn" required>
-                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                            <polyline points="22,6 12,13 2,6" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Mot de passe</label>
-                    <div class="input-wrapper">
-                        <input type="password" class="form-input" id="password" placeholder="••••••••" value="123456"
-                            required>
-                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                    </svg>
-                    Se connecter
-                </button>
-            </form>
-
-            <div class="test-credentials">
-                <p>Compte de test:</p>
-                <div class="credentials">Email: student@eduspace.tn</div>
-                <div class="credentials">Mot de passe: 123456</div>
-            </div>
+        <div id="error-msg" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center font-bold">
         </div>
 
-        <p class="footer-text">Besoin d'aide? Contactez l'administration</p>
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                        placeholder="etudiant@eduspace.com" required value="etudiant@eduspace.com">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                        placeholder="••••••••" required value="password123">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center">
+                    <input type="checkbox"
+                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                    <span class="ml-2 text-gray-600">Se souvenir de moi</span>
+                </label>
+                <a href="#" class="font-medium text-purple-600 hover:text-purple-500">Mot de passe oublié ?</a>
+            </div>
+
+            <button type="submit" id="submit-btn"
+                class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">
+                Se connecter
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm">
+            Pas encore de compte ?
+            <a href="etudiant/inscription.html" class="font-bold text-purple-600 hover:text-purple-500">S'inscrire</a>
+        </div>
     </div>
 
-    <script src="../js/main.js"></script>
+    <!-- Core Scripts -->
+    <script src="../js/core/data-manager.js"></script>
     <script>
-        const form = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
+        lucide.createIcons();
 
-        form.addEventListener('submit', function (e) {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
+            const btn = document.getElementById('submit-btn');
+            const errorDiv = document.getElementById('error-msg');
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Hide error
-            errorMessage.classList.remove('show');
+            btn.disabled = true;
+            btn.innerText = 'Connexion...';
+            errorDiv.classList.add('hidden');
 
-            // Show loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<div class="spinner"></div> Connexion...';
+            try {
+                if (!window.dataManager) await new Promise(r => setTimeout(r, 100));
+                await dataManager.init();
 
-            // Simulate login
-            setTimeout(function () {
-                if (password === '123456' && email === 'student@eduspace.tn') {
-                    // Save user to localStorage
-                    window.eduspace.utils.setStorage('user', {
-                        role: 'etudiant',
-                        email: email,
-                        id: '1'
-                    });
-
-                    // Redirect to dashboard
-                    window.location.href = 'etudiant/dashboard.html';
-                } else {
-                    // Show error
-                    errorText.textContent = 'Identifiants incorrects (Utilisez les comptes de test)';
-                    errorMessage.classList.add('show');
-
-                    // Reset button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                        </svg>
-                        Se connecter
-                    `;
+                let user;
+                try {
+                    user = await dataManager.login(email, password, 'etudiant');
+                } catch (loginError) {
+                    // AUTO-CREATION DEV si login échoue (pour faciliter le test immédiat)
+                    // if (loginError.message === 'Login failed') {
+                    //      await dataManager.create('users', { email, password, role: 'etudiant', name: 'Etudiant Démo' });
+                    //      user = await dataManager.login(email, password, 'etudiant');
+                    // } else throw loginError;
+                    throw loginError;
                 }
-            }, 500);
+
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // Redirection explicite vers le dashboard étudiant
+                window.location.href = 'etudiant/dashboard.html';
+
+            } catch (err) {
+                console.error(err);
+                errorDiv.textContent = "Identifiants incorrects.";
+                errorDiv.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerText = 'Se connecter';
+            }
         });
     </script>
-    <!-- Dynamic System Scripts -->
-    <script src="../../js/core/data-manager.js"></script>
 </body>
 
 </html>
