@@ -78,99 +78,117 @@ function writeJSON(collection, data) {
     fs.writeFileSync(filePath, JSON.stringify(secureData, null, 2));
 }
 
-// --- SERVEUR HTTP (Sans Framework) ---
+// --- MIME TYPES ---
+const MIME_TYPES = {
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.js': 'text/javascript',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml'
+};
+
+// --- SERVEUR HTTP (Frontend + Backend) ---
 
 const server = http.createServer((req, res) => {
-    // 1. Gérer CORS (pour que le frontend puisse parler au serveur)
+    // 1. Gérer CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
+    if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+
+    // 2. API ROUTING (Backend)
+    if (req.url.startsWith('/api/')) {
+        handleApiRequest(req, res);
         return;
     }
 
-    // 2. Parser l'URL
-    // Format attendu: /api/collection/id
+    // 3. STATIC FILE SERVING (Frontend)
+    let filePath = '.' + req.url;
+    if (filePath === './') filePath = './index.html';
+
+    // Prevent directory traversal
+    const safePath = path.normalize(filePath).replace(/^(\.\.[\/\\])+/, '');
+    const absolutePath = path.join(__dirname, safePath);
+
+    const extname = path.extname(absolutePath);
+    const contentType = MIME_TYPES[extname] || 'application/octet-stream';
+
+    fs.readFile(absolutePath, (err, content) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                // Page not found
+                res.writeHead(404, { 'Content-Type': 'text/html' });
+                res.end(`<h1>404 Not Found</h1><p>Le fichier ${req.url} n'existe pas.</p>`, 'utf-8');
+            } else {
+                // Server error
+                res.writeHead(500);
+                res.end(`Server Error: ${err.code}`);
+            }
+        } else {
+            // Success
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(content, 'utf-8');
+        }
+    });
+});
+
+// --- API HANDLER (Exctracted for clarity) ---
+function handleApiRequest(req, res) {
     const urlParts = req.url.split('/').filter(p => p.length > 0);
-    // urlParts = ['api', 'users', '123']
-
-    if (urlParts[0] !== 'api') {
-        res.writeHead(404);
-        res.end("Not Found");
-        return;
-    }
-
+    // urlParts = ['api', 'collection', 'id']
     const collection = urlParts[1];
     const id = urlParts[2];
 
-    // 3. Lire le Body de la requête
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', () => {
         let payload = null;
         try { if (body) payload = JSON.parse(body); } catch (e) { }
 
-        // --- ROUTING API REST ---
-
         try {
-            // GET /api/collection
+            // GET 
             if (req.method === 'GET' && !id) {
                 const data = readJSON(collection);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(data));
                 return;
             }
-
-            // GET /api/collection/id
             if (req.method === 'GET' && id) {
                 const data = readJSON(collection);
                 const item = data.find(i => i.id === id);
                 if (item) {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(item));
-                } else {
-                    res.writeHead(404);
-                    res.end(JSON.stringify({ error: "Not found" }));
-                }
+                } else { res.writeHead(404, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: "Not found" })); }
                 return;
             }
-
-            // POST /api/collection (Create)
+            // POST
             if (req.method === 'POST') {
                 const data = readJSON(collection);
-
-                // Login Special Case
                 if (collection === 'login') {
-                    // Chercher dans Users
                     const users = readJSON('users');
                     const user = users.find(u => u.email === payload.email && u.password === payload.password);
                     if (user) {
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ token: "fake-jwt-" + user.id, user }));
                     } else {
-                        res.writeHead(401);
+                        res.writeHead(401, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ error: "Login failed" }));
                     }
                     return;
                 }
-
-                const newItem = {
-                    id: crypto.randomUUID(),
-                    ...payload,
-                    createdAt: new Date().toISOString()
-                };
+                const newItem = { id: crypto.randomUUID(), ...payload, createdAt: new Date().toISOString() };
                 data.push(newItem);
                 writeJSON(collection, data);
-
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(newItem));
                 return;
             }
-
-            // PUT /api/collection/id (Update)
+            // PUT
             if (req.method === 'PUT' && id) {
                 const data = readJSON(collection);
                 const index = data.findIndex(i => i.id === id);
@@ -179,14 +197,10 @@ const server = http.createServer((req, res) => {
                     writeJSON(collection, data);
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(data[index]));
-                } else {
-                    res.writeHead(404);
-                    res.end(JSON.stringify({ error: "Not found" }));
-                }
+                } else { res.writeHead(404); res.end(JSON.stringify({ error: "Not found" })); }
                 return;
             }
-
-            // DELETE /api/collection/id
+            // DELETE
             if (req.method === 'DELETE' && id) {
                 let data = readJSON(collection);
                 const initialLen = data.length;
@@ -195,12 +209,12 @@ const server = http.createServer((req, res) => {
                     writeJSON(collection, data);
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: true }));
-                } else {
-                    res.writeHead(404);
-                    res.end(JSON.stringify({ error: "Not found" }));
-                }
+                } else { res.writeHead(404); res.end(JSON.stringify({ error: "Not found" })); }
                 return;
             }
+
+            res.writeHead(404);
+            res.end(JSON.stringify({ error: "API Endpoint not found" }));
 
         } catch (err) {
             console.error(err);
@@ -208,16 +222,14 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify({ error: err.message }));
         }
     });
-});
+}
 
 server.listen(PORT, () => {
     console.log(`
-    🚀 SERVEUR VANILLA JS DÉMARRÉ
-    ----------------------------
-    📡 Port: ${PORT}
-    📁 Base de données: ${DATA_DIR}
-    🔒 Cryptage: ACTIF
-    
-    ✅ Prêt à recevoir les requêtes du DataManager.
+    🚀 EDUSPACE COMPLET (Vanilla JS)
+    --------------------------------
+    🌍 Site Web: http://localhost:${PORT}
+    📡 API Base: http://localhost:${PORT}/api/
+    📁 Données : ${DATA_DIR}
     `);
 });
