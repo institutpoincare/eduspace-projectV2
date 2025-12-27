@@ -1,0 +1,98 @@
+[
+  {
+    "id": "inst-1",
+    "name": "Sarah Ben Ali",
+    "specialty": "Mathématiques Avancées",
+    "location": "Tunis",
+    "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "isLive": true,
+    "students": 120,
+    "bio": "Professeur agrégée avec 10 ans d'expérience. Je simplifie les concepts complexes pour garantir votre réussite au Bac.",
+    "services": ["live", "presentiel"],
+    "cv": {
+      "experience": [
+        { "description": "Enseignante au Lycée Pilote Bourguiba" }
+      ]
+    }
+  },
+  {
+    "id": "inst-2",
+    "name": "Ahmed Tounsi",
+    "specialty": "Physique & Chimie",
+    "location": "Sfax",
+    "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "isLive": false,
+    "students": 85,
+    "bio": "Passionné par les sciences expérimentales. Mes cours sont interactifs et basés sur des exemples concrets.",
+    "services": ["videos", "live"],
+    "cv": {
+      "experience": [
+        { "description": "Docteur en Physique Quantique" }
+      ]
+    }
+  },
+  {
+    "id": "inst-3",
+    "name": "Leila Kharrat",
+    "specialty": "Anglais & Communication",
+    "location": "Sousse",
+    "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "isLive": true,
+    "students": 250,
+    "bio": "Improve your English skills with a native-level speaker. Focus on business English and conversation.",
+    "services": ["live"],
+    "cv": {
+      "experience": [
+        { "description": "Certified TEFL Instructor" }
+      ]
+    }
+  },
+  {
+    "id": "inst-4",
+    "name": "Youssef Amri",
+    "specialty": "Développement Web",
+    "location": "Ariana",
+    "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "isLive": false,
+    "students": 400,
+    "bio": "Développeur Fullstack Senior. J'apprends aux débutants comment créer des sites web modernes de A à Z.",
+    "services": ["videos", "presentiel"],
+    "cv": {
+      "experience": [
+        { "description": "Lead Dev chez TechSolution" }
+      ]
+    }
+  },
+  {
+    "id": "inst-5",
+    "name": "Meriem Dridi",
+    "specialty": "Économie & Gestion",
+    "location": "Bizerte",
+    "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "isLive": false,
+    "students": 95,
+    "bio": "Experte en finance et gestion d'entreprise. Idéal pour les étudiants universitaires.",
+    "services": ["videos"],
+    "cv": {
+      "experience": [
+        { "description": "Expert Comptable" }
+      ]
+    }
+  },
+  {
+    "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+    "name": "Ahmed Aboudi",
+    "specialty": "Anglais",
+    "location": "Tunis",
+    "image": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5",
+    "isLive": true,
+    "students": 150,
+    "bio": "Enseignant passionné d'Anglais avec une méthode pédagogique interactive.",
+    "services": ["live", "videos"],
+    "cv": {
+      "experience": [
+        { "description": "Professeur certifié" }
+      ]
+    }
+  }
+]

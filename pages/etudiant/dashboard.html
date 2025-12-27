@@ -6,21 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord - EduSpace Étudiant</title>
     <link rel="stylesheet" href="../../css/main.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb', // blue-600
-                        secondary: '#4f46e5', // indigo-600
-                    }
-                }
-            }
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
         }
-    </script>
+
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -32,194 +80,119 @@
         <!-- Main Content -->
         <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
             <!-- Header -->
-            <header class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Bonjour, Ahmed 👋</h1>
-                    <p class="text-gray-500 mt-1">Prêt à continuer d'apprendre ?</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <input type="text" placeholder="Rechercher un cours..."
-                            class="pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-sm">
-                        <i data-lucide="search"
-                            class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <header class="mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-4xl font-bold text-gray-900" id="welcomeMessage">Bonjour, Étudiant 👋</h1>
+                        <p class="text-gray-500 mt-2">Continuez votre parcours d'apprentissage</p>
                     </div>
-                    <button
-                        class="p-2 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:shadow-md transition-all relative">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span
-                            class="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                    </button>
-                    <div
-                        class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:shadow-lg transition-all">
-                        AM
+                    <div class="flex items-center gap-4">
+                        <button
+                            class="p-3 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:shadow-md transition-all relative">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span id="notificationBadge"
+                                class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white hidden"></span>
+                        </button>
+                        <div id="userAvatar"
+                            class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:shadow-lg transition-all">
+                            ET
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Stats Overview - Dynamic -->
-            <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Stats will be loaded dynamically -->
-            </div>
-
-            <!-- Mes Cours - Dynamic -->
-            <div id="myCoursesContainer" class="mb-8">
-                <!-- My courses will be loaded dynamically -->
-            </div>
-
-            <!-- Cours Disponibles - Dynamic -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <i data-lucide="book-open" class="w-6 h-6 text-blue-600"></i>
-                        Cours disponibles
-                    </h2>
-                    <input id="searchCourses" type="text" placeholder="Rechercher un cours..."
-                        class="px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-sm">
-                </div>
-                <div id="availableCoursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Available courses will be loaded dynamically -->
-                </div>
-            </div>
-
-            <!-- Old Static Content (keeping for reference) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" style="display: none;">
-                <!-- Completion Rate -->
-                <div
-                    class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-6 text-white shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden group">
-                    <i data-lucide="trending-up"
-                        class="w-32 h-32 absolute -right-6 -bottom-6 opacity-10 rotate-12 group-hover:scale-110 transition-transform"></i>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                                <i data-lucide="target" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-blue-100 font-medium text-sm">Taux de complétion</p>
-                                <h3 class="text-3xl font-bold">68%</h3>
-                            </div>
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Stat 1: Cours Inscrits -->
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-6 h-6 text-blue-600"></i>
                         </div>
-                        <div class="w-full bg-blue-900/30 rounded-full h-2">
-                            <div class="bg-white h-full rounded-full" style="width: 68%"></div>
-                        </div>
+                        <span class="text-sm font-semibold text-green-600">+12%</span>
                     </div>
+                    <h3 class="text-3xl font-bold text-gray-900" id="enrolledCoursesCount">0</h3>
+                    <p class="text-gray-500 text-sm mt-1">Cours inscrits</p>
                 </div>
 
-                <!-- Average Grade -->
-                <div
-                    class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden group">
-                    <i data-lucide="award"
-                        class="w-32 h-32 absolute -right-6 -bottom-6 opacity-10 rotate-12 group-hover:scale-110 transition-transform"></i>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                                <i data-lucide="award" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-green-100 font-medium text-sm">Moyenne générale</p>
-                                <h3 class="text-3xl font-bold">16.5<span class="text-lg opacity-75">/20</span></h3>
-                            </div>
+                <!-- Stat 2: Cours Terminés -->
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                            <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
                         </div>
-                        <div
-                            class="flex items-center gap-1 text-green-100 text-sm font-medium bg-white/10 w-fit px-2 py-1 rounded-lg">
-                            <i data-lucide="trending-up" class="w-3 h-3"></i>
-                            +0.5 ce mois
-                        </div>
+                        <span class="text-sm font-semibold text-green-600">+8%</span>
                     </div>
+                    <h3 class="text-3xl font-bold text-gray-900" id="completedCoursesCount">0</h3>
+                    <p class="text-gray-500 text-sm mt-1">Cours terminés</p>
                 </div>
 
-                <!-- Active Courses -->
-                <div
-                    class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-6 text-white shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden group">
-                    <i data-lucide="book-open"
-                        class="w-32 h-32 absolute -right-6 -bottom-6 opacity-10 rotate-12 group-hover:scale-110 transition-transform"></i>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                                <i data-lucide="book-open" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-purple-100 font-medium text-sm">Cours actifs</p>
-                                <h3 class="text-3xl font-bold">4</h3>
-                            </div>
+                <!-- Stat 3: Prochaine Séance -->
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-6 h-6 text-purple-600"></i>
                         </div>
-                        <div class="flex items-center gap-1 text-purple-100 text-sm font-medium">
-                            <i data-lucide="check-circle" class="w-3 h-3"></i>
-                            2 certificats obtenus
-                        </div>
+                        <span class="text-sm font-semibold text-purple-600">Live</span>
                     </div>
+                    <h3 class="text-2xl font-bold text-gray-900" id="nextSessionTime">--:--</h3>
+                    <p class="text-gray-500 text-sm mt-1" id="nextSessionCourse">Prochaine séance</p>
                 </div>
 
-                <!-- Time Learned -->
-                <div
-                    class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden group">
-                    <i data-lucide="zap"
-                        class="w-32 h-32 absolute -right-6 -bottom-6 opacity-10 rotate-12 group-hover:scale-110 transition-transform"></i>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                                <i data-lucide="clock" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-orange-100 font-medium text-sm">Temps d'apprentissage</p>
-                                <h3 class="text-3xl font-bold">42h</h3>
-                            </div>
+                <!-- Stat 4: Impayés -->
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                            <i data-lucide="credit-card" class="w-6 h-6 text-red-600"></i>
                         </div>
-                        <div class="text-orange-100 text-sm font-medium">
-                            Cette semaine
-                        </div>
+                        <a href="paiements.html" class="text-sm font-semibold text-red-600 hover:underline">Payer</a>
                     </div>
+                    <h3 class="text-3xl font-bold text-gray-900" id="unpaidAmount">0 DT</h3>
+                    <p class="text-gray-500 text-sm mt-1">Impayés</p>
                 </div>
             </div>
 
-            <!-- Next Live Session (Mock Data) -->
-            <div class="mb-8">
-                <div
-                    class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-50"></div>
-                    <div class="relative z-10 flex items-center gap-6">
-                        <div
-                            class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-red-200">
-                            <i data-lucide="video" class="w-8 h-8"></i>
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <a href="catalogue.html" class="quick-action">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                            <i data-lucide="search" class="w-7 h-7"></i>
                         </div>
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="relative flex h-3 w-3">
-                                    <span
-                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                </span>
-                                <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider">Prochain Cours en
-                                    Direct</h2>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-900">Révision Mathématiques - Algèbre</h3>
-                            <p class="text-gray-500 font-medium">avec Dr. Sarah Ben Ali • Aujourd'hui à 18:00</p>
+                            <h3 class="font-bold text-lg">Explorer les cours</h3>
+                            <p class="text-white/80 text-sm">Découvrir de nouvelles formations</p>
                         </div>
                     </div>
-                    <div class="relative z-10 flex items-center gap-4">
-                        <div class="flex gap-2">
-                            <div
-                                class="bg-white/80 backdrop-blur-sm border border-gray-100 px-3 py-2 rounded-lg text-center min-w-[60px]">
-                                <div class="text-xl font-bold text-gray-900">02</div>
-                                <div class="text-[10px] text-gray-500 font-bold uppercase">Heures</div>
-                            </div>
-                            <div
-                                class="bg-white/80 backdrop-blur-sm border border-gray-100 px-3 py-2 rounded-lg text-center min-w-[60px]">
-                                <div class="text-xl font-bold text-gray-900">45</div>
-                                <div class="text-[10px] text-gray-500 font-bold uppercase">Min</div>
-                            </div>
+                </a>
+
+                <a href="mes-profs.html" class="quick-action" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                            <i data-lucide="users" class="w-7 h-7"></i>
                         </div>
-                        <button
-                            class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200 flex items-center gap-2">
-                            Rejoindre
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </button>
+                        <div>
+                            <h3 class="font-bold text-lg">Mes formateurs</h3>
+                            <p class="text-white/80 text-sm">Contacter vos enseignants</p>
+                        </div>
                     </div>
-                </div>
+                </a>
+
+                <a href="paiements.html" class="quick-action" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                            <i data-lucide="wallet" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Paiements</h3>
+                            <p class="text-white/80 text-sm">Gérer vos transactions</p>
+                        </div>
+                    </div>
+                </a>
             </div>
 
-            <!-- Active Courses Grid -->
-            <div>
+            <!-- Mes Cours Actifs -->
+            <div class="mb-8">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
                         <i data-lucide="book-open" class="w-6 h-6 text-blue-600"></i>
@@ -230,109 +203,53 @@
                         Voir tout <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </a>
                 </div>
+                <div id="myCoursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Courses will be loaded dynamically -->
+                </div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Course Card 1 -->
-                    <div
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group overflow-hidden">
-                        <div class="relative h-40 bg-gray-200">
-                            <img src="https://placehold.co/600x400/10B981/white?text=Physique" alt="Course"
-                                class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-3 left-3 right-3">
-                                <div
-                                    class="w-full bg-white/20 h-1.5 rounded-full mb-2 overflow-hidden backdrop-blur-sm">
-                                    <div class="bg-green-500 h-full rounded-full" style="width: 75%"></div>
-                                </div>
-                                <span class="text-white text-xs font-bold">75% complété</span>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-bold text-gray-900 mb-1 line-clamp-1">Physique - Mécanique Newtonienne</h3>
-                            <p class="text-xs text-gray-500 mb-4">par Prof. Ahmed Mansour</p>
-
-                            <div class="flex items-center gap-2 p-2 bg-blue-50 rounded-lg mb-4">
-                                <i data-lucide="play-circle" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
-                                <div class="min-w-0">
-                                    <p class="text-[10px] text-blue-600 font-bold uppercase">SUIVANT</p>
-                                    <p class="text-xs text-gray-900 font-medium truncate">Loi de la gravitation</p>
-                                </div>
-                            </div>
-
-                            <a href="#"
-                                class="block w-full text-center py-2 bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-700 text-sm font-bold rounded-lg transition-colors">
-                                Continuer
-                            </a>
-                        </div>
+            <!-- Résumés et Manuels -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Résumés de cours -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                            Résumés de cours
+                        </h3>
+                        <button class="text-blue-600 text-sm font-semibold hover:underline">Voir tout</button>
                     </div>
-
-                    <!-- Course Card 2 -->
-                    <div
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group overflow-hidden">
-                        <div class="relative h-40 bg-gray-200">
-                            <img src="https://placehold.co/600x400/4F46E5/white?text=Maths" alt="Course"
-                                class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-3 left-3 right-3">
-                                <div
-                                    class="w-full bg-white/20 h-1.5 rounded-full mb-2 overflow-hidden backdrop-blur-sm">
-                                    <div class="bg-orange-500 h-full rounded-full" style="width: 45%"></div>
-                                </div>
-                                <span class="text-white text-xs font-bold">45% complété</span>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-bold text-gray-900 mb-1 line-clamp-1">Mathématiques - Analyse Complexe</h3>
-                            <p class="text-xs text-gray-500 mb-4">par Dr. Sarah Ben Ali</p>
-
-                            <div class="flex items-center gap-2 p-2 bg-blue-50 rounded-lg mb-4">
-                                <i data-lucide="play-circle" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
-                                <div class="min-w-0">
-                                    <p class="text-[10px] text-blue-600 font-bold uppercase">SUIVANT</p>
-                                    <p class="text-xs text-gray-900 font-medium truncate">Nombres complexes</p>
-                                </div>
-                            </div>
-
-                            <a href="#"
-                                class="block w-full text-center py-2 bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-700 text-sm font-bold rounded-lg transition-colors">
-                                Continuer
-                            </a>
-                        </div>
+                    <div id="summariesContainer" class="space-y-3">
+                        <!-- Summaries will be loaded dynamically -->
                     </div>
+                </div>
 
-                    <!-- Course Card 3 (New) -->
-                    <div
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group overflow-hidden">
-                        <div class="relative h-40 bg-gray-200">
-                            <img src="https://placehold.co/600x400/F59E0B/white?text=Anglais" alt="Course"
-                                class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-3 left-3 right-3">
-                                <div
-                                    class="w-full bg-white/20 h-1.5 rounded-full mb-2 overflow-hidden backdrop-blur-sm">
-                                    <div class="bg-blue-500 h-full rounded-full" style="width: 10%"></div>
-                                </div>
-                                <span class="text-white text-xs font-bold">10% complété</span>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-bold text-gray-900 mb-1 line-clamp-1">Anglais Business</h3>
-                            <p class="text-xs text-gray-500 mb-4">par Mme. Layla Kallel</p>
-
-                            <div class="flex items-center gap-2 p-2 bg-blue-50 rounded-lg mb-4">
-                                <i data-lucide="play-circle" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
-                                <div class="min-w-0">
-                                    <p class="text-[10px] text-blue-600 font-bold uppercase">SUIVANT</p>
-                                    <p class="text-xs text-gray-900 font-medium truncate">Introduction</p>
-                                </div>
-                            </div>
-
-                            <a href="#"
-                                class="block w-full text-center py-2 bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-700 text-sm font-bold rounded-lg transition-colors">
-                                Continuer
-                            </a>
-                        </div>
+                <!-- Manuels et Ressources -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i data-lucide="book" class="w-5 h-5 text-purple-600"></i>
+                            Manuels et ressources
+                        </h3>
+                        <button class="text-purple-600 text-sm font-semibold hover:underline">Voir tout</button>
                     </div>
+                    <div id="manualsContainer" class="space-y-3">
+                        <!-- Manuals will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages avec Formateurs -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <i data-lucide="message-circle" class="w-5 h-5 text-green-600"></i>
+                        Discussions avec mes formateurs
+                    </h3>
+                    <a href="mes-profs.html" class="text-green-600 text-sm font-semibold hover:underline">Voir tout</a>
+                </div>
+                <div id="messagesContainer" class="space-y-3">
+                    <!-- Messages will be loaded dynamically -->
                 </div>
             </div>
 
@@ -341,7 +258,7 @@
 
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
-    <script src="../../js/pages/student-dashboard.js"></script>
+    <script src="../../js/pages/student-dashboard-modern.js"></script>
     <script src="../../js/components/sidebar-etudiant.js"></script>
     <script>
         lucide.createIcons();

@@ -51,6 +51,12 @@ const sidebarHTML = `
             <span class="font-medium group-hover:text-gray-900 sidebar-text">Mes Profs</span>
         </a>
 
+        <a href="messages.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group relative">
+            <i data-lucide="mail" class="w-5 h-5 group-hover:text-teal-600 group-hover:scale-110 transition-all"></i>
+            <span class="font-medium group-hover:text-gray-900 sidebar-text">Messages</span>
+            <span data-notification-badge="messages" class="hidden absolute top-2 right-2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">0</span>
+        </a>
+
          <a href="paiements.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
             <i data-lucide="credit-card" class="w-5 h-5 group-hover:text-orange-600 group-hover:scale-110 transition-all"></i>
             <span class="font-medium group-hover:text-gray-900 sidebar-text">Paiements</span>
@@ -87,19 +93,38 @@ const sidebarContainer = document.getElementById('sidebar-container');
 if (sidebarContainer) {
     sidebarContainer.innerHTML = sidebarHTML;
 
-    // --- LOGIC TO HIDE CATALOGUE FOR ENTERPRISE STUDENTS ---
+    // Update user info dynamically
     try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user && user.role === 'etudiant_entreprise') {
-            const navItems = sidebarContainer.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                if (item.getAttribute('href').includes('catalogue')) {
-                    item.style.display = 'none';
-                }
-            });
+        const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            
+            // Update avatar initials
+            const avatarDiv = sidebarContainer.querySelector('.w-10.h-10.rounded-full');
+            if (avatarDiv && user.name) {
+                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                avatarDiv.textContent = initials;
+            }
+
+            // Update name
+            const nameP = sidebarContainer.querySelector('.text-sm.font-bold');
+            if (nameP && user.name) {
+                nameP.textContent = user.name;
+            }
+
+            // Hide catalogue for enterprise students
+            if (user.role === 'etudiant_entreprise') {
+                const navItems = sidebarContainer.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if (item.getAttribute('href').includes('catalogue')) {
+                        item.style.display = 'none';
+                    }
+                });
+            }
         }
-    } catch (e) { console.error('Error checking user role:', e); }
-    // --------------------------------------------------------
+    } catch (e) { 
+        console.error('Error loading user info:', e); 
+    }
 
 } else {
     console.error('Sidebar container not found!');

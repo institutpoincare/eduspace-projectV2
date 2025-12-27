@@ -1,0 +1,60 @@
+[
+  {
+    "id": "msg_1766841416014",
+    "from": {
+      "id": "4b482bf4-d29c-41f9-a7de-49fe27509e91",
+      "name": "ahmed aboudi",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "demande de formation",
+    "message": "bonjour",
+    "isRead": true,
+    "createdAt": "2025-12-27T13:16:56.016Z",
+    "replies": [
+      {
+        "id": "reply_1766841432705",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "bonjour",
+        "createdAt": "2025-12-27T13:17:12.705Z"
+      },
+      {
+        "id": "reply_1766841452011",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "cava",
+        "createdAt": "2025-12-27T13:17:32.011Z"
+      },
+      {
+        "id": "reply_1766841461184",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "ffffffffffffffff",
+        "createdAt": "2025-12-27T13:17:41.184Z"
+      }
+    ],
+    "updatedAt": "2025-12-27T13:17:41.187Z"
+  },
+  {
+    "id": "msg_1766841519776",
+    "from": {
+      "id": "c164e1cd-9b68-4481-b07e-ffb6414c71a8",
+      "name": "monji laaghar",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "hhhhh",
+    "message": "hhhhhh",
+    "isRead": false,
+    "createdAt": "2025-12-27T13:18:39.779Z",
+    "replies": []
+  }
+]

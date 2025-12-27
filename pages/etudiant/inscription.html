@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription Étudiant - EduSpace</title>
     <link rel="stylesheet" href="../../css/main.css">
-
     <style>
         body {
             background: linear-gradient(to bottom right, var(--blue-50), white, var(--purple-50));
@@ -84,32 +83,18 @@
             margin-bottom: 0.5rem;
         }
 
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-        }
-
         .form-input {
             width: 100%;
-            padding: 0.75rem 3rem 0.75rem 1rem;
+            padding: 0.75rem 1rem;
             border: 1px solid var(--gray-200);
             border-radius: 0.75rem;
             font-size: 1rem;
             transition: all 0.3s;
-            text-align: right;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--blue-500);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--blue-600);
         }
 
         .btn-submit {
@@ -123,11 +108,6 @@
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
 
         .btn-submit:hover {
@@ -146,11 +126,11 @@
 
 <body>
     <div class="login-container">
-        <a href="../inscription-choix.html" class="back-link">
+        <a href="../../index.html" class="back-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Retour au choix
+            Retour à l'accueil
         </a>
 
         <div class="login-header">
@@ -160,44 +140,51 @@
                     <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
             </div>
-            <h1>Inscription Étudiant</h1>
-            <p>Créez votre compte pour accéder aux cours</p>
+            <h1>Espace Étudiant</h1>
+            <p>Créez votre compte pour apprendre</p>
         </div>
 
         <div class="login-card">
-            <form onsubmit="event.preventDefault(); window.location.href='dashboard.html';">
+            <form id="etudiantInscriptionForm">
                 <div class="form-group">
                     <label class="form-label">Nom complet</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-input" placeholder="Votre nom" required>
-                    </div>
+                    <input type="text" name="name" class="form-input" placeholder="Votre nom" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Adresse Email</label>
-                    <div class="input-wrapper">
-                        <input type="email" class="form-input" placeholder="exemple@email.com" required>
-                    </div>
+                    <input type="email" name="email" class="form-input" placeholder="etudiant@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Numéro de téléphone</label>
+                    <input type="tel" name="phone" class="form-input" placeholder="Ex: 50 123 456" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Mot de passe</label>
-                    <div class="input-wrapper">
-                        <input type="password" class="form-input" placeholder="••••••••" required>
-                    </div>
+                    <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <!-- CAPTCHA Section -->
+                <div class="form-group" id="captchaContainer">
+                    <label class="form-label">Vérification de sécurité</label>
+                    <p id="captchaQuestion" style="font-weight: 600; color: var(--blue-600); margin-bottom: 0.5rem;">
+                    </p>
+                    <input type="text" id="captchaInput" class="form-input" placeholder="Votre réponse" required>
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    Commencer l'apprentissage
+                    Céer mon compte
                 </button>
             </form>
-
             <p class="footer-text">Déjà inscrit ? <a href="../login-etudiant.html"
                     style="color: var(--blue-600); font-weight: bold;">Se connecter</a></p>
         </div>
     </div>
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/pages/etudiant-inscription.js"></script>
 </body>
 
 </html>

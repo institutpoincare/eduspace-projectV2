@@ -196,13 +196,42 @@
 
     <!-- Scripts -->
     <script src="../../js/components/sidebar-entreprise.js"></script>
-    <script>
-        // Override sidebar to highlight Admin functions
-        // Ideally we would trigger a function in sidebar-entreprise.js to filter links
-        lucide.createIcons();
-    </script>
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!window.dataManager) await new Promise(r => setTimeout(r, 100));
+            await dataManager.init();
+
+            // Auth Check
+            const user = dataManager.getCurrentUser();
+            if (!user) {
+                window.location.href = '../login-entreprise.html'; // Or main login
+                return;
+            }
+
+            // Update UI with User Info
+            // Assuming header has elements to update, or we add IDs.
+            // The file currently has: <span ...>Agent Admin</span> inside header.
+            // We can try to find where to put the name.
+            // For now, at least protection is active.
+
+            // Load some real stats if possible
+            try {
+                const users = await dataManager.getAll('users');
+                const newEmployees = users.filter(u => u.role === 'etudiant').length; // Mock mapping
+                // Update stats if elements have IDs? They don't have IDs in the viewed file.
+                // We'll leave the static numbers for now or add IDs in a bigger refactor.
+                console.log('Admin Dashboard loaded for:', user.name);
+            } catch (e) {
+                console.error(e);
+            }
+
+            // Override sidebar to highlight Admin functions
+            lucide.createIcons();
+        });
+    </script>
 </body>
 
 </html>

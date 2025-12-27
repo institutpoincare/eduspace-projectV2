@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -241,8 +241,7 @@
                 <div class="form-group">
                     <label class="form-label">Email Professionnel</label>
                     <div class="input-wrapper">
-                        <input type="email" class="form-input" id="email" placeholder="rh@entreprise.com"
-                            value="rh@techsplit.tn" required>
+                        <input type="email" class="form-input" id="email" placeholder="rh@entreprise.com" required>
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -254,8 +253,7 @@
                 <div class="form-group">
                     <label class="form-label">Mot de passe</label>
                     <div class="input-wrapper">
-                        <input type="password" class="form-input" id="password" placeholder="••••••••" value="123456"
-                            required>
+                        <input type="password" class="form-input" id="password" placeholder="••••••••" required>
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -287,12 +285,6 @@
                 </button>
             </form>
 
-            <div class="test-credentials">
-                <p>Compte de démonstration:</p>
-                <div class="credentials"><b>Entreprise:</b> TechSplit Solutions</div>
-                <div class="credentials"><b>Email:</b> rh@techsplit.tn</div>
-                <div class="credentials"><b>Mot de passe:</b> 123456</div>
-            </div>
         </div>
 
         <p class="footer-text">Vous n'avez pas de compte entreprise? <a href="#"
@@ -307,7 +299,12 @@
         const errorMessage = document.getElementById('errorMessage');
         const errorText = document.getElementById('errorText');
 
-        form.addEventListener('submit', function (e) {
+        // Init DataManager
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.dataManager) await window.dataManager.init();
+        });
+
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
@@ -317,36 +314,44 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<div class="spinner"></div> Connexion en cours...';
 
-            setTimeout(function () {
-                if (password === '123456' && email === 'rh@techsplit.tn') {
-                    window.eduspace.utils.setStorage('user', {
-                        role: 'entreprise',
-                        email: email,
-                        id: '900',
-                        name: 'Sarra RH',
-                        company: 'TechSplit Solutions'
-                    });
+            try {
+                // Use DataManager for dynamic login
+                // Note: The role for entreprise might be specific depending on sub-roles, 
+                // but 'entreprise' is the base role we put in users.json for now.
+                // If sub-roles are needed (gerant, commercial, etc), we should probably 
+                // check against 'entreprise' role in DB but maybe store sub-role metadata.
+                // For now, we assume simple 'entreprise' role match.
 
-                    window.location.href = 'entreprise/dashboard.html';
-                } else {
-                    errorText.textContent = 'Identifiants incorrects (Vérifiez les comptes de démo)';
-                    errorMessage.classList.add('show');
-
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                            <polyline points="10 17 15 12 10 7" />
-                            <line x1="15" y1="12" x2="3" y2="12" />
-                        </svg>
-                        Accéder au Portail
-                    `;
+                if (!window.dataManager) {
+                    throw new Error("Erreur système: DataManager non chargé");
                 }
-            }, 800);
+
+                await dataManager.login(email, password, 'entreprise');
+
+                // Redirect
+                window.location.href = 'entreprise/dashboard.html';
+
+            } catch (err) {
+                console.error(err);
+                // Show error
+                errorText.textContent = 'Identifiants incorrects';
+                errorMessage.classList.add('show');
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                    </svg>
+                    Accéder au Portail
+                `;
+            }
         });
     </script>
+
     <!-- Dynamic System Scripts -->
-    <script src="../../js/core/data-manager.js"></script>
+    <script src="../js/core/data-manager.js"></script>
 </body>
 
 </html>

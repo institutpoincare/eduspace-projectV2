@@ -46,7 +46,7 @@
                     </div>
                     <input type="email" id="email"
                         class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-colors"
-                        placeholder="etudiant@eduspace.com" required value="etudiant@eduspace.com">
+                        placeholder="etudiant@eduspace.com" required>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
                     </div>
                     <input type="password" id="password"
                         class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-colors"
-                        placeholder="••••••••" required value="password123">
+                        placeholder="••••••••" required>
                 </div>
             </div>
 
@@ -103,19 +103,8 @@
                 if (!window.dataManager) await new Promise(r => setTimeout(r, 100));
                 await dataManager.init();
 
-                let user;
-                try {
-                    user = await dataManager.login(email, password, 'etudiant');
-                } catch (loginError) {
-                    // AUTO-CREATION DEV si login échoue (pour faciliter le test immédiat)
-                    // if (loginError.message === 'Login failed') {
-                    //      await dataManager.create('users', { email, password, role: 'etudiant', name: 'Etudiant Démo' });
-                    //      user = await dataManager.login(email, password, 'etudiant');
-                    // } else throw loginError;
-                    throw loginError;
-                }
-
-                localStorage.setItem('user', JSON.stringify(user));
+                // Login via DataManager (stocke en sessionStorage)
+                await dataManager.login(email, password, 'etudiant');
 
                 // Redirection explicite vers le dashboard étudiant
                 window.location.href = 'etudiant/dashboard.html';

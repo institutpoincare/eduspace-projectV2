@@ -92,127 +92,12 @@
 
             <!-- Course Grid (Live) -->
             <div id="grid-live" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Live Course 1 -->
-                <div
-                    class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-2">
-                    <div class="relative h-48 overflow-hidden bg-gray-100">
-                        <img src="https://placehold.co/600x400/4F46E5/white?text=Math" alt="Course"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                        <div
-                            class="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg flex items-center gap-1">
-                            <i data-lucide="video" class="w-3 h-3"></i> Live
-                        </div>
-                        <div class="absolute bottom-3 left-3 right-3">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-white text-xs font-bold">42% complété</span>
-                                <span class="text-white text-xs">5/12 sessions</span>
-                            </div>
-                            <div class="w-full bg-white/30 rounded-full h-2 overflow-hidden backdrop-blur-sm">
-                                <div class="h-full bg-blue-500 transition-all duration-500" style="width: 42%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <h3
-                            class="font-bold text-gray-900 text-lg mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            Mathématiques Avancées - Bac</h3>
-                        <p class="text-sm text-gray-500 flex items-center gap-1 mb-3"><i data-lucide="award"
-                                class="w-3 h-3"></i> Dr. Sarah Ben Ali</p>
-
-                        <div class="mb-3 p-3 bg-blue-50 rounded-lg">
-                            <div class="flex items-center gap-2 text-sm">
-                                <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
-                                <span class="text-blue-900 font-medium">Prochaine session: Demain 14:00</span>
-                            </div>
-                        </div>
-
-                        <button
-                            class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg">
-                            <i data-lucide="play" class="w-4 h-4"></i> Continuer
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Live Course 2 -->
-                <div
-                    class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-2">
-                    <div class="relative h-48 overflow-hidden bg-gray-100">
-                        <img src="https://placehold.co/600x400/10B981/white?text=Physique" alt="Course"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                        <div
-                            class="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg flex items-center gap-1">
-                            <i data-lucide="video" class="w-3 h-3"></i> Live
-                        </div>
-                        <div class="absolute bottom-3 left-3 right-3">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-white text-xs font-bold">80% complété</span>
-                                <span class="text-white text-xs">8/10 sessions</span>
-                            </div>
-                            <div class="w-full bg-white/30 rounded-full h-2 overflow-hidden backdrop-blur-sm">
-                                <div class="h-full bg-green-500 transition-all duration-500" style="width: 80%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <h3
-                            class="font-bold text-gray-900 text-lg mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            Physique - Terminale</h3>
-                        <p class="text-sm text-gray-500 flex items-center gap-1 mb-3"><i data-lucide="award"
-                                class="w-3 h-3"></i> Prof. Ahmed Mansour</p>
-
-                        <div class="mb-3 p-3 bg-blue-50 rounded-lg">
-                            <div class="flex items-center gap-2 text-sm">
-                                <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
-                                <span class="text-blue-900 font-medium">Prochaine session: 04 Déc 16:00</span>
-                            </div>
-                        </div>
-
-                        <button
-                            class="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg animate-pulse">
-                            <i data-lucide="credit-card" class="w-4 h-4"></i> Payer pour accéder
-                        </button>
-                    </div>
-                </div>
+                <!-- Dynamic Content -->
             </div>
 
             <!-- Course Grid (Recorded) - Hidden by default -->
             <div id="grid-recorded" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
-                <!-- Recorded Course 1 -->
-                <div
-                    class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-2">
-                    <div class="relative h-48 overflow-hidden bg-gray-100">
-                        <img src="https://placehold.co/600x400/F59E0B/white?text=English" alt="Course"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                        <div
-                            class="absolute top-3 left-3 px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-lg flex items-center gap-1">
-                            <i data-lucide="check-circle" class="w-3 h-3"></i> Terminé
-                        </div>
-                        <div class="absolute bottom-3 left-3 right-3">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-white text-xs font-bold">100% complété</span>
-                                <span class="text-white text-xs">20/20 leçons</span>
-                            </div>
-                            <div class="w-full bg-white/30 rounded-full h-2 overflow-hidden backdrop-blur-sm">
-                                <div class="h-full bg-green-500 transition-all duration-500" style="width: 100%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <h3
-                            class="font-bold text-gray-900 text-lg mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            Anglais Intensif</h3>
-                        <p class="text-sm text-gray-500 flex items-center gap-1 mb-3"><i data-lucide="award"
-                                class="w-3 h-3"></i> Mme. Layla Kallel</p>
-
-                        <button
-                            class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg">
-                            <i data-lucide="download" class="w-4 h-4"></i> Revoir
-                        </button>
-                    </div>
-                </div>
+                 <!-- Dynamic Content -->
             </div>
 
         </main>
@@ -252,6 +137,7 @@
     </script>
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/pages/student-courses.js"></script>
 </body>
 
 </html>

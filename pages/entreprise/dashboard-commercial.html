@@ -616,6 +616,19 @@
     </script>
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!window.dataManager) await new Promise(r => setTimeout(r, 100));
+            await dataManager.init();
+
+            const user = dataManager.getCurrentUser();
+            if (!user) {
+                window.location.href = '../login-entreprise.html';
+                return;
+            }
+            console.log('Commercial Dashboard loaded for:', user.name);
+        });
+    </script>
 </body>
 
 </html>

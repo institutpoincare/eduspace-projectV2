@@ -50,12 +50,12 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-green-100 font-medium text-sm">Total payé</p>
-                                <h3 class="text-3xl font-bold mt-1">2 450.00 TND</h3>
+                                <h3 id="totalPaid" class="text-3xl font-bold mt-1">0.00 TND</h3>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 text-sm text-green-100 pt-4 border-t border-white/20">
                             <i data-lucide="check-circle" class="w-4 h-4"></i>
-                            <span>4 cours payés</span>
+                            <span id="paidCount">0 cours payés</span>
                         </div>
                     </div>
                 </div>
@@ -71,14 +71,13 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-orange-100 font-medium text-sm">Prochaine échéance</p>
-                                <h3 class="text-3xl font-bold mt-1">350.00 TND</h3>
+                                <h3 id="nextDue" class="text-3xl font-bold mt-1">0.00 TND</h3>
                             </div>
                         </div>
-                        <div class="pt-4 border-t border-white/20">
+                        <div id="nextDueDetails" class="pt-4 border-t border-white/20">
                             <div class="flex items-center justify-between text-sm text-orange-100">
-                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> 15 Déc
-                                    2025</span>
-                                <span class="font-medium truncate max-w-[150px]">Physique Quantique</span>
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> <span id="nextDueDate">-</span></span>
+                                <span id="nextDueCourse" class="font-medium truncate max-w-[150px]">-</span>
                             </div>
                         </div>
                     </div>
@@ -158,58 +157,51 @@
     <!-- Scripts -->
     <script src="../../js/components/sidebar-etudiant.js"></script>
     <script>
-        const transactions = [
-            {
-                id: 1,
-                date: '2023-11-15',
-                course: 'Mathématiques Avancées',
-                instructor: 'Dr. Sarah Ben Ali',
-                amount: 450,
-                method: 'Carte Bancaire',
-                status: 'paid'
-            },
-            {
-                id: 2,
-                date: '2023-10-28',
-                course: 'Fullstack JS Bootcamp',
-                instructor: 'Mohamed Tounsi',
-                amount: 850,
-                method: 'Virement',
-                status: 'paid'
-            },
-            {
-                id: 3,
-                date: '2023-12-15',
-                course: 'Physique Quantique',
-                instructor: 'Ahmed Jlassi',
-                amount: 350,
-                method: '-',
-                status: 'pending'
-            },
-            {
-                id: 4,
-                date: '2023-09-20',
-                course: 'Dev Mobile React Native',
-                instructor: 'Karim Ben Salem',
-                amount: 200,
-                method: '-',
-                status: 'late'
-            },
-            {
-                id: 5,
-                date: '2023-10-05',
-                course: 'Anglais B2',
-                instructor: 'Mme. Kallel',
-                amount: 600,
-                method: 'Sobflous',
-                status: 'paid'
-            }
-        ];
+        let transactions = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
+            await loadPayments();
             renderTable('all');
         });
+
+        async function loadPayments() {
+            try {
+                await dataManager.init();
+                const currentUser = dataManager.getCurrentUser();
+                if (!currentUser) {
+                    window.location.href = '/pages/etudiant/login.html';
+                    return;
+                }
+
+                const allPayments = await dataManager.getAll('payments');
+                transactions = allPayments.filter(p => p.userId === currentUser.id);
+
+                updateSummary();
+            } catch (error) {
+                console.error('Erreur chargement paiements:', error);
+            }
+        }
+
+        function updateSummary() {
+            const paid = transactions.filter(t => t.status === 'paid');
+            const pending = transactions.filter(t => t.status === 'pending');
+            
+            const totalPaid = paid.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('totalPaid').textContent = totalPaid.toFixed(2) + ' TND';
+            document.getElementById('paidCount').textContent = paid.length + ' cours payés';
+
+            if (pending.length > 0) {
+                const nextPayment = pending.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+                document.getElementById('nextDue').textContent = nextPayment.amount.toFixed(2) + ' TND';
+                document.getElementById('nextDueDate').textContent = new Date(nextPayment.dueDate).toLocaleDateString('fr-FR');
+                document.getElementById('nextDueCourse').textContent = nextPayment.course;
+            } else {
+                document.getElementById('nextDue').textContent = '0.00 TND';
+                document.getElementById('nextDueDate').textContent = '-';
+                document.getElementById('nextDueCourse').textContent = 'Aucune échéance';
+            }
+        }
 
         function filterTable(status) {
             // Update buttons
@@ -232,7 +224,14 @@
             const filtered = transactions.filter(t => filter === 'all' || t.status === filter);
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">Aucune transaction trouvée for ce filtre.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center gap-3">
+                        <i data-lucide="inbox" class="w-12 h-12 text-gray-300"></i>
+                        <p class="text-gray-500 font-medium">Aucune transaction trouvée</p>
+                        <p class="text-gray-400 text-sm">Vos paiements apparaîtront ici</p>
+                    </div>
+                </td></tr>`;
+                lucide.createIcons();
                 return;
             }
 

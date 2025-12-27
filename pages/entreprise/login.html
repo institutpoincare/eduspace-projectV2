@@ -166,36 +166,44 @@
         // Simpler: Just generic styles.
         document.getElementById('role-icon').setAttribute('data-lucide', config.icon);
 
-        // Pre-fill email and password
-        if (config.email) document.getElementById('email').value = config.email;
-        if (config.password) document.getElementById('password').value = config.password;
-
         // Initialize Icons
         lucide.createIcons();
 
-        function handleLogin(e) {
+        // Init DataManager
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.dataManager) await window.dataManager.init();
+        });
+
+        async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
             btn.innerText = 'Connexion en cours...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                // Set Role in LocalStorage for persistence
-                let storageRole = 'entreprise_' + currentRole;
-                if (currentRole === 'etudiant') storageRole = 'etudiant_entreprise';
-                if (currentRole === 'parent') storageRole = 'parent_entreprise';
+            try {
+                if (!window.dataManager) throw new Error("Système non prêt");
 
-                const user = {
-                    role: storageRole,
-                    name: 'Utilisateur ' + config.title,
-                    email: config.email || 'user@test.com'
-                };
-
-                localStorage.setItem('user', JSON.stringify(user));
+                // Note: We use 'currentRole' which comes from URL (?role=gerant etc).
+                // Ensure users.json has users with these roles.
+                // For 'formateur', 'etudiant', 'parent', they exist as main roles too.
+                await dataManager.login(email, password, currentRole);
 
                 // Redirect
                 window.location.href = config.redirect || 'dashboard.html';
-            }, 800);
+
+            } catch (err) {
+                console.error(err);
+                btn.innerText = 'Erreur: Identifiants invalides';
+                btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerText = 'Se connecter';
+                    btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                }, 2000);
+            }
         }
     </script>
     <!-- Dynamic System Scripts -->

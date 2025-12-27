@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outils Pédagogiques - EduSpace Formateur</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="dashboard-layout flex">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">🎨 Outils Pédagogiques</h1>
+                <p class="text-gray-500">Créez du contenu interactif et animez vos cours en direct</p>
+            </div>
+
+            <!-- Tools Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                <!-- PDF Annotator -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="file-text" class="w-7 h-7 text-red-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">PDF Annotator</h3>
+                            <p class="text-sm text-gray-500">Annotez vos PDF comme un tableau blanc</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Écrivez directement sur vos PDF</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Enregistrez vos annotations</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Partagez avec vos étudiants</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="https://www.pdfannotator.com/en/download" target="_blank"
+                            class="block w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors text-center">
+                            <i data-lucide="download" class="w-4 h-4 inline mr-2"></i>
+                            Télécharger PDF Annotator
+                        </a>
+                        <p class="text-xs text-gray-500 text-center">Version d'essai gratuite disponible</p>
+                    </div>
+                </div>
+
+                <!-- Google Meet -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="video" class="w-7 h-7 text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">Google Meet</h3>
+                            <p class="text-sm text-gray-500">Cours en direct avec enregistrement</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Créez des sessions live</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Enregistrez automatiquement</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Partagez votre écran</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="https://meet.google.com/" target="_blank"
+                            class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors text-center">
+                            <i data-lucide="external-link" class="w-4 h-4 inline mr-2"></i>
+                            Ouvrir Google Meet
+                        </a>
+                        <p class="text-xs text-gray-500 text-center">Gratuit avec compte Google</p>
+                    </div>
+                </div>
+
+                <!-- FastStone Capture -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="camera" class="w-7 h-7 text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">FastStone Capture</h3>
+                            <p class="text-sm text-gray-500">Capture et annotation d'écran</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Capturez votre écran</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Annotez les captures</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Enregistrez des vidéos</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="https://www.faststone.org/FSCaptureDownload.htm" target="_blank"
+                            class="block w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors text-center">
+                            <i data-lucide="download" class="w-4 h-4 inline mr-2"></i>
+                            Télécharger FastStone
+                        </a>
+                        <p class="text-xs text-gray-500 text-center">Gratuit pour usage personnel</p>
+                    </div>
+                </div>
+
+                <!-- Nearpod -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="users" class="w-7 h-7 text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">Nearpod</h3>
+                            <p class="text-sm text-gray-500">Suivi et engagement des étudiants</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Suivez la présence en temps réel</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Créez des quiz interactifs</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Analysez les résultats</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="https://nearpod.com/" target="_blank"
+                            class="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors text-center">
+                            <i data-lucide="external-link" class="w-4 h-4 inline mr-2"></i>
+                            Ouvrir Nearpod
+                        </a>
+                        <p class="text-xs text-gray-500 text-center">Version gratuite disponible</p>
+                    </div>
+                </div>
+
+                <!-- OBS Studio -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="video" class="w-7 h-7 text-red-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">OBS Studio</h3>
+                            <p class="text-sm text-gray-500">Enregistrement professionnel d'écran</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Enregistrement HD local</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Streaming en direct</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Overlay personnalisé</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="https://obsproject.com/download" target="_blank"
+                            class="block w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors text-center">
+                            <i data-lucide="download" class="w-4 h-4 inline mr-2"></i>
+                            Télécharger OBS Studio
+                        </a>
+                        <p class="text-xs text-gray-500 text-center">100% Gratuit et Open Source</p>
+                    </div>
+                </div>
+
+                <!-- DisplayFusion -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="monitor" class="w-7 h-7 text-indigo-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">DisplayFusion</h3>
+                            <p class="text-sm text-gray-500">Gestion multi-écrans avancée</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Divisez votre écran facilement</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Layouts personnalisés</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Raccourcis clavier</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="https://www.displayfusion.com/Download/" target="_blank"
+                            class="block w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors text-center">
+                            <i data-lucide="download" class="w-4 h-4 inline mr-2"></i>
+                            Télécharger DisplayFusion
+                        </a>
+                        <p class="text-xs text-gray-500 text-center">Essai gratuit 30 jours</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Workflow Guide -->
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-8 mb-8">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="p-3 bg-indigo-600 rounded-xl shrink-0">
+                        <i data-lucide="workflow" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">🎓 Workflow Complet de Création de Cours</h3>
+                        <p class="text-gray-600">Suivez ce processus professionnel pour créer une expérience d'apprentissage de qualité</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Étape 1 -->
+                    <div class="bg-white rounded-xl p-5 border border-indigo-100">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold mb-3 text-lg">1</div>
+                        <h4 class="font-bold text-gray-900 mb-2 text-lg">📝 Préparation</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Rédigez votre cours dans <strong>Word</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Convertissez en <strong>PDF</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Annotez avec <strong>PDF Annotator</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Uploadez dans <strong>Dépôt de Cours</strong></span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Étape 2 -->
+                    <div class="bg-white rounded-xl p-5 border border-indigo-100">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold mb-3 text-lg">2</div>
+                        <h4 class="font-bold text-gray-900 mb-2 text-lg">⚙️ Configuration</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Configurez <strong>DisplayFusion</strong> (écran divisé)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Lancez <strong>OBS Studio</strong> ou <strong>Google Meet</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Activez l'<strong>enregistrement</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Ouvrez votre <strong>PDF</strong> dans PDF Annotator</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Étape 3 -->
+                    <div class="bg-white rounded-xl p-5 border border-indigo-100">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold mb-3 text-lg">3</div>
+                        <h4 class="font-bold text-gray-900 mb-2 text-lg">🎥 Enseignement</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Enseignez en utilisant <strong>PDF Annotator</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Écrivez comme sur un <strong>tableau blanc</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Utilisez <strong>FastStone</strong> pour les captures</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Suivez vos étudiants avec <strong>Nearpod</strong></span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Étape 4 -->
+                    <div class="bg-white rounded-xl p-5 border border-indigo-100">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold mb-3 text-lg">4</div>
+                        <h4 class="font-bold text-gray-900 mb-2 text-lg">📤 Partage</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Arrêtez l'<strong>enregistrement</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Sauvegardez le <strong>PDF annoté</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Uploadez tout dans la <strong>Médiathèque</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-indigo-600 mt-0.5 shrink-0"></i>
+                                <span>Associez à votre <strong>classe</strong></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Pro Tips -->
+                <div class="bg-white rounded-xl p-5 border-2 border-indigo-200">
+                    <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-500"></i>
+                        Conseils Professionnels
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span><strong>OBS Studio</strong> offre une meilleure qualité que Google Meet pour l'enregistrement local</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span><strong>DisplayFusion</strong> permet de garder PDF Annotator d'un côté et le tableau blanc de l'autre</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Sauvegardez votre PDF annoté après chaque session pour le partager avec les étudiants</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-500 mt-0.5 shrink-0"></i>
+                            <span>Utilisez <strong>FastStone</strong> pour capturer les moments clés et créer des résumés visuels</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Configuration Guide -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 mb-8">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="p-3 bg-orange-100 rounded-xl shrink-0">
+                        <i data-lucide="settings" class="w-6 h-6 text-orange-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">⚙️ Configuration Rapide</h3>
+                        <p class="text-gray-600">Configurez votre environnement de travail en quelques minutes</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Config 1: DisplayFusion -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-5 border border-indigo-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">1</div>
+                            <h4 class="font-bold text-gray-900">DisplayFusion</h4>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-600 font-bold">→</span>
+                                <span>Divisez l'écran en 2 parties</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-600 font-bold">→</span>
+                                <span><strong>Gauche:</strong> PDF Annotator</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-600 font-bold">→</span>
+                                <span><strong>Droite:</strong> Tableau blanc / Notes</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-600 font-bold">→</span>
+                                <span>Sauvegardez ce layout</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Config 2: OBS Studio -->
+                    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5 border border-red-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold">2</div>
+                            <h4 class="font-bold text-gray-900">OBS Studio</h4>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-600 font-bold">→</span>
+                                <span>Ajoutez source "Capture d'écran"</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-600 font-bold">→</span>
+                                <span>Ajoutez source "Audio" (micro)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-600 font-bold">→</span>
+                                <span>Réglez qualité: <strong>1080p 30fps</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-600 font-bold">→</span>
+                                <span>Testez avant de commencer!</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Config 3: Google Meet -->
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center text-white font-bold">3</div>
+                            <h4 class="font-bold text-gray-900">Google Meet</h4>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600 font-bold">→</span>
+                                <span>Créez une réunion planifiée</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600 font-bold">→</span>
+                                <span>Activez <strong>Enregistrement</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600 font-bold">→</span>
+                                <span>Partagez votre écran (PDF)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600 font-bold">→</span>
+                                <span>L'enregistrement → Google Drive</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Alternative Choice -->
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="info" class="w-5 h-5 text-yellow-600 mt-0.5 shrink-0"></i>
+                        <div class="text-sm text-gray-700">
+                            <p class="font-bold text-gray-900 mb-1">💡 Choisissez votre méthode d'enregistrement:</p>
+                            <ul class="space-y-1 ml-4">
+                                <li><strong>OBS Studio:</strong> Meilleure qualité, enregistrement local, contrôle total (recommandé pour cours enregistrés)</li>
+                                <li><strong>Google Meet:</strong> Plus simple, enregistrement cloud, idéal pour cours live avec étudiants</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="p-3 bg-green-100 rounded-xl shrink-0">
+                        <i data-lucide="upload-cloud" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">📤 Partagez vos enregistrements</h3>
+                        <p class="text-gray-600 mb-4">Une fois votre cours enregistré avec Google Meet, uploadez-le dans votre médiathèque pour le partager avec vos étudiants</p>
+                        <a href="mediatheque.html" 
+                            class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors">
+                            <i data-lucide="folder-open" class="w-5 h-5"></i>
+                            Aller à la Médiathèque
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Banner -->
+            <div class="mt-8 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-8">
+                <div class="flex items-start gap-6">
+                    <div class="p-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shrink-0 shadow-lg">
+                        <i data-lucide="rocket" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">🚀 Prêt à créer du contenu professionnel ?</h3>
+                        <p class="text-gray-700 mb-6 text-lg leading-relaxed">
+                            Avec ces outils, vous pouvez créer des cours de qualité professionnelle qui captivent vos étudiants. 
+                            Commencez par préparer vos supports dans le <strong>Dépôt de Cours</strong>, puis utilisez les outils 
+                            pour enregistrer et partager vos sessions.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <a href="live.html" 
+                                class="flex items-center gap-3 p-4 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-xl transition-all group">
+                                <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
+                                    <i data-lucide="folder-plus" class="w-5 h-5 text-indigo-600"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-900">Dépôt de Cours</div>
+                                    <div class="text-xs text-gray-500">Préparez vos supports</div>
+                                </div>
+                            </a>
+                            
+                            <a href="mediatheque.html" 
+                                class="flex items-center gap-3 p-4 bg-white hover:bg-green-50 border border-green-100 rounded-xl transition-all group">
+                                <div class="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                                    <i data-lucide="folder-open" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-900">Médiathèque</div>
+                                    <div class="text-xs text-gray-500">Gérez vos fichiers</div>
+                                </div>
+                            </a>
+                            
+                            <a href="classes.html" 
+                                class="flex items-center gap-3 p-4 bg-white hover:bg-purple-50 border border-purple-100 rounded-xl transition-all group">
+                                <div class="p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                                    <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-900">Mes Classes</div>
+                                    <div class="text-xs text-gray-500">Partagez avec vos élèves</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/components/sidebar-formateur.js"></script>
+    <script src="../../js/core/data-manager.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function openTool(toolName) {
+            switch(toolName) {
+                case 'pdf':
+                    window.location.href = 'outils-pdf.html';
+                    break;
+                case 'whiteboard':
+                    window.location.href = 'outils-tableau.html';
+                    break;
+                case 'meet':
+                    createMeetSession();
+                    break;
+                case 'screenshot':
+                    alert('Outil de capture d\'écran - En développement');
+                    break;
+                case 'tracking':
+                    window.location.href = 'classes.html';
+                    break;
+                case 'quiz':
+                    alert('Créateur de quiz - En développement');
+                    break;
+            }
+        }
+
+        function createMeetSession() {
+            const meetUrl = 'https://meet.google.com/new';
+            const confirmed = confirm('Voulez-vous créer une nouvelle session Google Meet?\n\nCela ouvrira une nouvelle fenêtre.');
+            if (confirmed) {
+                window.open(meetUrl, '_blank');
+            }
+        }
+    </script>
+</body>
+
+</html>

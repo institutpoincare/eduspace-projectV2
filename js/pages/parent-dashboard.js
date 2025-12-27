@@ -25,8 +25,11 @@ class ParentDashboard {
     }
 
     async getCurrentParent() {
-        const parentId = localStorage.getItem('currentUserId') || 'parent-1';
-        return { id: parentId, name: 'Parent', email: 'parent@eduspace.tn' };
+        const user = dataManager.getCurrentUser();
+        if (user && user.role === 'parent') {
+            return user;
+        }
+        return null;
     }
 
     async loadChildren() {

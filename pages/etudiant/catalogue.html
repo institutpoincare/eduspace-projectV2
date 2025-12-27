@@ -152,7 +152,7 @@
                             <label
                                 class="flex items-center gap-3 cursor-pointer group p-2 rounded-xl hover:bg-gray-50 transition-colors">
                                 <div class="relative flex items-center">
-                                    <input type="checkbox"
+                                    <input type="checkbox" id="filter-free"
                                         class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-indigo-600 checked:bg-indigo-600 checked:before:bg-indigo-600 outline-none focus:ring-2 focus:ring-indigo-100">
                                     <i data-lucide="check"
                                         class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></i>
@@ -165,9 +165,39 @@
                                     <span>0 TND</span>
                                     <span>500 TND</span>
                                 </div>
-                                <input type="range"
+                                <input type="range" id="price-range" min="0" max="500" value="0" step="10"
                                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 hover:accent-indigo-500">
+                                <div class="text-center mt-2">
+                                    <span class="text-sm font-bold text-indigo-600">Max: <span id="price-value">0</span> TND</span>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter: Type de Formation -->
+                    <div class="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50">
+                        <h3 class="font-bold text-gray-900 mb-5 flex items-center gap-2 text-lg">
+                            <div class="p-2 bg-purple-100 rounded-lg text-purple-600"><i data-lucide="graduation-cap"
+                                    class="w-5 h-5"></i></div>
+                            Type de Formation
+                        </h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-purple-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-purple-500 focus:ring-purple-200">
+                                <span class="text-gray-600 group-hover:text-purple-700 font-medium text-sm">Soutien Scolaire</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-purple-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-purple-500 focus:ring-purple-200">
+                                <span class="text-gray-600 group-hover:text-purple-700 font-medium text-sm">Formation Professionnelle</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-purple-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-purple-500 focus:ring-purple-200">
+                                <span class="text-gray-600 group-hover:text-purple-700 font-medium text-sm">Cours Particuliers</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-purple-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-purple-500 focus:ring-purple-200">
+                                <span class="text-gray-600 group-hover:text-purple-700 font-medium text-sm">Préparation Examens</span>
+                            </label>
                         </div>
                     </div>
 
@@ -180,31 +210,80 @@
                             Matières
                         </h3>
                         <div class="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar pb-4">
-                            <label
-                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
-                                <input type="checkbox"
-                                    class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
-                                <span
-                                    class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Informatique</span>
+                            <!-- Sciences -->
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Mathématiques</span>
                             </label>
-                            <label
-                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
-                                <input type="checkbox"
-                                    class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
-                                <span
-                                    class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Mathématiques</span>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Physique</span>
                             </label>
-                            <label
-                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
-                                <input type="checkbox"
-                                    class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
-                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Langues</span>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Chimie</span>
                             </label>
-                            <label
-                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
-                                <input type="checkbox"
-                                    class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">SVT (Sciences de la Vie)</span>
+                            </label>
+                            
+                            <!-- Langues -->
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Français</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Anglais</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Allemand</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Italien</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Espagnol</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Arabe</span>
+                            </label>
+                            
+                            <!-- Informatique -->
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Informatique</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Programmation</span>
+                            </label>
+                            
+                            <!-- Autres -->
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Histoire-Géographie</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Philosophie</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Économie</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
                                 <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Design</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-pink-50 cursor-pointer transition-all group">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-200">
+                                <span class="text-gray-600 group-hover:text-pink-700 font-medium text-sm">Musique</span>
                             </label>
                         </div>
                         <!-- Bottom Fade Gradient -->
@@ -241,209 +320,7 @@
 
                     <!-- Instructor Cards Grid -->
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-
-                        <!-- Instructor Card 1 (Animated Video Hover) -->
-                        <div
-                            class="group bg-white rounded-[2rem] border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2">
-                            <!-- Hover Glow Effect -->
-                            <div
-                                class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500">
-                            </div>
-
-                            <div class="relative p-6 z-10 flex flex-col h-full bg-white">
-                                <!-- Header -->
-                                <div class="flex items-start justify-between mb-6">
-                                    <div class="flex gap-5 items-center">
-                                        <div class="relative w-20 h-20">
-                                            <!-- Profile Image with Ring Animation -->
-                                            <div
-                                                class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 animate-pulse opacity-50 blur">
-                                            </div>
-                                            <img src="https://ui-avatars.com/api/?name=Ahmed+Ben+Ali&background=random"
-                                                class="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10 border-2 border-white">
-
-                                            <!-- Status Indicator -->
-                                            <div
-                                                class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm flex items-center gap-1 z-20">
-                                                <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
-                                                Live
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <h3
-                                                class="font-bold text-xl text-gray-900 group-hover:text-indigo-600 transition-colors">
-                                                Ahmed Ben Ali</h3>
-                                            <p class="text-gray-500 font-medium">Expert Fullstack JS</p>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <div class="flex text-yellow-400">
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                </div>
-                                                <span class="text-xs font-bold text-gray-400">(230 avis)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        class="w-10 h-10 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all">
-                                        <i data-lucide="heart" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-
-                                <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                                    "Apprenez à coder comme un pro. Je vous accompagne de la première ligne de code
-                                    jusqu'au déploiement en production."
-                                </p>
-
-                                <!-- Interactive Service Grid -->
-                                <div class="grid grid-cols-2 gap-3 mb-6">
-                                    <!-- Service: Live -->
-                                    <div
-                                        class="bg-gradient-to-br from-red-50 to-orange-50 p-3 rounded-2xl border border-red-100 flex items-center gap-3 transition-transform group/service hover:scale-105 cursor-default">
-                                        <div
-                                            class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-red-500 group-hover/service:rotate-12 transition-transform">
-                                            <i data-lucide="video" class="w-5 h-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-900 uppercase tracking-wider">Live</p>
-                                            <span
-                                                class="inline-block px-2 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-bold">Dispo
-                                                maintenant</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Service: Recorded -->
-                                    <div
-                                        class="bg-gradient-to-br from-blue-50 to-indigo-50 p-3 rounded-2xl border border-blue-100 flex items-center gap-3 transition-transform group/service hover:scale-105 cursor-default">
-                                        <div
-                                            class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-500 group-hover/service:rotate-12 transition-transform">
-                                            <i data-lucide="play-circle" class="w-5 h-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-900 uppercase tracking-wider">Vidéos
-                                            </p>
-                                            <p class="text-xs text-gray-500">25 Modules</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="mt-auto flex gap-3">
-                                    <button
-                                        class="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2">
-                                        Voir Profil
-                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                    </button>
-                                    <button
-                                        class="px-5 py-3 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors">
-                                        Discuter
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Instructor Card 2 -->
-                        <div
-                            class="group bg-white rounded-[2rem] border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2">
-                            <div class="relative p-6 z-10 flex flex-col h-full bg-white">
-                                <!-- Header -->
-                                <div class="flex items-start justify-between mb-6">
-                                    <div class="flex gap-5 items-center">
-                                        <div class="relative w-20 h-20">
-                                            <img src="https://ui-avatars.com/api/?name=Prof+Karim&background=random"
-                                                class="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10 border-2 border-white">
-                                            <div
-                                                class="absolute -bottom-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm flex items-center gap-1 z-20">
-                                                <i data-lucide="map-pin" class="w-3 h-3"></i> Tunis
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <h3
-                                                class="font-bold text-xl text-gray-900 group-hover:text-emerald-600 transition-colors">
-                                                Prof. Karim</h3>
-                                            <p class="text-gray-500 font-medium">Maths & Physique</p>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <div class="flex text-yellow-400">
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                                                </div>
-                                                <span class="text-xs font-bold text-gray-400">(50 avis)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        class="w-10 h-10 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all">
-                                        <i data-lucide="heart" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-
-                                <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                                    "Préparation intensive aux concours et examens. Méthodologie rigoureuse et résultats
-                                    garantis."
-                                </p>
-
-                                <!-- Interactive Service Grid -->
-                                <div class="grid grid-cols-2 gap-3 mb-6">
-                                    <!-- Service: Face to Face -->
-                                    <div
-                                        class="bg-gradient-to-br from-emerald-50 to-teal-50 p-3 rounded-2xl border border-emerald-100 flex items-center gap-3 transition-transform group/service hover:scale-105 cursor-default relative overflow-hidden">
-                                        <!-- Animated Background Effect -->
-                                        <div
-                                            class="absolute inset-0 bg-emerald-200/20 translate-y-full group-hover/service:translate-y-0 transition-transform duration-300">
-                                        </div>
-
-                                        <div
-                                            class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-500 relative z-10">
-                                            <i data-lucide="users" class="w-5 h-5"></i>
-                                        </div>
-                                        <div class="relative z-10">
-                                            <p class="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                                                Présentiel</p>
-                                            <span
-                                                class="inline-block px-2 py-0.5 bg-white/50 text-emerald-800 rounded text-[10px] font-bold">Centre
-                                                Tunis</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Service: Individual -->
-                                    <div
-                                        class="bg-gradient-to-br from-purple-50 to-pink-50 p-3 rounded-2xl border border-purple-100 flex items-center gap-3 transition-transform group/service hover:scale-105 cursor-default">
-                                        <div
-                                            class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-purple-500">
-                                            <i data-lucide="user" class="w-5 h-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                                                Individuel</p>
-                                            <p class="text-xs text-gray-500">Coaching</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="mt-auto flex gap-3">
-                                    <button
-                                        class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-200 hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2">
-                                        Réserver
-                                        <i data-lucide="calendar" class="w-4 h-4"></i>
-                                    </button>
-                                    <button
-                                        class="px-5 py-3 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors">
-                                        Contact
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
+                        <!-- Instructors will be loaded dynamically -->
                     </div>
                 </div>
             </div>
@@ -452,56 +329,22 @@
     </div>
 
     <!-- Dynamic System Scripts -->
+    <script src="../../js/core/global-functions.js"></script>
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-etudiant.js"></script>
+    <script src="../../js/pages/student-catalogue.js"></script>
     <script>
         lucide.createIcons();
-
-        // Load instructors dynamically
-        document.addEventListener('DOMContentLoaded', async () => {
-            await dataManager.init();
-            const instructors = await dataManager.getAll('instructors');
-            const container = document.querySelector('.grid.grid-cols-1.xl\\:grid-cols-2');
-
-            if (container && instructors.length > 0) {
-                container.innerHTML = instructors.map(instructor => `
-                    <div class="group bg-white rounded-[2rem] border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2">
-                        <div class="relative p-6 z-10 flex flex-col h-full bg-white">
-                            <div class="flex items-start justify-between mb-6">
-                                <div class="flex gap-5 items-center">
-                                    <div class="relative w-20 h-20">
-                                        <img src="${instructor.image}" class="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10 border-2 border-white">
-                                        <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm flex items-center gap-1 z-20">
-                                            <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> Live
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-xl text-gray-900 group-hover:text-indigo-600 transition-colors">${instructor.name}</h3>
-                                        <p class="text-gray-500 font-medium">${instructor.specialty}</p>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <div class="flex text-yellow-400">
-                                                ${Array(5).fill('<i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>').join('')}
-                                            </div>
-                                            <span class="text-xs font-bold text-gray-400">(${instructor.students}+ élèves)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-6 leading-relaxed">${instructor.cv.experience[0]?.description || 'Expert dans son domaine'}</p>
-                            <div class="mt-auto flex gap-3">
-                                <button onclick="window.location.href='../formateur/profil.html?id=${instructor.id}'" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2">
-                                    Voir Profil <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="startChat('${instructor.id}', 'instructor')" class="px-5 py-3 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors">
-                                    Discuter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        });
+        
+        // Price range slider functionality
+        const priceRange = document.getElementById('price-range');
+        const priceValue = document.getElementById('price-value');
+        
+        if (priceRange && priceValue) {
+            priceRange.addEventListener('input', (e) => {
+                priceValue.textContent = e.target.value;
+            });
+        }
     </script>
 </body>
 

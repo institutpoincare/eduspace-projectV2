@@ -25,8 +25,13 @@ class EntrepriseDashboard {
     }
 
     async getCurrentCompany() {
-        const companyId = localStorage.getItem('currentUserId') || 'user-6';
-        return await dataManager.getById('users', companyId);
+        const user = dataManager.getCurrentUser();
+        // Le dashboard entreprise peut être accédé par plusieurs rôles (gérant, admin, formateur...)
+        // On vérifie juste qu'il y a un user connecté
+        if (user) {
+            return user;
+        }
+        return null;
     }
 
     async loadData() {

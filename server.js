@@ -183,7 +183,11 @@ function handleApiRequest(req, res) {
                     }
                     return;
                 }
-                const newItem = { id: crypto.randomUUID(), ...payload, createdAt: new Date().toISOString() };
+                const newItem = { 
+                    id: payload.id || crypto.randomUUID(), 
+                    ...payload, 
+                    createdAt: new Date().toISOString() 
+                };
                 data.push(newItem);
                 writeJSON(collection, data);
                 res.writeHead(201, { 'Content-Type': 'application/json' });

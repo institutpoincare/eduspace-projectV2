@@ -6,28 +6,38 @@
         { href: 'dashboard.html', icon: 'layout-dashboard', label: 'Tableau de bord' },
         { href: 'classes.html', icon: 'users', label: 'Gestion des Classes' },
         { href: 'calendar.html', icon: 'calendar', label: 'Mon Calendrier' },
-        { href: 'live.html', icon: 'video', label: 'Création Contenu Live' },
+        { href: 'outils.html', icon: 'wrench', label: 'Outils Pédagogiques' },
+        { href: 'live.html', icon: 'folder-plus', label: 'Dépôt de Cours' },
         { href: 'enregistre.html', icon: 'file-video', label: 'Contenu Enregistré' },
         { href: 'mediatheque.html', icon: 'folder-open', label: 'Ma Médiathèque' },
-        { href: 'paiements.html', icon: 'dollar-sign', label: 'Paiements' }
+        { href: 'paiements.html', icon: 'dollar-sign', label: 'Paiements' },
+        { href: 'profile.html', icon: 'user-circle', label: 'Profil' },
+        { href: 'messages.html', icon: 'mail', label: 'Messages', badge: true }
     ];
 
     const generateNavItems = () => {
+        // Get unread messages count from localStorage
+        const unreadCount = parseInt(localStorage.getItem('unreadMessagesCount') || '0');
+        
         return items.map(item => {
             let isActive = currentPath.includes(item.href);
-            // Special case for class details -> keeps Classes active
             if (item.href === 'classes.html' && currentPath.includes('class-details.html')) {
                 isActive = true;
             }
 
-            const baseClass = "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium mb-1";
-            const activeClass = "bg-indigo-600 text-white shadow-lg shadow-indigo-200";
-            const inactiveClass = "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600";
+            const baseClass = "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium mb-1 relative";
+            const activeClass = "bg-blue-600 text-white shadow-lg shadow-blue-200";
+            const inactiveClass = "text-gray-500 hover:bg-blue-50 hover:text-blue-600";
+
+            const badgeHtml = item.badge && unreadCount > 0 
+                ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">${unreadCount > 9 ? '9+' : unreadCount}</span>` 
+                : '';
 
             return `
                 <a href="${item.href}" class="${baseClass} ${isActive ? activeClass : inactiveClass}" title="${item.label}">
                     <i data-lucide="${item.icon}" class="w-5 h-5"></i>
                     <span>${item.label}</span>
+                    ${badgeHtml}
                 </a>
             `;
         }).join('');
@@ -36,11 +46,11 @@
     const sidebarHTML = `
         <div class="flex flex-col h-full bg-white border-r border-gray-100 p-6">
             <div class="flex items-center gap-3 mb-10 px-2">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                     <i data-lucide="graduation-cap" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">EduSpace</span>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">EduSpace</span>
                     <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-widest">Formateur</span>
                 </div>
             </div>

@@ -3,6 +3,8 @@
  * Gère l'affichage dynamique de la page d'accueil
  */
 
+let allInstructors = [];
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialisation
     try {
@@ -10,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadDynamicContent();
     } catch (error) {
         console.error('Erreur initialisation home:', error);
-        // En cas d'erreur, on essaie quand même d'afficher quelque chose ou de cacher les loaders
         hideLoaders();
     }
 });
@@ -18,93 +19,96 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadDynamicContent() {
     console.log("🚀 Démarrage du chargement du contenu...");
 
-    // Données de secours GARANTIES (Hardcoded) pour affichage immédiat
-    const HARDCODED_INSTRUCTORS = [
-        {
-            id: 'ahmed',
-            name: 'Ahmed Ben Ali',
-            specialty: 'Expert DevOps & Cloud',
-            rating: 4.9,
-            students: '15k+',
-            image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-            bio: 'Formateur certifié AWS et Kubernetes avec 10 ans d\'expérience.'
-        },
-        {
-            id: 'sarah',
-            name: 'Sarah M.',
-            specialty: 'Design UX/UI',
-            rating: 5.0,
-            students: '8k+',
-            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-            bio: 'Expert en design système et prototypage interactif.'
-        },
-        {
-            id: 'karim',
-            name: 'Karim S.',
-            specialty: 'Dév Mobile iOS',
-            rating: 4.7,
-            students: '5k+',
-            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-            bio: 'Développeur senior Swift et SwiftUI.'
-        },
-        {
-            id: 'leila',
-            name: 'Leila K.',
-            specialty: 'Marketing Digital',
-            rating: 4.8,
-            students: '12k+',
-            image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-            bio: 'Spécialiste SEO et Growth Hacking.'
-        }
-    ];
-
-    const HARDCODED_CENTERS = [
-        {
-            id: 'c1',
-            name: 'GoMyCode',
-            category: 'Coding Bootcamp',
-            location: 'Tunis',
-            description: 'Le premier bootcamp de code en Tunisie, formant la prochaine génération de développeurs.',
-            image: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-        },
-        {
-            id: 'c2',
-            name: 'RBK Tunisia',
-            category: 'Fullstack JS',
-            location: 'Ariana',
-            description: 'Formation intensive en développement logiciel pour changer de carrière en 4 mois.',
-            image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-        },
-        {
-            id: 'c3',
-            name: 'GMC Sousse',
-            category: 'Tech Hub',
-            location: 'Sousse',
-            description: 'Un espace d\'innovation et d\'apprentissage au cœur du Sahel.',
-            image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-        }
-    ];
-
     try {
-        // Tenter de charger depuis le DataManager
         const [instructors, centers] = await Promise.all([
             dataManager.getAll('instructors'),
             dataManager.getAll('centers')
         ]);
 
-        // Si DataManager renvoie vide, utiliser les données en dur
-        const finalInstructors = (instructors && instructors.length > 0) ? instructors : HARDCODED_INSTRUCTORS;
-        const finalCenters = (centers && centers.length > 0) ? centers : HARDCODED_CENTERS;
+        allInstructors = instructors || [];
+        const finalCenters = centers || [];
 
-        renderInstructors(finalInstructors);
+        // Setup Filters
+        setupFilters();
+        
+        // Initial render (Filtered by Sales by default)
+        filterAndRender('sales');
+        
         renderCenters(finalCenters);
 
     } catch (error) {
-        console.error("⚠️ Erreur chargement, utilisation des données de secours", error);
-        // En cas d'erreur fatale, afficher les données en dur DIRECTEMENT
-        renderInstructors(HARDCODED_INSTRUCTORS);
-        renderCenters(HARDCODED_CENTERS);
+        console.error("⚠️ Erreur chargement des données", error);
+        hideLoaders();
     }
+}
+
+function setupFilters() {
+    const btnSales = document.getElementById('filter-sales');
+    const btnRating = document.getElementById('filter-rating');
+    const btnNew = document.getElementById('filter-new');
+
+    if(btnSales) btnSales.addEventListener('click', () => filterAndRender('sales'));
+    if(btnRating) btnRating.addEventListener('click', () => filterAndRender('rating'));
+    if(btnNew) btnNew.addEventListener('click', () => filterAndRender('new'));
+}
+
+function filterAndRender(criteria) {
+    // Visual update of buttons
+    updateActiveButton(criteria);
+
+    // Sorting logic
+    let sorted = [...allInstructors];
+    switch (criteria) {
+        case 'sales':
+            // Sort by students count (descending)
+            sorted.sort((a, b) => parseStudents(b.students) - parseStudents(a.students));
+            break;
+        case 'rating':
+            // Sort by rating (descending)
+            sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            break;
+        case 'new':
+            // Sort by join date (descending, newest first)
+            // If no joinedDate, fallback to ID or index (assuming later in array = newer if push based)
+            sorted.sort((a, b) => {
+                const dateA = new Date(a.joinedDate || 0);
+                const dateB = new Date(b.joinedDate || 0);
+                return dateB - dateA;
+            });
+            break;
+    }
+
+    renderInstructors(sorted);
+}
+
+function parseStudents(val) {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+        const lower = val.toLowerCase();
+        if (lower.includes('k')) {
+            return parseFloat(lower.replace('k', '')) * 1000;
+        }
+        return parseFloat(val) || 0;
+    }
+    return 0;
+}
+
+function updateActiveButton(activeType) {
+    const map = {
+        'sales': 'filter-sales',
+        'rating': 'filter-rating',
+        'new': 'filter-new'
+    };
+
+    const activeClass = "px-6 py-3 bg-white text-gray-900 rounded-lg font-bold shadow-sm hover:shadow-md transition-all whitespace-nowrap filter-btn";
+    const inactiveClass = "px-6 py-3 text-gray-500 hover:bg-white/50 hover:text-gray-900 rounded-lg font-bold transition-all whitespace-nowrap filter-btn";
+
+    Object.entries(map).forEach(([type, id]) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.className = (type === activeType) ? activeClass : inactiveClass;
+        }
+    });
 }
 
 function renderInstructors(instructors) {
@@ -112,13 +116,12 @@ function renderInstructors(instructors) {
 
     if (!container) return;
 
-    // Si pas de données, afficher un message ou des explications
     if (!instructors || instructors.length === 0) {
         container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">Aucun formateur disponible pour le moment.</div>';
         return;
     }
 
-    // Vider le loader
+    // Limit to 4 items max
     container.innerHTML = instructors.slice(0, 4).map(instructor => `
         <div class="group bg-white rounded-[2.5rem] border border-gray-100 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden flex flex-col relative transform hover:-translate-y-2 h-full">
             <!-- Hover Glow Effect -->
@@ -134,10 +137,11 @@ function renderInstructors(instructors) {
                             <img src="${instructor.image || 'https://ui-avatars.com/api/?name=' + instructor.name}" class="w-24 h-24 rounded-3xl object-cover shadow-xl relative z-10 border-4 border-white">
                             
                             <!-- Status Indicator -->
+                            ${instructor.isLive ? `
                             <div class="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full border-4 border-white shadow-sm flex items-center gap-1.5 z-20">
                                 <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
                                 Live
-                            </div>
+                            </div>` : ''}
                         </div>
 
                         <div>
@@ -145,16 +149,17 @@ function renderInstructors(instructors) {
                             <p class="text-indigo-600 font-medium text-sm bg-indigo-50 px-3 py-1 rounded-lg inline-block">${instructor.specialty}</p>
                             <div class="flex items-center gap-2 mt-3">
                                 <div class="flex text-yellow-400 gap-0.5">
-                                    ${Array(5).fill('<i data-lucide="star" class="w-4 h-4 fill-current"></i>').join('')}
+                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <span class="font-bold text-gray-900 ml-1">${instructor.rating}</span>
                                 </div>
-                                <span class="text-sm font-bold text-gray-400">(${instructor.rating} avis)</span>
+                                <span class="text-sm font-bold text-gray-400">(${typeof instructor.students === 'number' ? instructor.students + ' étudiants' : instructor.students})</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <p class="text-gray-600 text-base mb-8 leading-relaxed line-clamp-3 flex-1">
-                    ${instructor.bio || "Expert qualifié prêt à vous accompagner dans votre apprentissage."}
+                    ${instructor.bio || "Expert qualifié prêt à vous accompagner dans votre apprentissage et à booster vos compétences."}
                 </p>
 
                 <!-- Action Buttons -->
@@ -170,22 +175,18 @@ function renderInstructors(instructors) {
         </div>
     `).join('');
 
-    // Réinitialiser les icônes Lucide
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function renderCenters(centers) {
     const container = document.getElementById('centersGrid');
-
     if (!container) return;
-
     if (!centers || centers.length === 0) {
         container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">Aucun centre partenaire affiché.</div>';
         return;
     }
 
     container.innerHTML = centers.slice(0, 3).map((center, index) => {
-        // Styles alternés pour la variété visuelle
         const gradients = [
             'from-indigo-600 to-purple-600',
             'from-blue-600 to-cyan-600',
@@ -222,13 +223,7 @@ function renderCenters(centers) {
         </div>
         `;
     }).join('');
-
     if (typeof lucide !== 'undefined') lucide.createIcons();
-
-    // Notification de succès pour l'utilisateur
-    if (window.showNotification) {
-        setTimeout(() => showNotification('Les meilleurs formateurs sont prêts pour vous !', 'success'), 1000);
-    }
 }
 
 function hideLoaders() {
@@ -236,7 +231,6 @@ function hideLoaders() {
     if (instructorsGrid && instructorsGrid.innerHTML.includes('Chargement')) {
         instructorsGrid.innerHTML = '<div class="col-span-full text-center text-gray-400">Données non disponibles</div>';
     }
-
     const centersGrid = document.getElementById('centersGrid');
     if (centersGrid && centersGrid.innerHTML.includes('Chargement')) {
         centersGrid.innerHTML = '<div class="col-span-full text-center text-gray-400">Données non disponibles</div>';

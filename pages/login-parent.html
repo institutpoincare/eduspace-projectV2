@@ -46,7 +46,7 @@
                     </div>
                     <input type="email" id="email"
                         class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                        placeholder="parent@eduspace.com" required value="parent@eduspace.com">
+                        placeholder="parent@eduspace.com" required>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
                     </div>
                     <input type="password" id="password"
                         class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                        placeholder="••••••••" required value="password123">
+                        placeholder="••••••••" required>
                 </div>
             </div>
 
@@ -102,14 +102,7 @@
                 if (!window.dataManager) await new Promise(r => setTimeout(r, 100));
                 await dataManager.init();
 
-                let user;
-                try {
-                    user = await dataManager.login(email, password, 'parent');
-                } catch (loginError) {
-                    throw loginError;
-                }
-
-                localStorage.setItem('user', JSON.stringify(user));
+                await dataManager.login(email, password, 'parent');
                 window.location.href = 'parent/dashboard.html';
 
             } catch (err) {

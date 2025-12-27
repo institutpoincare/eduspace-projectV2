@@ -85,6 +85,42 @@ class DataManager {
         sessionStorage.removeItem('user');
         window.location.href = '../../index.html';
     }
+
+    // --- HELPER METHODS ---
+
+    async getMessages() {
+        return await this.getAll('messages');
+    }
+
+    async createMessage(messageData) {
+        return await this.create('messages', messageData);
+    }
+
+    async updateMessage(messageId, updates) {
+        return await this.update('messages', messageId, updates);
+    }
+
+    async getInstructors() {
+        return await this.getAll('instructors');
+    }
+
+    async getCourses() {
+        return await this.getAll('courses');
+    }
+
+    async getEnrollments() {
+        return await this.getAll('enrollments');
+    }
+
+    getCurrentUser() {
+        if (this.currentUser) return this.currentUser;
+        const stored = sessionStorage.getItem('user');
+        if (stored) {
+            this.currentUser = JSON.parse(stored);
+            return this.currentUser;
+        }
+        return null;
+    }
 }
 
 const dataManager = new DataManager();

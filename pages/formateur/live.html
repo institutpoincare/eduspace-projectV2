@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Création Live - EduSpace Formateur</title>
+    <title>Dépôt de Cours - EduSpace Formateur</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,6 +19,7 @@
         }
     </script>
     <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/whiteboard.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar {
@@ -129,19 +130,154 @@
                             <i data-lucide="menu" class="w-6 h-6"></i>
                         </button>
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900">Mes Cours Live</h1>
-                            <p class="text-gray-500 mt-1">Gérez vos contenus pédagogiques</p>
+                            <h1 class="text-2xl font-bold text-gray-900">Dépôt de Cours</h1>
+                            <p class="text-gray-500 mt-1">Gérez vos supports de cours préparés</p>
                         </div>
                     </div>
-                    <button onclick="showWizard()"
-                        class="flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105 active:scale-95">
-                        <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Créer Nouveau Cours
-                    </button>
+                    <div class="flex gap-3">
+                        <button onclick="showUploadModal()"
+                            class="flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105 active:scale-95">
+                            <i data-lucide="upload" class="w-5 h-5 mr-2"></i> Uploader un Cours
+                        </button>
+                    </div>
                 </header>
+
+                <!-- Info Banner -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 mb-6">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-blue-100 rounded-xl shrink-0">
+                            <i data-lucide="info" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-2">📚 Comment utiliser le Dépôt de Cours ?</h3>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">1.</span>
+                                    <span>Préparez vos cours dans <strong>Word</strong>, convertissez en <strong>PDF</strong></span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">2.</span>
+                                    <span>Annotez avec <strong>PDF Annotator</strong> (ajoutez notes, dessins, explications)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">3.</span>
+                                    <span>Uploadez ici vos PDF annotés pour les organiser et les partager</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Grid of Courses -->
                 <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <!-- Loaded via JS -->
+                </div>
+            </div>
+
+            <!-- Upload Modal -->
+            <div id="upload-modal" class="fixed inset-0 z-50 bg-gray-900/50 hidden flex items-center justify-center backdrop-blur-sm">
+                <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl m-4 animate-[fadeIn_0.2s_ease-out] max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl sticky top-0 z-10">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Uploader un Cours</h3>
+                            <p class="text-sm text-gray-500">Ajoutez vos PDF annotés à votre dépôt</p>
+                        </div>
+                        <button onclick="closeUploadModal()"
+                            class="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                            <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="p-6">
+                        <form id="upload-form" onsubmit="return handleUpload(event)">
+                            <div class="space-y-6">
+                                <!-- Title -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Titre du cours</label>
+                                    <input type="text" id="course-title" required
+                                        class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                        placeholder="Ex: Algèbre Linéaire - Chapitre 1">
+                                </div>
+
+                                <!-- Type -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Type d'enseignement</label>
+                                    <select id="course-type" onchange="updateNiveauOptions()"
+                                        class="w-full p-4 border border-gray-200 rounded-xl outline-none bg-white">
+                                        <option value="scolaire">Scolaire</option>
+                                        <option value="universitaire">Universitaire</option>
+                                        <option value="professionnel">Professionnel</option>
+                                    </select>
+                                </div>
+
+                                <!-- Category & Subcategory -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-700 mb-2">Matière</label>
+                                        <select id="course-category" onchange="updateSubcategoryOptions()"
+                                            class="w-full p-4 border border-gray-200 rounded-xl outline-none bg-white">
+                                            <option value="mathematiques">Mathématiques</option>
+                                            <option value="physique">Physique</option>
+                                            <option value="chimie">Chimie</option>
+                                            <option value="informatique">Informatique</option>
+                                            <option value="langues">Langues</option>
+                                            <option value="sciences">Sciences Naturelles</option>
+                                            <option value="histoire">Histoire & Géographie</option>
+                                            <option value="autre">Autre</option>
+                                        </select>
+                                    </div>
+                                    <div id="subcategory-container">
+                                        <label class="block text-sm font-bold text-gray-700 mb-2">Spécialité</label>
+                                        <select id="course-subcategory"
+                                            class="w-full p-4 border border-gray-200 rounded-xl outline-none bg-white">
+                                            <option value="">Général</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Niveau (Dynamic based on Type) -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Niveau</label>
+                                    <select id="course-level"
+                                        class="w-full p-4 border border-gray-200 rounded-xl outline-none bg-white">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+
+                                <!-- File Upload -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Fichier PDF</label>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-500 transition-colors cursor-pointer"
+                                        onclick="document.getElementById('pdf-file').click()">
+                                        <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-gray-400 mb-3"></i>
+                                        <p class="text-gray-600 font-medium mb-1">Cliquez pour uploader votre PDF</p>
+                                        <p class="text-sm text-gray-400">ou glissez-déposez le fichier ici</p>
+                                        <input type="file" id="pdf-file" accept=".pdf" class="hidden" onchange="updateFileName(this)">
+                                    </div>
+                                    <p id="file-name" class="text-sm text-gray-500 mt-2"></p>
+                                </div>
+
+                                <!-- Description -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Description (optionnelle)</label>
+                                    <textarea id="course-description" rows="3"
+                                        class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                        placeholder="Brève description du contenu..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end gap-3">
+                                <button type="button" onclick="closeUploadModal()"
+                                    class="px-6 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors">
+                                    Annuler
+                                </button>
+                                <button type="submit"
+                                    class="flex items-center px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-0.5">
+                                    <i data-lucide="check" class="w-5 h-5 mr-2"></i> Uploader
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -153,7 +289,7 @@
                             class="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-gray-200 shadow-sm">
                             <i data-lucide="arrow-left" class="text-gray-600"></i>
                         </button>
-                        <h1 class="text-2xl font-bold text-gray-900" id="wizard-title">Nouveau Cours Live</h1>
+                        <h1 class="text-2xl font-bold text-gray-900" id="wizard-title">Nouveau Support de Cours</h1>
                     </div>
                 </header>
 
@@ -277,9 +413,90 @@
         </main>
     </div>
 
+    <!-- Whiteboard Container -->
+    <div id="whiteboard-container">
+        <canvas id="whiteboard-canvas"></canvas>
+
+        <!-- Close Button -->
+        <button id="whiteboard-close-btn" onclick="closeWhiteboard()">
+            <i data-lucide="x"></i> Fermer
+        </button>
+
+        <!-- Toolbar -->
+        <div id="whiteboard-tools">
+            <button id="wb-pen-btn" data-tooltip="Stylo">
+                <i data-lucide="pen-tool"></i>
+            </button>
+            <button id="wb-highlight-btn" data-tooltip="Surligneur">
+                <i data-lucide="highlighter"></i>
+            </button>
+            <button id="wb-eraser-btn" data-tooltip="Gomme">
+                <i data-lucide="eraser"></i>
+            </button>
+            <button id="wb-clear-btn" data-tooltip="Tout Effacer">
+                <i data-lucide="trash-2"></i>
+            </button>
+        </div>
+
+        <!-- Toggle Toolbar Button -->
+        <button id="toggle-whiteboard-tools">
+            <i data-lucide="settings"></i>
+        </button>
+
+        <!-- Pen Modal -->
+        <div id="wb-pen-modal" class="whiteboard-modal" style="top: 150px; right: 100px;">
+            <div class="whiteboard-modal-header">
+                <h3>Paramètres Stylo</h3>
+                <button class="whiteboard-modal-close">&times;</button>
+            </div>
+            <div class="whiteboard-modal-body">
+                <label>
+                    Couleur:
+                    <input type="color" id="wb-pen-color" value="#000000">
+                </label>
+                <label>
+                    Taille:
+                    <input type="number" id="wb-pen-size" value="5" min="1" max="50">
+                </label>
+            </div>
+        </div>
+
+        <!-- Highlight Modal -->
+        <div id="wb-highlight-modal" class="whiteboard-modal" style="top: 200px; right: 100px;">
+            <div class="whiteboard-modal-header">
+                <h3>Paramètres Surligneur</h3>
+                <button class="whiteboard-modal-close">&times;</button>
+            </div>
+            <div class="whiteboard-modal-body">
+                <label>
+                    Couleur:
+                    <input type="color" id="wb-highlight-color" value="#ffff00">
+                </label>
+                <label>
+                    Opacité:
+                    <input type="number" id="wb-highlight-opacity" value="0.3" min="0.1" max="1" step="0.1">
+                </label>
+                <label>
+                    Taille:
+                    <input type="number" id="wb-highlight-size" value="10" min="1" max="50">
+                </label>
+            </div>
+        </div>
+
+        <!-- Eraser Modal -->
+        <div id="wb-eraser-modal" class="whiteboard-eraser-modal">
+            <h3>Taille de la Gomme</h3>
+            <input type="range" id="wb-eraser-slider" min="5" max="50" value="10">
+            <div id="eraser-size-display">Taille: 10px</div>
+            <div id="eraser-size-circle" style="width: 10px; height: 10px;"></div>
+            <button id="wb-eraser-close">Fermer</button>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js?v=2"></script>
+    <script src="../../js/components/whiteboard.js"></script>
     <script>
         // --- State ---
         let chapters = [];
@@ -295,79 +512,100 @@
 
         // --- VIEWS ---
         async function loadCourses() {
-            const courses = await dataManager.getAll('sessions') || [];
+            const courses = await dataManager.getAll('courses') || [];
             const container = document.getElementById('courses-grid');
 
             if (courses.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">
-                    <i data-lucide="book" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-                    <p class="text-lg font-medium">Aucun cours créé.</p>
+                container.innerHTML = `<div class="col-span-full text-center py-20">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="folder-open" class="w-10 h-10 text-gray-400"></i>
+                    </div>
+                    <p class="text-lg font-medium text-gray-600 mb-2">Aucun cours uploadé</p>
+                    <p class="text-sm text-gray-400 mb-4">Commencez par uploader vos PDF annotés</p>
+                    <button onclick="showUploadModal()" 
+                        class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors">
+                        <i data-lucide="upload" class="w-5 h-5 mr-2"></i> Uploader un Cours
+                    </button>
                 </div>`;
             } else {
-                container.innerHTML = courses.map(c => `
-                    <div class="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg transition-all group flex flex-col h-full">
-                        <div class="flex justify-between items-start mb-3">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">${c.type || 'Formation'}</span>
+                container.innerHTML = courses.map(c => {
+                    // Determine color based on category
+                    const categoryColors = {
+                        'mathematiques': 'blue',
+                        'physique': 'purple',
+                        'chimie': 'green',
+                        'informatique': 'indigo',
+                        'langues': 'pink',
+                        'sciences': 'emerald',
+                        'histoire': 'orange'
+                    };
+                    const color = categoryColors[c.category] || 'gray';
+                    
+                    return `
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl transition-all group flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                                    <i data-lucide="file-text" class="w-6 h-6 text-red-600"></i>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="px-2 py-0.5 bg-${color}-100 text-${color}-700 rounded-full text-xs font-bold inline-block w-fit">
+                                        ${c.categoryLabel || c.category}
+                                    </span>
+                                    ${c.subcategory && c.subcategory !== '' ? `
+                                        <span class="text-xs text-gray-500">→ ${c.subcategoryLabel}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
                             <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="editCourse('${c.id}')" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg" title="Modifier"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                                <button onclick="deleteCourse('${c.id}')" class="p-2 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-lg" title="Supprimer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="viewCourse('${c.id}')" class="p-2 text-gray-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg" title="Voir">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteCourse('${c.id}')" class="p-2 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-lg" title="Supprimer">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
                             </div>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-1 leading-tight">${c.title}</h3>
-                        <p class="text-sm text-gray-500 mb-4">${c.level || 'Tous niveaux'} • ${c.chaptersData ? c.chaptersData.length : 0} Chapitres</p>
-                        <div class="mt-auto pt-4 border-t border-gray-100 text-xs font-bold text-gray-400">
-                            Créé le ${new Date(c.createdAt).toLocaleDateString()}
+                        
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 leading-tight">${c.title}</h3>
+                        
+                        ${c.description ? `<p class="text-sm text-gray-600 mb-3 line-clamp-2">${c.description}</p>` : ''}
+                        
+                        <div class="flex flex-wrap items-center gap-2 text-xs mb-3">
+                            <div class="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
+                                <i data-lucide="graduation-cap" class="w-3 h-3 text-gray-600"></i>
+                                <span class="font-medium text-gray-700">${c.typeLabel || c.type}</span>
+                            </div>
+                            <div class="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
+                                <i data-lucide="layers" class="w-3 h-3 text-gray-600"></i>
+                                <span class="font-medium text-gray-700">${c.levelLabel || c.level}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-gray-100">
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-1 text-gray-500">
+                                    <i data-lucide="file" class="w-3 h-3"></i>
+                                    <span>${c.fileName || 'PDF'}</span>
+                                </div>
+                                <span class="text-gray-400">${new Date(c.uploadedAt || c.createdAt).toLocaleDateString()}</span>
+                            </div>
                         </div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
             }
             lucide.createIcons();
         }
 
-        function showWizard() {
-            document.getElementById('view-list').classList.add('hidden');
-            document.getElementById('view-wizard').classList.remove('hidden');
-            resetWizard();
-        }
-
-        function showList() {
-            document.getElementById('view-wizard').classList.add('hidden');
-            document.getElementById('view-list').classList.remove('hidden');
-            loadCourses();
-        }
-
-        function resetWizard() {
-            isEditing = false; editingId = null;
-            document.getElementById('wizard-title').innerText = "Nouveau Cours Live";
-            document.getElementById('course-title').value = '';
-            chapters = [{ id: Date.now(), title: '', pdf: null, subChapters: [{ id: Date.now() + 1, title: '', pdf: null, quiz: null }] }];
-            nextStep(1);
-            renderChapters();
-        }
-
-        // --- EDIT / DELETE ---
-        async function editCourse(id) {
-            const courses = await dataManager.getAll('sessions');
-            const course = courses.find(c => c.id === id);
-            if (!course) return;
-
-            isEditing = true; editingId = id;
-            document.getElementById('wizard-title').innerText = "Modifier Cours Live";
-            document.getElementById('view-list').classList.add('hidden');
-            document.getElementById('view-wizard').classList.remove('hidden');
-
-            document.getElementById('course-title').value = course.title;
-            document.getElementById('course-type').value = course.type || 'Scolaire';
-            document.getElementById('course-level').value = course.level || 'Débutant';
-            chapters = course.chaptersData || [];
-
-            nextStep(1);
-            renderChapters();
+        function viewCourse(id) {
+            // In a real app, this would open the PDF viewer
+            alert('Ouverture du cours... (fonctionnalité à venir)');
         }
 
         async function deleteCourse(id) {
             if (confirm("Supprimer ce cours définitivement ?")) {
-                await dataManager.delete('sessions', id);
+                await dataManager.delete('courses', id);
                 await loadCourses();
             }
         }
@@ -531,6 +769,166 @@
                     <button onclick="editingQuizState.currentQuiz.questions.splice(${i}, 1); renderQuizQuestions()" class="text-red-500 text-xs font-bold mt-2">Supprimer</button>
                  </div>
              `).join('');
+        }
+
+        // --- DYNAMIC FILTERS ---
+        const subcategories = {
+            'langues': [
+                { value: 'francais', label: 'Français' },
+                { value: 'anglais', label: 'Anglais' },
+                { value: 'arabe', label: 'Arabe' },
+                { value: 'espagnol', label: 'Espagnol' },
+                { value: 'allemand', label: 'Allemand' }
+            ],
+            'informatique': [
+                { value: 'programmation', label: 'Programmation' },
+                { value: 'reseaux', label: 'Réseaux' },
+                { value: 'web', label: 'Développement Web' },
+                { value: 'data', label: 'Data Science' },
+                { value: 'cybersecurite', label: 'Cybersécurité' }
+            ],
+            'sciences': [
+                { value: 'biologie', label: 'Biologie' },
+                { value: 'geologie', label: 'Géologie' },
+                { value: 'svt', label: 'SVT' }
+            ],
+            'histoire': [
+                { value: 'histoire', label: 'Histoire' },
+                { value: 'geographie', label: 'Géographie' },
+                { value: 'civique', label: 'Éducation Civique' }
+            ]
+        };
+
+        const niveaux = {
+            'scolaire': [
+                { value: '7eme', label: '7ème année' },
+                { value: '8eme', label: '8ème année' },
+                { value: '9eme', label: '9ème année' },
+                { value: '1ere', label: '1ère année secondaire' },
+                { value: '2eme', label: '2ème année secondaire' },
+                { value: '3eme', label: '3ème année secondaire' },
+                { value: '4eme', label: '4ème année secondaire (Bac)' }
+            ],
+            'universitaire': [
+                { value: 'l1', label: 'Licence 1' },
+                { value: 'l2', label: 'Licence 2' },
+                { value: 'l3', label: 'Licence 3' },
+                { value: 'm1', label: 'Master 1' },
+                { value: 'm2', label: 'Master 2' },
+                { value: 'doctorat', label: 'Doctorat' }
+            ],
+            'professionnel': [
+                { value: 'debutant', label: 'Débutant' },
+                { value: 'intermediaire', label: 'Intermédiaire' },
+                { value: 'avance', label: 'Avancé' },
+                { value: 'expert', label: 'Expert' }
+            ]
+        };
+
+        function updateNiveauOptions() {
+            const type = document.getElementById('course-type').value;
+            const niveauSelect = document.getElementById('course-level');
+            
+            niveauSelect.innerHTML = '';
+            
+            const options = niveaux[type] || [];
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                niveauSelect.appendChild(option);
+            });
+        }
+
+        function updateSubcategoryOptions() {
+            const category = document.getElementById('course-category').value;
+            const subcategorySelect = document.getElementById('course-subcategory');
+            
+            subcategorySelect.innerHTML = '<option value="">Général</option>';
+            
+            const subs = subcategories[category] || [];
+            subs.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.value;
+                option.textContent = sub.label;
+                subcategorySelect.appendChild(option);
+            });
+        }
+
+        // --- UPLOAD MODAL FUNCTIONS ---
+        function showUploadModal() {
+            document.getElementById('upload-modal').classList.remove('hidden');
+            // Initialize niveau options based on default type
+            updateNiveauOptions();
+            lucide.createIcons();
+        }
+
+        function closeUploadModal() {
+            document.getElementById('upload-modal').classList.add('hidden');
+            document.getElementById('upload-form').reset();
+            document.getElementById('file-name').textContent = '';
+        }
+
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || '';
+            const fileNameEl = document.getElementById('file-name');
+            if (fileName) {
+                fileNameEl.textContent = `📄 ${fileName}`;
+                fileNameEl.classList.add('text-green-600', 'font-medium');
+            } else {
+                fileNameEl.textContent = '';
+                fileNameEl.classList.remove('text-green-600', 'font-medium');
+            }
+        }
+
+        async function handleUpload(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('course-title').value;
+            const type = document.getElementById('course-type').value;
+            const category = document.getElementById('course-category').value;
+            const subcategory = document.getElementById('course-subcategory').value;
+            const level = document.getElementById('course-level').value;
+            const description = document.getElementById('course-description').value;
+            const fileInput = document.getElementById('pdf-file');
+            
+            if (!fileInput.files[0]) {
+                alert('Veuillez sélectionner un fichier PDF');
+                return false;
+            }
+
+            // Get display labels
+            const typeLabel = document.getElementById('course-type').selectedOptions[0].text;
+            const categoryLabel = document.getElementById('course-category').selectedOptions[0].text;
+            const subcategoryLabel = document.getElementById('course-subcategory').selectedOptions[0].text;
+            const levelLabel = document.getElementById('course-level').selectedOptions[0].text;
+
+            // Simulate file upload (in real app, this would upload to server)
+            const courseData = {
+                id: 'course_' + Date.now(),
+                title: title,
+                type: type,
+                typeLabel: typeLabel,
+                category: category,
+                categoryLabel: categoryLabel,
+                subcategory: subcategory,
+                subcategoryLabel: subcategoryLabel,
+                level: level,
+                levelLabel: levelLabel,
+                description: description,
+                fileName: fileInput.files[0].name,
+                fileSize: (fileInput.files[0].size / 1024).toFixed(2) + ' KB',
+                uploadedAt: new Date().toISOString(),
+                status: 'uploaded'
+            };
+
+            await dataManager.create('courses', courseData);
+            
+            alert('✅ Cours uploadé avec succès!');
+            closeUploadModal();
+            await loadCourses();
+            
+            return false;
         }
     </script>
 </body>

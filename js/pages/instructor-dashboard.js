@@ -25,7 +25,8 @@ class InstructorDashboard {
         if (!this.currentInstructor) {
             console.error('❌ Aucun formateur connecté');
             // Redirection vers la page de login générique (ou accueil si pas de login spécifique)
-            window.location.href = '../../pages/login-etudiant.html';
+            // Redirection vers la page d'accueil si pas de login spécifique
+            window.location.href = '../../index.html';
             return;
         }
 
@@ -33,6 +34,9 @@ class InstructorDashboard {
         await this.loadMyCourses();
         await this.loadMyStudents();
         await this.loadStats();
+        await this.loadUnreadMessages();
+        this.updateHeader();
+        this.checkLiveSessions();
 
         // Initialiser les événements
         this.initializeEvents();
@@ -40,14 +44,43 @@ class InstructorDashboard {
         console.log('✅ Dashboard formateur chargé');
     }
 
+    updateHeader() {
+        if (this.currentInstructor) {
+            const nameEl = document.getElementById('user-name');
+            const roleEl = document.getElementById('user-role');
+            if (nameEl) nameEl.textContent = this.currentInstructor.name;
+            if (roleEl) roleEl.textContent = this.currentInstructor.role || 'Formateur';
+            
+            // Update welcome message
+            const welcomeEl = document.querySelector('h2.text-3xl');
+            if (welcomeEl) welcomeEl.textContent = `Bonjour, ${this.currentInstructor.name.split(' ')[0]} ! 👋`;
+        }
+    }
+
+    checkLiveSessions() {
+        // Simulation: Check if any course has a live session soon
+        // For now, we just keep it hidden or show if we find a specific flag
+        // Real implementation would check course schedules
+        const liveCard = document.getElementById('live-session-card');
+        if (liveCard) {
+            // Logic to show card if live session exists
+            // liveCard.classList.remove('hidden');
+        }
+    }
+
     /**
      * Récupérer le formateur connecté
      */
     async getCurrentInstructor() {
-        // Simulation - En production, récupérer depuis session/localStorage
-        const instructorId = localStorage.getItem('currentUserId') || 'ahmed';
-        return await dataManager.getById('users', instructorId);
+        const user = dataManager.getCurrentUser();
+        console.log("Checking Current User:", user); // Debug
+        if (user && (user.role === 'formateur' || user.role === 'instructor')) { // Allow both roles
+            return user;
+        }
+        console.warn("User is not an instructor or not logged in:", user);
+        return null;
     }
+
 
     /**
      * Charger mes cours
@@ -72,21 +105,6 @@ class InstructorDashboard {
         if (!container) return;
 
         container.innerHTML = '';
-
-        if (this.courses.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-12">
-                    <i data-lucide="book-open" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
-                    <p class="text-gray-500 text-lg mb-4">Aucun cours pour le moment</p>
-                    <button onclick="instructorDashboard.showCreateCourseModal()" 
-                            class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
-                        Créer mon premier cours
-                    </button>
-                </div>
-            `;
-            return;
-        }
-
         this.courses.forEach(course => {
             const card = this.createCourseCard(course);
             container.appendChild(card);
@@ -225,17 +243,28 @@ class InstructorDashboard {
      * DELETE - Supprimer un cours
      */
     async deleteCourse(courseId) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce cours?')) {
+        console.log('🗑️ Tentative de suppression du cours:', courseId);
+
+        if (!courseId) {
+            alert('Erreur: ID du cours manquant');
+            return;
+        }
+
+        if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce cours définitivement ?')) {
             return;
         }
 
         try {
             await dataManager.delete('courses', courseId);
             console.log('✅ Cours supprimé:', courseId);
+
+            // Recharger les données
             await this.loadMyCourses();
+
             this.showNotification('Cours supprimé avec succès!', 'success');
         } catch (error) {
             console.error('❌ Erreur suppression cours:', error);
+            alert('Erreur lors de la suppression: ' + error.message);
             this.showNotification('Erreur lors de la suppression', 'error');
         }
     }
@@ -305,45 +334,186 @@ class InstructorDashboard {
     }
 
     /**
-     * Charger les statistiques
+     * Charger les statistiques détaillées
      */
     async loadStats() {
-        const statsContainer = document.getElementById('statsContainer');
-        if (!statsContainer) return;
+        // 1. Calculer les revenus et étudiants
+        let totalRevenue = 0;
+        let pendingRevenue = 0;
+        let totalHours = 0;
+        let uniqueStudents = new Set();
 
-        const totalStudents = this.courses.reduce((sum, c) => sum + (c.enrolled || 0), 0);
-        const totalRevenue = this.courses.reduce((sum, c) => sum + (c.price * (c.enrolled || 0)), 0);
-        const avgRating = this.courses.length > 0
-            ? (this.courses.reduce((sum, c) => sum + (c.rating || 0), 0) / this.courses.length).toFixed(1)
-            : 0;
+        // Récupérer tous les enrollments pour plus de précision
+        const allEnrollments = await dataManager.getAll('enrollments');
+        
+        this.courses.forEach(course => {
+            // Revenus & Pending
+            const courseEnrollments = allEnrollments.filter(e => e.courseId === course.id);
+            courseEnrollments.forEach(e => {
+                const paid = e.amountPaid || 0;
+                const price = course.price || 0;
+                totalRevenue += paid;
+                if (price > paid) {
+                    pendingRevenue += (price - paid);
+                }
+                uniqueStudents.add(e.userId);
+            });
 
-        statsContainer.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-                    <i data-lucide="book-open" class="w-8 h-8 mb-2"></i>
-                    <p class="text-3xl font-bold">${this.courses.length}</p>
-                    <p class="text-blue-100">Cours actifs</p>
+            // Heures (Estimation si pas de sessions précises)
+            // Si le cours a des slots, on calcule : semaines * slots * 2h (moyenne)
+            const weeks = parseInt(course.weeksDuration) || 12; // Default 12 weeks
+            const slotsCount = (course.slots && course.slots.length) || 2; // Default 2 slots
+            totalHours += weeks * slotsCount * 2; 
+        });
+
+        // Mise à jour du DOM
+        this.animateValue('stat-total-revenue', totalRevenue, ' TND');
+        this.animateValue('stat-pending-revenue', pendingRevenue, ' TND');
+        this.animateValue('stat-total-hours', totalHours, 'h');
+        this.animateValue('stat-active-students', uniqueStudents.size, '');
+
+        // Charger la prochaine session
+        this.loadNextSession();
+        
+        // Charger l'activité récente
+        this.loadRecentActivity(allEnrollments);
+    }
+
+    animateValue(id, end, suffix) {
+        const obj = document.getElementById(id);
+        if (!obj) return;
+        
+        // Si c'est 0, on affiche direct
+        if (end === 0) {
+            obj.textContent = "0" + suffix;
+            return;
+        }
+
+        const duration = 1000;
+        const start = 0;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const value = Math.floor(progress * (end - start) + start);
+            obj.textContent = value + suffix;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    /**
+     * Charger la prochaine session (Simulation intelligente)
+     */
+    loadNextSession() {
+        // Dans un vrai cas, on chercherait dans le calendrier.
+        // Ici on va simuler une session proche pour la démo "2025"
+        const now = new Date();
+        const nextSessionDate = new Date(now.getTime() + 2 * 60 * 60 * 1000 + 45 * 60 * 1000); // Dans 2h 45min
+        
+        // Trouver un cours actif aléatoire pour l'afficher
+        const activeCourse = this.courses.find(c => c.status === 'active') || this.courses[0];
+        
+        if (activeCourse) {
+            document.getElementById('next-class-title').textContent = activeCourse.title;
+            document.getElementById('next-class-subtitle').textContent = `Session de ${activeCourse.level} • ${activeCourse.category || 'Général'}`;
+            
+            // Activer le bouton
+            const btn = document.getElementById('btn-join-class');
+            btn.onclick = () => {
+                alert(`Lancement de la session live pour : ${activeCourse.title}`);
+                // window.location.href = 'live-room.html?id=' + activeCourse.id;
+            };
+
+            // Lancer le compte à rebours
+            this.startCountdown(nextSessionDate);
+        } else {
+            document.getElementById('next-class-title').textContent = "Aucune session prévue";
+            document.getElementById('next-class-subtitle').textContent = "Créez un cours pour commencer";
+            document.getElementById('countdown-timer').textContent = "--:--:--";
+        }
+    }
+
+    startCountdown(endDate) {
+        const timerEl = document.getElementById('countdown-timer');
+        
+        const update = () => {
+            const now = new Date().getTime();
+            const distance = endDate - now;
+
+            if (distance < 0) {
+                timerEl.textContent = "EN DIRECT";
+                timerEl.classList.add('text-red-500', 'animate-pulse');
+                return;
+            }
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timerEl.textContent = 
+                (hours < 10 ? "0" + hours : hours) + ":" + 
+                (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+                (seconds < 10 ? "0" + seconds : seconds);
+        };
+
+        setInterval(update, 1000);
+        update();
+    }
+
+    loadRecentActivity(enrollments) {
+        const container = document.getElementById('recent-activity-list');
+        if (!container) return;
+
+        // Trier par date (récent en premier)
+        const recent = enrollments
+            .filter(e => this.courses.some(c => c.id === e.courseId))
+            .sort((a, b) => new Date(b.enrolledAt) - new Date(a.enrolledAt))
+            .slice(0, 5);
+
+        if (recent.length === 0) {
+            container.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Aucune activité récente</div>';
+            return;
+        }
+
+        container.innerHTML = recent.map(e => `
+            <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                    ${e.name ? e.name.charAt(0) : 'U'}
                 </div>
-                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
-                    <i data-lucide="users" class="w-8 h-8 mb-2"></i>
-                    <p class="text-3xl font-bold">${totalStudents}</p>
-                    <p class="text-green-100">Étudiants</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-gray-900 truncate">${e.name || 'Étudiant'}</p>
+                    <p class="text-xs text-gray-500 truncate">S'est inscrit à ${e.courseName || 'un cours'}</p>
                 </div>
-                <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-6 text-white">
-                    <i data-lucide="star" class="w-8 h-8 mb-2"></i>
-                    <p class="text-3xl font-bold">${avgRating}</p>
-                    <p class="text-yellow-100">Note moyenne</p>
-                </div>
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-                    <i data-lucide="dollar-sign" class="w-8 h-8 mb-2"></i>
-                    <p class="text-3xl font-bold">${totalRevenue}</p>
-                    <p class="text-purple-100">TND Revenue</p>
-                </div>
+                <span class="text-xs text-gray-400 whitespace-nowrap">Il y a 2h</span>
             </div>
-        `;
+        `).join('');
+    }
 
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+    /**
+     * Charger les messages non lus
+     */
+    async loadUnreadMessages() {
+        try {
+            const allMessages = await dataManager.getAll('messages');
+            const unreadCount = allMessages.filter(msg => 
+                msg.to.id === this.currentInstructor.id && !msg.isRead
+            ).length;
+
+            const unreadEl = document.getElementById('unread-messages-count');
+            if (unreadEl) unreadEl.textContent = unreadCount;
+            
+            const badge = document.getElementById('badge-messages');
+            if (badge) {
+                if (unreadCount > 0) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+            
+            localStorage.setItem('unreadMessagesCount', unreadCount);
+        } catch (error) {
+            console.error('❌ Erreur chargement messages:', error);
         }
     }
 
@@ -388,9 +558,16 @@ class InstructorDashboard {
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium mb-2">Prix (TND)</label>
-                            <input type="number" name="price" required
-                                   class="w-full px-4 py-2 border rounded-lg">
+                            <label class="block text-sm font-medium mb-2">Prix (TND) & Type de Paiement</label>
+                            <!-- خيارات الدفع: كامل، شهري، أو بالثلاثية -->
+                            <div class="flex gap-2">
+                                <input type="number" name="price" required
+                                    class="w-2/3 px-4 py-2 border rounded-lg" placeholder="Montant">
+                                <select name="paymentType" class="w-1/3 px-2 py-2 border rounded-lg bg-gray-50 text-sm">
+                                    <option value="total">Total</option>
+                                    <option value="session">Par Séance</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-2">Durée</label>
@@ -424,6 +601,7 @@ class InstructorDashboard {
                 type: formData.get('type'),
                 level: formData.get('level'),
                 price: parseInt(formData.get('price')),
+                paymentType: formData.get('paymentType'), // نوع الدفع (كامل، شهري، ثلاثي)
                 duration: formData.get('duration'),
                 language: 'Français',
                 category: 'General',
@@ -447,13 +625,36 @@ class InstructorDashboard {
      * Afficher notification
      */
     showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white`;
-        notification.textContent = message;
-        document.body.appendChild(notification);
+        // Remove existing notifications
+        const existing = document.querySelectorAll('.toast-notification');
+        existing.forEach(e => e.remove());
 
-        setTimeout(() => notification.remove(), 3000);
+        const notification = document.createElement('div');
+        notification.className = `toast-notification fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transform transition-all duration-500 translate-x-full flex items-center gap-3 ${type === 'success' ? 'bg-white border-l-4 border-green-500 text-gray-800' : 'bg-white border-l-4 border-red-500 text-gray-800'
+            }`;
+        
+        const icon = type === 'success' ? '<i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i>' : '<i data-lucide="alert-circle" class="w-6 h-6 text-red-500"></i>';
+        
+        notification.innerHTML = `
+            ${icon}
+            <div>
+                <h4 class="font-bold text-sm">${type === 'success' ? 'Succès' : 'Erreur'}</h4>
+                <p class="text-sm text-gray-600">${message}</p>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Animate in
+        requestAnimationFrame(() => {
+            notification.classList.remove('translate-x-full');
+        });
+
+        setTimeout(() => {
+            notification.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
     }
 
     /**
@@ -478,9 +679,93 @@ class InstructorDashboard {
      * Afficher modal édition
      */
     showEditCourseModal(course) {
-        // Similar to create modal but with pre-filled data
-        console.log('Edit course:', course);
-        // Implementation similar to showCreateCourseModal
+        // Supprimer modal existant si présent
+        this.closeModal();
+
+        const modal = document.createElement('div');
+        modal.id = 'courseModal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6">Modifier le cours</h2>
+                <form id="editCourseForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Titre du cours</label>
+                        <input type="text" name="title" value="${course.title}" required
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Description</label>
+                        <textarea name="description" required rows="3"
+                                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">${course.description}</textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Type</label>
+                            <select name="type" required class="w-full px-4 py-2 border rounded-lg">
+                                <option value="live" ${course.type === 'live' ? 'selected' : ''}>Live</option>
+                                <option value="recorded" ${course.type === 'recorded' ? 'selected' : ''}>Enregistré</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Niveau</label>
+                            <select name="level" required class="w-full px-4 py-2 border rounded-lg">
+                                <option value="Débutant" ${course.level === 'Débutant' ? 'selected' : ''}>Débutant</option>
+                                <option value="Intermédiaire" ${course.level === 'Intermédiaire' ? 'selected' : ''}>Intermédiaire</option>
+                                <option value="Avancé" ${course.level === 'Avancé' ? 'selected' : ''}>Avancé</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Prix (TND) & Type de Paiement</label>
+                            <!-- تعديل خيارات الدفع -->
+                            <div class="flex gap-2">
+                                <input type="number" name="price" value="${course.price}" required
+                                    class="w-2/3 px-4 py-2 border rounded-lg">
+                                <select name="paymentType" class="w-1/3 px-2 py-2 border rounded-lg bg-gray-50 text-sm">
+                                    <option value="total" ${course.paymentType === 'total' ? 'selected' : ''}>Total</option>
+                                    <option value="session" ${course.paymentType === 'session' ? 'selected' : ''}>Par Séance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Durée</label>
+                            <input type="text" name="duration" value="${course.duration}" required placeholder="Ex: 3 mois"
+                                   class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" 
+                                class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                            Enregistrer
+                        </button>
+                        <button type="button" onclick="instructorDashboard.closeModal()"
+                                class="px-6 py-3 border rounded-lg hover:bg-gray-50">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Gérer la soumission
+        document.getElementById('editCourseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const updates = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                type: formData.get('type'),
+                level: formData.get('level'),
+                price: parseInt(formData.get('price')),
+                paymentType: formData.get('paymentType'), // تحديث نوع الدفع
+                duration: formData.get('duration')
+            };
+            await this.updateCourse(course.id, updates);
+        });
     }
 }
 

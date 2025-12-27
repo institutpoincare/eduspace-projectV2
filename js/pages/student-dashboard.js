@@ -29,9 +29,11 @@ class StudentDashboard {
         }
 
         // Charger les données
+        this.updateHeader();
         await this.loadAvailableCourses();
         await this.loadMyCourses();
         await this.loadStats();
+        await this.loadNextLiveSession();
 
         // Initialiser les événements
         this.initializeEvents();
@@ -40,12 +42,112 @@ class StudentDashboard {
     }
 
     /**
+     * Mettre à jour l'en-tête avec les infos de l'étudiant
+     */
+    updateHeader() {
+        const headerTitle = document.querySelector('header h1');
+        const avatar = document.querySelector('header .bg-gradient-to-tr');
+        
+        if (this.currentStudent) {
+            if (headerTitle) {
+                headerTitle.textContent = `Bonjour, ${this.currentStudent.name} 👋`;
+            }
+            if (avatar) {
+                // Initials
+                const initials = this.currentStudent.name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+                avatar.textContent = initials;
+            }
+        }
+    }
+
+    /**
+     * Charger le prochain cours en direct
+     */
+    async loadNextLiveSession() {
+        const container = document.getElementById('liveSessionContainer');
+        if (!container) return;
+
+        // Trouver le prochain live à venir dans MES cours
+        const now = new Date();
+        const upcomingLiveCourses = this.myCourses
+            .filter(c => c.type === 'Live' && c.nextSession)
+            .map(c => ({
+                ...c,
+                sessionDate: new Date(c.nextSession)
+            }))
+            .filter(c => c.sessionDate > now)
+            .sort((a, b) => a.sessionDate - b.sessionDate);
+
+        if (upcomingLiveCourses.length === 0) {
+            container.innerHTML = '';
+            container.style.display = 'none';
+            return;
+        }
+
+        const nextCourse = upcomingLiveCourses[0];
+        const timeDiff = nextCourse.sessionDate - now;
+        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+        container.style.display = 'block';
+        container.innerHTML = `
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-50"></div>
+                <div class="relative z-10 flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-red-200">
+                        <i data-lucide="video" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                            <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider">Prochain Cours en Direct</h2>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">${nextCourse.title}</h3>
+                        <p class="text-gray-500 font-medium">avec ${nextCourse.instructor} • ${nextCourse.sessionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                </div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="flex gap-2">
+                        <div class="bg-white/80 backdrop-blur-sm border border-gray-100 px-3 py-2 rounded-lg text-center min-w-[60px]">
+                            <div class="text-xl font-bold text-gray-900">${hours}</div>
+                            <div class="text-[10px] text-gray-500 font-bold uppercase">Heures</div>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm border border-gray-100 px-3 py-2 rounded-lg text-center min-w-[60px]">
+                            <div class="text-xl font-bold text-gray-900">${minutes}</div>
+                            <div class="text-[10px] text-gray-500 font-bold uppercase">Min</div>
+                        </div>
+                    </div>
+                    <button onclick="studentDashboard.viewCourse('${nextCourse.id}')"
+                        class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200 flex items-center gap-2">
+                        Rejoindre
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    /**
      * Récupérer l'étudiant connecté
      */
     async getCurrentStudent() {
-        // Simulation - En production, récupérer depuis session
-        const studentId = localStorage.getItem('currentUserId') || 'user-1';
-        return await dataManager.getById('users', studentId);
+        const user = dataManager.getCurrentUser();
+        if (user && user.role === 'etudiant') {
+            return user;
+        }
+        return null; // Don't redirect here, let init handle it or caller
     }
 
     /**
@@ -209,6 +311,7 @@ class StudentDashboard {
         container.innerHTML = '';
 
         if (this.myCourses.length === 0) {
+            container.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-4', 'gap-6');
             container.innerHTML = `
                 <div class="text-center py-12">
                     <i data-lucide="book-open" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
@@ -221,6 +324,8 @@ class StudentDashboard {
             `;
             return;
         }
+
+        container.classList.add('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-4', 'gap-6');
 
         this.myCourses.forEach(({ enrollment, ...course }) => {
             const card = document.createElement('div');

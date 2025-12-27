@@ -125,24 +125,72 @@
         </main>
     </div>
 
-    <script src="../../js/core/data-manager.js"></script>
-    <script src="../../js/components/sidebar-formateur.js"></script>
-    <script>
-        // STATE
-        let currentDate = new Date();
-        let classes = [];
-        let currentView = 'month';
+    <!-- Live Session Modal -->
+    <div id="liveModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl transform scale-100 transition-all">
+            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                <i data-lucide="video" class="w-10 h-10"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2" id="modalTitle">Titre du cours</h3>
+            <p class="text-gray-500 mb-8">La session est prête. Voulez-vous lancer le direct maintenant ?</p>
+            <div class="flex gap-4">
+                <button onclick="closeLiveModal()" 
+                    class="flex-1 py-3 px-6 border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-colors">
+                    Annuler
+                </button>
+                <button onclick="startLiveSession()" 
+                    class="flex-1 py-3 px-6 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all hover:scale-105 flex items-center justify-center gap-2">
+                    <i data-lucide="play" class="w-4 h-4"></i> Lancer
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // INIT
+    <!-- Scripts -->
+    <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/components/sidebar-formateur.js?v=2"></script>
+    
+    <script>
+        let currentDate = new Date();
+        let currentView = 'month';
+        let classes = [];
+        let currentSessionId = null;
+
         document.addEventListener('DOMContentLoaded', async () => {
             if (window.dataManager) {
                 await dataManager.init();
-                classes = await dataManager.getAll('courses') || [];
+                const allCourses = await dataManager.getAll('courses') || [];
+                const user = dataManager.getCurrentUser();
+                if (user) {
+                    classes = allCourses.filter(c => c.instructorId === user.id);
+                }
             }
             renderCalendar();
             renderAgenda();
             lucide.createIcons();
         });
+
+        // MODAL LOGIC
+        function showLiveModal(id, title) {
+            currentSessionId = id;
+            document.getElementById('modalTitle').textContent = title;
+            const modal = document.getElementById('liveModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLiveModal() {
+            const modal = document.getElementById('liveModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function startLiveSession() {
+            // Simulation de lancement
+            closeLiveModal();
+            // Redirection vers la page live (ou simulation)
+            window.location.href = `live.html?session=${currentSessionId}`;
+        }
 
         // VIEW UTILS
         function setView(view) {
@@ -197,7 +245,6 @@
                 const numDays = new Date(y, m + 1, 0).getDate();
                 for (let i = 1; i <= numDays; i++) dates.push(new Date(y, m, i));
             }
-
             const results = [];
             dates.forEach(d => {
                 const dIdx = d.getDay();
@@ -241,8 +288,7 @@
                 for (let i = 1; i <= daysInMonth; i++) cells.push(new Date(y, m, i));
             } else {
                 // For week and day, we act slightly differently
-                const dates = getSessions(currentDate, currentView).map(s => s.date)
-                    .filter((val, id, arr) => arr.findIndex(t => t.getTime() === val.getTime()) === id); // Unique dates
+                const dates = getSessions(currentDate, currentView).map(s => s.date).filter((val, id, arr) => arr.findIndex(t => t.getTime() === val.getTime()) === id); // Unique dates
                 // Actually easier: just regenerate dates based on view
                 if (currentView === 'day') {
                     grid.className = 'flex flex-col gap-4';
@@ -256,7 +302,6 @@
             }
 
             const sessions = getSessions(currentDate, currentView);
-
             cells.forEach(date => {
                 const cell = document.createElement('div');
                 cell.className = (currentView === 'month') ? 'calendar-cell min-h-[120px] border relative group' :
@@ -281,10 +326,11 @@
 
                         chip.innerHTML = (currentView === 'month') ?
                             `<b>${s.start}</b> ${s.title}` :
-                            `<div class="font-bold">${s.start} - ${s.end}</div><div>${s.title}</div>`;
+                            `<div class="font-bold">${s.start} - ${s.end}</div>
+                                    <div>${s.title}</div>`;
 
-                        // LINK HERE
-                        chip.onclick = () => window.location.href = `class-details.html?id=${s.id}`;
+                        // LINK HERE - UPDATED TO SHOW MODAL
+                        chip.onclick = () => showLiveModal(s.id, s.title);
                         cell.appendChild(chip);
                     });
                 } else {
@@ -304,17 +350,18 @@
             }
 
             list.innerHTML = todaySessions.map(s => `
-                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <div class="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>${s.start} - ${s.end}</span>
-                        <span class="uppercase font-bold text-gray-400">${s.category}</span>
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>${s.start} - ${s.end}</span>
+                            <span class="uppercase font-bold text-gray-400">${s.category}</span>
+                        </div>
+                        <div class="font-bold text-gray-900 mb-2">${s.title}</div>
+                        <button onclick="showLiveModal('${s.id}', '${s.title.replace(/'/g, "\\'")}')" 
+                            class="w-full py-1.5 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
+                            Lancer
+                        </button>
                     </div>
-                    <div class="font-bold text-gray-900 mb-2">${s.title}</div>
-                    <button onclick="window.location.href='class-details.html?id=${s.id}'" class="w-full py-1.5 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
-                        Gérer
-                    </button>
-                </div>
-            `).join('');
+                `).join('');
         }
     </script>
 </body>

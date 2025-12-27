@@ -48,9 +48,7 @@
 <body class="bg-gray-50 text-gray-900">
 
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar Placeholder (Will be loaded by JS if needed, or we can hardcode for consistency) -->
-        <!-- Pour l'instant, je garde le chargement dynamique du Sidebar pour ne pas casser la navigation globale, 
-             mais je vais styliser le conteneur -->
+        <!-- Sidebar Placeholder -->
         <div id="sidebar-container"
             class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0 relative z-20"></div>
 
@@ -93,8 +91,8 @@
                     <!-- User Profile -->
                     <div class="flex items-center gap-3 pl-6 border-l border-gray-100">
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-bold text-gray-900">Ahmed Ben Ali</p>
-                            <p class="text-xs text-gray-500 font-medium">Formateur Principal</p>
+                            <p id="user-name" class="text-sm font-bold text-gray-900">Chargement...</p>
+                            <p id="user-role" class="text-xs text-gray-500 font-medium">Formateur</p>
                         </div>
                         <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
                             alt="Profile"
@@ -105,108 +103,170 @@
 
             <!-- Scrollable Content -->
             <main class="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth">
-                <div class="max-w-7xl mx-auto space-y-10">
+                <div class="max-w-7xl mx-auto space-y-8">
 
                     <!-- Welcome Section -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h2 class="text-3xl font-extrabold text-gray-900">Bonjour, Ahmed ! 👋</h2>
-                            <p class="text-gray-500 mt-1 font-medium">Voici ce qui se passe dans vos cours aujourd'hui.
-                            </p>
+                            <h2 class="text-3xl font-extrabold text-gray-900">Bonjour, <span id="welcome-name">Formateur</span> ! 👋</h2>
+                            <p class="text-gray-500 mt-1 font-medium">Voici un aperçu de votre activité et de vos revenus.</p>
                         </div>
-                        <button onclick="instructorDashboard.showCreateCourseModal()"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all hover:-translate-y-1 flex items-center gap-2">
-                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Nouveau Cours
-                        </button>
+                        <div class="flex gap-3">
+                             <a href="classes.html?openCreate=true"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all hover:-translate-y-1 flex items-center gap-2">
+                                <i data-lucide="plus" class="w-5 h-5"></i> Nouveau Cours
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Stats Container (Loaded Dynamically) -->
-                    <div id="statsContainer" class="animate-fade-in">
-                        <!-- Placeholder while loading -->
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse"></div>
-                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse delay-75"></div>
-                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse delay-150"></div>
-                            <div class="h-32 bg-gray-100 rounded-2xl animate-pulse delay-200"></div>
+                    <!-- Detailed Stats Grid (Reports) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="statsContainer">
+                        <!-- Total Revenue -->
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-green-50 text-green-600 rounded-xl group-hover:scale-110 transition-transform">
+                                    <i data-lucide="wallet" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">+12%</span>
+                            </div>
+                            <p class="text-gray-500 text-sm font-medium">Revenus Total</p>
+                            <h3 class="text-3xl font-extrabold text-gray-900 mt-1" id="stat-total-revenue">0 TND</h3>
+                            <p class="text-xs text-gray-400 mt-2">Total encaissé à ce jour</p>
+                        </div>
+
+                        <!-- Pending Payments (Outstanding) -->
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-orange-50 text-orange-600 rounded-xl group-hover:scale-110 transition-transform">
+                                    <i data-lucide="clock" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-lg">En attente</span>
+                            </div>
+                            <p class="text-gray-500 text-sm font-medium">Reste à Percevoir</p>
+                            <h3 class="text-3xl font-extrabold text-gray-900 mt-1" id="stat-pending-revenue">0 TND</h3>
+                            <p class="text-xs text-gray-400 mt-2">Paiements étudiants en attente</p>
+                        </div>
+
+                        <!-- Work Done (Hours) -->
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:scale-110 transition-transform">
+                                    <i data-lucide="hourglass" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm font-medium">Heures Enseignées</p>
+                            <h3 class="text-3xl font-extrabold text-gray-900 mt-1" id="stat-total-hours">0h</h3>
+                            <p class="text-xs text-gray-400 mt-2">Total des sessions terminées</p>
+                        </div>
+
+                        <!-- Active Students -->
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 bg-purple-50 text-purple-600 rounded-xl group-hover:scale-110 transition-transform">
+                                    <i data-lucide="users" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-lg">Actifs</span>
+                            </div>
+                            <p class="text-gray-500 text-sm font-medium">Étudiants Actifs</p>
+                            <h3 class="text-3xl font-extrabold text-gray-900 mt-1" id="stat-active-students">0</h3>
+                            <p class="text-xs text-gray-400 mt-2">Inscrits dans vos cours</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                        <!-- Next Live Session Card (Premium) -->
-                        <div
-                            class="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200 group">
-                            <!-- Background blobs -->
-                            <div
-                                class="absolute top-0 right-0 p-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700">
-                            </div>
-                            <div class="absolute bottom-0 left-0 p-20 bg-black/10 rounded-full blur-2xl -ml-10 -mb-10">
-                            </div>
-
-                            <div class="relative z-10">
-                                <div
-                                    class="flex items-center gap-2 mb-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg inline-block text-xs font-bold uppercase tracking-wider">
-                                    <i data-lucide="video" class="w-3 h-3 inline"></i> En direct dans
-                                </div>
-                                <h3 class="text-2xl md:text-4xl font-extrabold mb-2">Mathématiques Avancées</h3>
-                                <p class="text-indigo-100 font-medium mb-8">Session de révision pour l'examen final •
-                                    Terminale S</p>
-
-                                <div class="flex flex-wrap items-end gap-6">
-                                    <div class="flex gap-4">
-                                        <div
-                                            class="text-center bg-white/10 backdrop-blur-md rounded-xl p-3 min-w-[70px]">
-                                            <span class="block text-2xl font-bold">02</span>
-                                            <span class="text-[10px] uppercase font-bold text-indigo-200">Heures</span>
+                        <!-- Next Class & Countdown -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200 group">
+                                <!-- Decorative Elements -->
+                                <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                                <div class="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
+                                
+                                <div class="relative z-10">
+                                    <div class="flex justify-between items-start mb-8">
+                                        <div>
+                                            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 backdrop-blur-md text-xs font-bold uppercase tracking-wider text-indigo-100 border border-white/10 mb-3">
+                                                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Prochaine Session
+                                            </span>
+                                            <h3 class="text-3xl font-bold mb-1" id="next-class-title">Chargement...</h3>
+                                            <p class="text-indigo-200 text-sm" id="next-class-subtitle">Recherche de la prochaine séance...</p>
                                         </div>
-                                        <div
-                                            class="text-center bg-white/10 backdrop-blur-md rounded-xl p-3 min-w-[70px]">
-                                            <span class="block text-2xl font-bold">45</span>
-                                            <span class="text-[10px] uppercase font-bold text-indigo-200">Minutes</span>
+                                        <div class="text-right">
+                                            <div class="text-4xl font-mono font-bold tracking-tight" id="countdown-timer">--:--:--</div>
+                                            <p class="text-xs text-indigo-300 uppercase tracking-widest mt-1">Temps Restant</p>
                                         </div>
                                     </div>
-                                    <button
-                                        class="bg-white text-indigo-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold shadow-lg transition-all hover:scale-105 flex items-center gap-2">
-                                        Lancer le Live <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                                    </button>
+
+                                    <div class="flex items-center gap-4 mt-8">
+                                        <button id="btn-join-class" disabled 
+                                            class="bg-white text-indigo-900 px-8 py-3.5 rounded-xl font-bold hover:bg-indigo-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg">
+                                            <i data-lucide="video" class="w-5 h-5"></i> Rejoindre le Live
+                                        </button>
+                                        <button class="px-6 py-3.5 rounded-xl font-bold text-white border border-white/20 hover:bg-white/10 transition-all">
+                                            Voir Détails
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity / Messages -->
+                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="font-bold text-gray-900 text-lg">Activité Récente</h3>
+                                    <a href="messages.html" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">Voir tout</a>
+                                </div>
+                                <div class="space-y-4" id="recent-activity-list">
+                                    <!-- Dynamic Content -->
+                                    <div class="text-center py-8 text-gray-400 text-sm">Aucune activité récente</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Quick Actions & Mini Stats -->
+                        <!-- Shortcuts Grid -->
                         <div class="space-y-6">
-                            <!-- Active Students Card -->
-                            <div
-                                class="bg-white rounded-[1.5rem] p-6 border border-gray-100 shadow-xl shadow-gray-100 flex items-center justify-between hover:border-green-100 transition-colors">
-                                <div>
-                                    <p class="text-gray-500 font-medium text-sm mb-1">Étudiants en ligne</p>
-                                    <h4 class="text-3xl font-extrabold text-gray-900">42</h4>
-                                    <span class="text-xs font-bold text-green-500 flex items-center gap-1 mt-1">
-                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Actifs
-                                        maintenant
-                                    </span>
-                                </div>
-                                <div
-                                    class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                                    <i data-lucide="users" class="w-6 h-6"></i>
-                                </div>
-                            </div>
+                            <h3 class="font-bold text-gray-900 text-lg">Accès Rapide</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <a href="classes.html" class="p-4 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all group flex flex-col items-center gap-3 text-center cursor-pointer">
+                                    <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-700 text-sm">Mes Classes</span>
+                                </a>
 
-                            <!-- Messages Card -->
-                            <div class="bg-white rounded-[1.5rem] p-6 border border-gray-100 shadow-xl shadow-gray-100 flex items-center justify-between hover:border-blue-100 transition-colors cursor-pointer group"
-                                onclick="window.location.href='../etudiant/messages.html?role=formateur'">
-                                <div>
-                                    <p class="text-gray-500 font-medium text-sm mb-1">Messages non lus</p>
-                                    <h4 class="text-3xl font-extrabold text-gray-900">5</h4>
-                                    <span
-                                        class="text-xs font-bold text-blue-500 flex items-center gap-1 mt-1 group-hover:underline">
-                                        Voir les discussions
-                                    </span>
-                                </div>
-                                <div
-                                    class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-                                    <i data-lucide="message-square" class="w-6 h-6"></i>
-                                </div>
+                                <a href="calendar.html" class="p-4 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all group flex flex-col items-center gap-3 text-center cursor-pointer">
+                                    <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="calendar" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-700 text-sm">Calendrier</span>
+                                </a>
+
+                                <a href="messages.html" class="p-4 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all group flex flex-col items-center gap-3 text-center cursor-pointer relative">
+                                    <div class="w-12 h-12 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="message-circle" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-700 text-sm">Messages</span>
+                                    <span id="badge-messages" class="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span>
+                                </a>
+
+                                <a href="mediatheque.html" class="p-4 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all group flex flex-col items-center gap-3 text-center cursor-pointer">
+                                    <div class="w-12 h-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="folder" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-700 text-sm">Médiathèque</span>
+                                </a>
+
+                                <a href="paiements.html" class="p-4 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all group flex flex-col items-center gap-3 text-center cursor-pointer">
+                                    <div class="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-700 text-sm">Paiements</span>
+                                </a>
+
+                                <a href="profile.html" class="p-4 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all group flex flex-col items-center gap-3 text-center cursor-pointer">
+                                    <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="user" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-700 text-sm">Profil</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -237,9 +297,8 @@
 
     <!-- Scripts -->
     <script src="../../js/core/data-manager.js"></script>
-    <!-- Ajout de ?v=2 pour forcer le rechargement du cache et afficher la nouvelle sidebar -->
     <script src="../../js/components/sidebar-formateur.js?v=2"></script>
-    <script src="../../js/pages/instructor-dashboard.js"></script>
+    <script src="../../js/pages/instructor-dashboard.js?v=4"></script>
 
     <script>
         // Init Icons
