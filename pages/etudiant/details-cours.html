@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Cours - EduSpace</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#818cf8',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-900">
+
+    <!-- Navigation (Simplified) -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="catalogue.html" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white transform group-hover:rotate-12 transition-transform">
+                    <span class="font-bold text-xl">E</span>
+                </div>
+                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">EduSpace</span>
+            </a>
+            <button onclick="history.back()" class="text-gray-500 hover:text-indigo-600 font-medium flex items-center gap-2 transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Retour
+            </button>
+        </div>
+    </nav>
+
+    <div id="loading-state" class="min-h-screen flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+        <p class="text-gray-500 font-medium">Chargement du cours...</p>
+    </div>
+
+    <main id="course-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+            <a href="catalogue.html" class="hover:text-indigo-600 transition-colors">Catalogue</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span id="breadcrumb-category" class="hover:text-indigo-600 transition-colors cursor-pointer">Catégorie</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span class="text-gray-900 font-medium truncate max-w-[200px]" id="breadcrumb-title">...</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <!-- Left Column: Content -->
+            <div class="lg:col-span-2 space-y-12">
+                
+                <!-- Header Info -->
+                <div class="space-y-6">
+                    <h1 id="course-title" class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                        <!-- Course Title -->
+                    </h1>
+                    <p id="course-description-short" class="text-xl text-gray-600 leading-relaxed">
+                        <!-- Short Description -->
+                    </p>
+                    
+                    <div class="flex flex-wrap items-center gap-6 text-sm">
+                        <!-- Instructor -->
+                        <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                            <img id="instructor-avatar" src="" alt="" class="w-8 h-8 rounded-full bg-gray-200">
+                            <span class="font-bold text-gray-900">Par <span id="instructor-name" class="text-indigo-600">...</span></span>
+                        </div>
+                        
+                        <!-- Rating -->
+                        <div class="flex items-center gap-2 text-amber-500 font-bold bg-amber-50 px-3 py-1.5 rounded-lg">
+                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                            <span>4.8</span>
+                            <span class="text-gray-400 font-medium text-xs">(125 avis)</span>
+                        </div>
+
+                        <!-- Update Date -->
+                        <div class="flex items-center gap-2 text-gray-500">
+                            <i data-lucide="clock" class="w-4 h-4"></i>
+                            <span>Dernière mise à jour: <span class="text-gray-900 font-medium">Oct 2025</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cover Image (Mobile Only - distinct logic maybe? No, let's keep it consistent) -->
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl aspect-video lg:hidden">
+                    <img id="course-cover-mobile" src="" alt="Course Cover" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4">
+                         <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-bold border border-white/30 uppercase tracking-wide" id="course-category-badge-mobile">
+                            -
+                        </span>
+                    </div>
+                </div>
+
+                <!-- What you'll learn -->
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <i data-lucide="check-circle-2" class="w-6 h-6 text-indigo-600"></i>
+                        Ce que vous apprendrez
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <ul class="space-y-3" id="learn-list-1">
+                            <!-- Dynamic Items -->
+                            <li class="flex items-start gap-3 text-gray-600">
+                                <i data-lucide="check" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span>Maîtriser les concepts fondamentaux</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-600">
+                                <i data-lucide="check" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span>Créer des projets concrets et pratiques</span>
+                            </li>
+                        </ul>
+                        <ul class="space-y-3" id="learn-list-2">
+                            <li class="flex items-start gap-3 text-gray-600">
+                                <i data-lucide="check" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span>Développer une expertise professionnelle</span>
+                            </li>
+                             <li class="flex items-start gap-3 text-gray-600">
+                                <i data-lucide="check" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span>Obtenir une certification reconnue</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Course Content (Curriculum) -->
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Contenu du cours</h3>
+                    <div id="course-curriculum" class="space-y-4">
+                        <!-- Dynamic Chapters -->
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                     <h3 class="text-2xl font-bold text-gray-900 mb-6">Description</h3>
+                     <div id="course-description-full" class="prose prose-indigo text-gray-600 max-w-none">
+                        <!-- Full Description -->
+                     </div>
+                </div>
+                
+                 <!-- Instructor Bio -->
+                 <div class="bg-indigo-50/50 rounded-3xl p-8 border border-indigo-100">
+                    <h3 class="text-xl font-bold text-indigo-900 mb-6">Votre Formateur</h3>
+                    <div class="flex items-start gap-6">
+                         <img id="instructor-bio-avatar" src="" class="w-20 h-20 rounded-2xl object-cover shadow-md bg-white">
+                         <div>
+                             <h4 id="instructor-bio-name" class="text-lg font-bold text-gray-900 mb-1">...</h4>
+                             <p id="instructor-bio-role" class="text-indigo-600 font-medium text-sm mb-4">...</p>
+                             <p id="instructor-bio-text" class="text-gray-600 text-sm leading-relaxed">...</p>
+                             <div class="mt-4 flex gap-3">
+                                 <button class="px-4 py-2 bg-white rounded-xl text-xs font-bold text-gray-700 shadow-sm border border-gray-100 hover:text-indigo-600">Voir le profil</button>
+                             </div>
+                         </div>
+                    </div>
+                 </div>
+
+            </div>
+
+            <!-- Right Column: Sticky Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-24 space-y-6">
+                    <!-- Preview Card -->
+                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                        <!-- video/image preview -->
+                        <div class="relative aspect-video group cursor-pointer overflow-hidden">
+                             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors z-10"></div>
+                             <img id="course-cover-sidebar" src="" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                             <div class="absolute inset-0 flex items-center justify-center z-20">
+                                 <div class="w-16 h-16 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-indigo-600 shadow-lg group-hover:scale-110 transition-transform">
+                                     <i data-lucide="play" class="w-6 h-6 fill-current ml-1"></i>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="p-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex flex-col">
+                                    <span class="text-3xl font-bold text-gray-900" id="course-price">-- TND</span>
+                                    <span class="text-xs text-gray-400 font-bold line-through ml-1 mt-1">100 TND</span>
+                                </div>
+                                <span class="px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-lg">-50% OFF</span>
+                            </div>
+
+                            <button onclick="buyCourse()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:shadow-2xl hover:-translate-y-1 transition-all mb-4 flex items-center justify-center gap-2">
+                                <span>Acheter maintenant</span>
+                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            </button>
+                             <button class="w-full py-3 bg-white border-2 border-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-200 transition-colors mb-6">
+                                Ajouter au panier
+                            </button>
+
+                            <div class="space-y-4 text-sm text-gray-600">
+                                <p class="font-bold text-gray-900 mb-2">Ce cours inclut :</p>
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="video" class="w-4 h-4 text-indigo-500"></i>
+                                    <span>24 heures de vidéo à la demande</span>
+                                </div>
+                                 <div class="flex items-center gap-3">
+                                    <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i>
+                                    <span>5 articles et ressources</span>
+                                </div>
+                                 <div class="flex items-center gap-3">
+                                    <i data-lucide="infinity" class="w-4 h-4 text-indigo-500"></i>
+                                    <span>Accès illimité</span>
+                                </div>
+                                 <div class="flex items-center gap-3">
+                                    <i data-lucide="smartphone" class="w-4 h-4 text-indigo-500"></i>
+                                    <span>Accès sur mobile et TV</span>
+                                </div>
+                                 <div class="flex items-center gap-3">
+                                    <i data-lucide="award" class="w-4 h-4 text-indigo-500"></i>
+                                    <span>Certificat de fin de formation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/pages/course-details.js"></script>
+</body>
+</html>

@@ -336,11 +336,11 @@
                                             </div>
                                             
                                             <div class="flex gap-2">
-                                                <button onclick="window.location.href='../etudiant/mes-cours.html'" 
-                                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-gray-100 hover:text-indigo-600 transition-colors" title="Voir">
+                                                <button onclick="window.location.href='../etudiant/details-cours.html?id=${course.id}'" 
+                                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-gray-100 hover:text-indigo-600 transition-colors" title="Voir les détails">
                                                     <i data-lucide="eye" class="w-5 h-5"></i>
                                                 </button>
-                                                <button onclick="alert('Redirection vers le paiement pour: ${course.title}')" 
+                                                <button onclick="window.location.href='../etudiant/details-cours.html?id=${course.id}'" 
                                                         class="px-6 py-2.5 rounded-xl bg-gray-900 text-white font-bold text-sm shadow-lg shadow-gray-200 hover:bg-indigo-600 hover:shadow-indigo-200 hover:-translate-y-0.5 transition-all flex items-center gap-2">
                                                     <span>Acheter</span>
                                                     <i data-lucide="shopping-cart" class="w-4 h-4"></i>
