@@ -63,9 +63,25 @@
             if (!instructor) instructor = await dataManager.getById('instructors', instructorId);
 
             if (instructor) {
-                // Fetch courses for this instructor
-                const allCourses = await dataManager.getAll('courses');
-                instructor.coursesList = allCourses.filter(c => c.instructorId === instructor.id);
+                // Fetch courses and enrollments
+                const [allCourses, allEnrollments] = await Promise.all([
+                    dataManager.getAll('courses'),
+                    dataManager.getAll('enrollments')
+                ]);
+                
+                // Process Courses (Recorded/Live)
+                instructor.coursesList = allCourses.filter(c => c.instructorId === instructor.id && c.type !== 'class');
+
+                // Process Classes
+                const myClasses = allCourses.filter(c => c.instructorId === instructor.id && c.type === 'class');
+                instructor.classesList = myClasses.map(cls => {
+                    const studentCount = allEnrollments.filter(e => e.courseId === cls.id && e.status === 'active').length;
+                    return {
+                        ...cls,
+                        students: studentCount,
+                        days: cls.schedule || 'Emploi du temps non défini' // Fallback if no specific schedule field
+                    };
+                });
 
                 enrichInstructorData(instructor);
                 renderProfile(instructor);
@@ -118,12 +134,9 @@
                 instructor.coursesList = [];
             }
 
-            // Simulation Classes (Groupes)
+            // Simulation Classes (Groupes) - REMOVED (Now fetched from DB)
             if (!instructor.classesList) {
-                instructor.classesList = [
-                    { name: "Groupe Alpha", students: 12, days: "Lundi, Jeudi" },
-                    { name: "Groupe Beta", students: 8, days: "Mardi, Vendredi" }
-                ];
+                instructor.classesList = [];
             }
         }
 
@@ -313,20 +326,30 @@
                     <!-- CLASSES TAB -->
                     <div id="tab-classes" class="tab-content hidden animate-fade-in-up">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            ${(instructor.classesList || []).map(cls => `
-                                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-6 hover:shadow-lg transition-all">
-                                    <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 font-bold text-2xl">
-                                        ${cls.name.charAt(0)}
+                            ${(instructor.classesList || []).length === 0 ? `
+                                <div class="col-span-full flex flex-col items-center justify-center py-10 text-gray-400">
+                                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                                        <i data-lucide="calendar-x" class="w-8 h-8 opacity-50"></i>
                                     </div>
-                                    <div>
-                                        <h4 class="text-xl font-bold text-gray-900">${cls.name}</h4>
-                                        <p class="text-emerald-600 font-medium text-sm mb-2">${cls.students} Étudiants inscrits</p>
+                                    <p>Aucune classe active pour le moment.</p>
+                                </div>
+                            ` : (instructor.classesList || []).map(cls => `
+                                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-6 hover:shadow-lg transition-all group">
+                                    <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 font-bold text-2xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                        ${cls.title.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-xl font-bold text-gray-900 mb-1">${cls.title}</h4>
+                                        <p class="text-emerald-600 font-medium text-sm mb-2 flex items-center gap-1">
+                                            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                                            ${cls.students || 0} Étudiants inscrits
+                                        </p>
                                         <div class="flex items-center gap-2 text-xs text-gray-500">
-                                            <i data-lucide="calendar" class="w-4 h-4"></i>
-                                            ${cls.days}
+                                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                                            ${cls.category || 'Général'}
                                         </div>
                                     </div>
-                                    <button class="ml-auto w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-emerald-500 hover:text-white transition-all">
+                                    <button class="ml-auto w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-110">
                                         <i data-lucide="arrow-right" class="w-5 h-5"></i>
                                     </button>
                                 </div>
