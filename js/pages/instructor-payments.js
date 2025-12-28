@@ -354,8 +354,22 @@ class InstructorPayments {
             sessionStorage.setItem('user', JSON.stringify(this.currentInstructor));
             
             this.loadBankDetails();
-            this.closeBankModal();
-            alert("✅ Coordonnées bancaires enregistrées avec succès !");
+            
+            // Show Animation
+            document.getElementById('bank-config-form').classList.add('hidden');
+            document.getElementById('bank-config-success').classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // Wait and Close
+            setTimeout(() => {
+                this.closeBankModal();
+                // Reset for next time
+                setTimeout(() => {
+                    document.getElementById('bank-config-form').classList.remove('hidden');
+                    document.getElementById('bank-config-success').classList.add('hidden');
+                }, 300);
+            }, 1500);
+            // alert("✅ Coordonnées bancaires enregistrées avec succès !"); // REMOVED
 
         } catch (error) {
             console.error("Erreur lors de la sauvegarde:", error);

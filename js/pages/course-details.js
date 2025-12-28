@@ -242,7 +242,7 @@ window.handleCardPayment = async (e) => {
         enrolledAt: new Date().toISOString()
     };
     
-    await dataManager.add('enrollments', enrollment);
+    await dataManager.create('enrollments', enrollment);
     
     // Also log payment transaction logic here if needed (skipping for brevity)
     
@@ -275,7 +275,7 @@ window.handleTransferPayment = async (e) => {
         requestDate: new Date().toISOString()
     };
 
-    await dataManager.add('enrollments', enrollment);
+    await dataManager.create('enrollments', enrollment);
 
     closePaymentModal();
     alert("Votre demande a été envoyée ! Le formateur validera votre inscription sous peu.");

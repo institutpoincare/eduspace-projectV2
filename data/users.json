@@ -2,8 +2,8 @@
   {
     "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
     "name": "Ahmed Aboudi",
-    "email": "39dde5d494090f7243b3b3f7640d0a01:1135ff81b79ecd9b8d681a7ea609d500649ce23dab6523f4631389433ff70901",
-    "password": "a54d0266d0890cc0fd1fc4cd585f89bd:3ce8eb937e8f9de5916eb073685fc722",
+    "email": "2c7813942f2c2955429c345e4a5de371:e7bb36a64b623b6e7f767faaea1182f3397286599e3516747f58bb5ba2f0988c",
+    "password": "8a4654aa92b450e5c0bbb6d0d962cb04:d3770acc9c214e362f42d2639d7bf068",
     "role": "formateur",
     "specialite": "Anglais",
     "createdAt": "2025-12-19T09:54:23.964Z",
@@ -36,14 +36,19 @@
     },
     "coursesList": [],
     "videosList": [],
-    "updatedAt": "2025-12-27T19:56:02.810Z"
+    "updatedAt": "2025-12-28T12:48:08.286Z",
+    "bankDetails": {
+      "bankName": "BIAT",
+      "rib": "12345678901234567890",
+      "beneficiaryName": "AB"
+    }
   },
   {
     "id": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
     "name": "monji laagharr",
-    "email": "eb08df9ba42f5f87c8ff0762e3d9207d:f9f71782091c828df8d5a2fe8863694a10ac117baa3212fe06f41dc4234ecd20",
-    "phone": "da9b2efa34944325b23cbd5d276a2cd3:c2470f69fe8c68743590699281d38f49",
-    "password": "3770a0370d1d18594453d8bb2660119d:7b6fd1d07a4f1e630a82ceeadcf5604d",
+    "email": "0966f7eaa2dce1f413085d32fc13b144:2eb74c057d5c95be4144245fa331aabe22f0a22efbe9097bfae1ecd989698ca4",
+    "phone": "85acc8f2a8e70884c4d1a938da852420:4e0db6aca4ef210e4ffdac515c7bccf7",
+    "password": "d3b183478dfe2127212114242df5f2ef:f304b84dac8e55098271be4c12ce7a46",
     "role": "etudiant",
     "joinedAt": "2025-12-27T13:38:25.789Z",
     "createdAt": "2025-12-27T13:38:25.792Z"
