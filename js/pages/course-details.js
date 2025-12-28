@@ -164,7 +164,7 @@ window.closePaymentModal = () => {
     document.body.style.overflow = 'auto';
 };
 
-window.switchPaymentTab = (method) => {
+window.switchPaymentTab = async (method) => {
     const cardTab = document.getElementById('tab-payment-card');
     const transferTab = document.getElementById('tab-payment-transfer');
     const cardContent = document.getElementById('content-payment-card');
@@ -186,6 +186,26 @@ window.switchPaymentTab = (method) => {
 
         transferContent.classList.remove('hidden');
         cardContent.classList.add('hidden');
+
+        // Load Dynamic Bank Details
+        if (currentCourse) {
+            const instructor = await dataManager.getById('users', currentCourse.instructorId);
+            const container = document.querySelector('#content-payment-transfer .bg-gray-50');
+            
+            if (instructor && instructor.bankDetails) {
+                 container.innerHTML = `
+                    <p><span class="font-bold">RIB:</span> ${instructor.bankDetails.rib}</p>
+                    <p><span class="font-bold">Banque:</span> ${instructor.bankDetails.bankName}</p>
+                    <p><span class="font-bold">Bénéficiaire:</span> ${instructor.bankDetails.beneficiaryName}</p>
+                    <p><span class="font-bold">Motif:</span> <span id="transfer-ref">REF-${currentCourse.id.substring(0,6).toUpperCase()}</span></p>
+                `;
+            } else {
+                 container.innerHTML = `
+                    <p class="text-red-500 font-bold mb-2">Non configuré</p>
+                    <p class="text-xs text-gray-500">Ce formateur n'a pas encore configuré ses coordonnées bancaires.</p>
+                `;
+            }
+        }
     }
 };
 

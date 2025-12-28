@@ -31,6 +31,7 @@ class InstructorPayments {
 
         this.updateHeader();
         await this.loadPaymentData();
+        this.loadBankDetails();
     }
 
     updateHeader() {
