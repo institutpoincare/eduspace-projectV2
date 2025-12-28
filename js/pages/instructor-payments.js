@@ -254,29 +254,38 @@ class InstructorPayments {
     async approveAccess(enrollmentId) {
         if (!confirm("Confirmer la réception du paiement et débloquer l'accès ?")) return;
 
-        const allEnrollments = await dataManager.getAll('enrollments');
-        const index = allEnrollments.findIndex(e => e.id === enrollmentId);
-        
-        if (index !== -1) {
-            allEnrollments[index].status = 'active';
-            allEnrollments[index].activatedAt = new Date().toISOString();
+        try {
+            // Get the enrollment to check amountPaid/studentId
+            const enrollment = await dataManager.getById('enrollments', enrollmentId);
             
-            // Also create a payment record
-            const payment = {
-                id: dataManager.generateId(),
-                instructorId: this.currentInstructor.id,
-                amount: allEnrollments[index].amountPaid || 0, // Should be updated properly
-                status: 'paid',
-                date: new Date().toISOString(),
-                method: 'Virement',
-                description: 'Achat Cours (Validé)',
-                studentId: allEnrollments[index].studentId
-            };
-            await dataManager.add('payments', payment);
-            await dataManager.saveAll('enrollments', allEnrollments);
-            
-            this.init(); // Reload
-            alert("Accès validé avec succès !");
+            if (enrollment) {
+                // Update Enrollment Status
+                await dataManager.update('enrollments', enrollmentId, {
+                    status: 'active',
+                    activatedAt: new Date().toISOString()
+                });
+                
+                // Create Payment Record
+                const payment = {
+                    id: dataManager.generateId ? dataManager.generateId() : crypto.randomUUID(), // Fallback if generateId missing
+                    instructorId: this.currentInstructor.id,
+                    amount: enrollment.amountPaid || 0, // Should be updated properly from course price if 0
+                    status: 'paid',
+                    date: new Date().toISOString(),
+                    method: 'Virement',
+                    description: 'Achat Cours (Validé)',
+                    studentId: enrollment.studentId
+                };
+                
+                // Use create() not add()
+                await dataManager.create('payments', payment);
+                
+                this.init(); // Reload
+                alert("Accès validé avec succès !");
+            }
+        } catch (error) {
+            console.error("Erreur validation:", error);
+            alert("Erreur lors de la validation: " + error.message);
         }
     }
 
@@ -317,31 +326,40 @@ class InstructorPayments {
     }
 
     async saveBankDetails() {
-        const bankName = document.getElementById('config-bank-name').value;
-        const rib = document.getElementById('config-bank-rib').value;
-        const beneficiaryName = document.getElementById('config-bank-beneficiary').value;
+        console.log("💾 Tentative de sauvegarde...");
+        try {
+            const bankName = document.getElementById('config-bank-name').value;
+            const rib = document.getElementById('config-bank-rib').value;
+            const beneficiaryName = document.getElementById('config-bank-beneficiary').value;
 
-        if (!bankName || !rib || !beneficiaryName) {
-            alert("Veuillez remplir tous les champs.");
-            return;
-        }
+            console.log("Valeurs:", { bankName, rib, beneficiaryName });
 
-        // Update local object
-        this.currentInstructor.bankDetails = { bankName, rib, beneficiaryName };
-        
-        // Update Database
-        const allUsers = await dataManager.getAll('users');
-        const index = allUsers.findIndex(u => u.id === this.currentInstructor.id);
-        if (index !== -1) {
-            allUsers[index].bankDetails = this.currentInstructor.bankDetails;
-            await dataManager.saveAll('users', allUsers);
+            if (!bankName || !rib || !beneficiaryName) {
+                alert("Attention: Veuillez remplir tous les champs (Banque, RIB, Bénéficiaire).");
+                return;
+            }
+
+            // Update local object
+            this.currentInstructor.bankDetails = { bankName, rib, beneficiaryName };
+            
+            // Update Database (PUT request)
+            console.log("Mise à jour de l'utilisateur...", this.currentInstructor.id);
+            
+            // We use update() which handles the API call
+            await dataManager.update('users', this.currentInstructor.id, { 
+                bankDetails: this.currentInstructor.bankDetails 
+            });
             
             // Update Session
             sessionStorage.setItem('user', JSON.stringify(this.currentInstructor));
             
             this.loadBankDetails();
             this.closeBankModal();
-            alert("Coordonnées bancaires enregistrées !");
+            alert("✅ Coordonnées bancaires enregistrées avec succès !");
+
+        } catch (error) {
+            console.error("Erreur lors de la sauvegarde:", error);
+            alert("Une erreur est survenue lors de la sauvegarde: " + error.message);
         }
     }
 }

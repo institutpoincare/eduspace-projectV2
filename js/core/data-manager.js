@@ -112,6 +112,10 @@ class DataManager {
         return await this.getAll('enrollments');
     }
 
+    generateId() {
+        return 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    }
+
     getCurrentUser() {
         if (this.currentUser) return this.currentUser;
         const stored = sessionStorage.getItem('user');
