@@ -10,6 +10,8 @@ class StudentMessages {
     this.instructors = [];
     this.selectedMessage = null;
     this.currentFilter = 'all';
+    this.refreshInterval = null;
+    this.REFRESH_RATE = 3000; // تحديث كل 3 ثوانٍ
   }
 
   async init() {
@@ -25,6 +27,91 @@ class StudentMessages {
     await this.loadData();
     this.setupEventListeners();
     this.checkPendingChat();
+    this.startAutoRefresh();
+  }
+
+  /**
+   * بدء التحديث التلقائي للرسائل
+   */
+  startAutoRefresh() {
+    // إيقاف أي تحديث سابق
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
+
+    // بدء التحديث الدوري
+    this.refreshInterval = setInterval(async () => {
+      await this.refreshMessages();
+    }, this.REFRESH_RATE);
+
+    console.log('🔄 Auto-refresh started: every', this.REFRESH_RATE / 1000, 'seconds');
+  }
+
+  /**
+   * إيقاف التحديث التلقائي
+   */
+  stopAutoRefresh() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = null;
+      console.log('⏸️ Auto-refresh stopped');
+    }
+  }
+
+  /**
+   * تحديث الرسائل في الخلفية
+   */
+  async refreshMessages() {
+    try {
+      const allMessages = await dataManager.getAll('messages');
+      const newMessages = (allMessages || []).filter(msg => 
+        msg.from.id === this.currentUser.id || msg.to.id === this.currentUser.id
+      );
+
+      // التحقق من وجود رسائل جديدة أو تحديثات
+      const hasChanges = JSON.stringify(newMessages) !== JSON.stringify(this.messages);
+      
+      if (hasChanges) {
+        console.log('📬 New messages detected! Updating...');
+        this.messages = newMessages;
+        
+        // تحديث قائمة الرسائل
+        this.renderMessagesList();
+        this.updateUnreadCount();
+
+        // إذا كانت هناك رسالة محددة، تحديث تفاصيلها دون مسح حقل الرد
+        if (this.selectedMessage) {
+          const updatedMessage = this.messages.find(m => m.id === this.selectedMessage.id);
+          if (updatedMessage) {
+            // حفظ حالة حقل الرد قبل التحديث
+            const replyInput = document.getElementById('reply-input');
+            const savedReplyText = replyInput ? replyInput.value : '';
+            const wasFocused = replyInput && document.activeElement === replyInput;
+            const cursorPosition = replyInput ? replyInput.selectionStart : 0;
+            
+            this.selectedMessage = updatedMessage;
+            this.renderMessageDetail();
+            
+            // استعادة حالة حقل الرد بعد التحديث
+            if (savedReplyText || wasFocused) {
+              const newReplyInput = document.getElementById('reply-input');
+              if (newReplyInput) {
+                // استعادة النص
+                newReplyInput.value = savedReplyText;
+                
+                // استعادة التركيز وموضع المؤشر
+                if (wasFocused) {
+                  newReplyInput.focus();
+                  newReplyInput.setSelectionRange(cursorPosition, cursorPosition);
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing messages:', error);
+    }
   }
 
   checkPendingChat() {
@@ -158,6 +245,10 @@ class StudentMessages {
     const container = document.getElementById('message-detail-container');
     if (!container || !this.selectedMessage) return;
 
+    // إزالة كلاسات التوسيط الافتراضية لضمان أن المحتوى يأخذ كامل المساحة
+    container.classList.remove('items-center', 'justify-center', 'text-gray-400');
+    container.classList.add('block', 'h-full'); // ضمان أن الحاوية تأخذ الارتفاع الكامل
+
     const isSent = this.selectedMessage.from.id === this.currentUser.id;
     const otherPerson = isSent ? this.selectedMessage.to : this.selectedMessage.from;
 
@@ -254,6 +345,12 @@ class StudentMessages {
         e.preventDefault();
         this.sendReply();
       });
+    }
+
+    // Scroll to bottom
+    const historyContainer = container.querySelector('.custom-scrollbar');
+    if (historyContainer) {
+      historyContainer.scrollTop = historyContainer.scrollHeight;
     }
   }
 

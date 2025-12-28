@@ -1,9 +1,9 @@
 [
   {
-    "id": "msg_1766841416014",
+    "id": "msg_1766863496714",
     "from": {
-      "id": "4b482bf4-d29c-41f9-a7de-49fe27509e91",
-      "name": "ahmed aboudi",
+      "id": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+      "name": "monji laagharr",
       "role": "etudiant",
       "avatar": ""
     },
@@ -12,37 +12,18 @@
       "name": "Ahmed Aboudi",
       "role": "formateur"
     },
-    "subject": "demande de formation",
-    "message": "bonjour",
+    "subject": "First Message",
+    "message": "Testing with clean DB",
     "isRead": true,
-    "createdAt": "2025-12-27T13:16:56.016Z",
-    "replies": [
-      {
-        "id": "reply_1766841432705",
-        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-        "message": "bonjour",
-        "createdAt": "2025-12-27T13:17:12.705Z"
-      },
-      {
-        "id": "reply_1766841452011",
-        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-        "message": "cava",
-        "createdAt": "2025-12-27T13:17:32.011Z"
-      },
-      {
-        "id": "reply_1766841461184",
-        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-        "message": "ffffffffffffffff",
-        "createdAt": "2025-12-27T13:17:41.184Z"
-      }
-    ],
-    "updatedAt": "2025-12-27T13:17:41.187Z"
+    "createdAt": "2025-12-27T19:24:56.715Z",
+    "replies": [],
+    "updatedAt": "2025-12-28T08:07:33.484Z"
   },
   {
-    "id": "msg_1766841519776",
+    "id": "msg_1766909812635",
     "from": {
-      "id": "c164e1cd-9b68-4481-b07e-ffb6414c71a8",
-      "name": "monji laaghar",
+      "id": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+      "name": "monji laagharr",
       "role": "etudiant",
       "avatar": ""
     },
@@ -51,10 +32,48 @@
       "name": "Ahmed Aboudi",
       "role": "formateur"
     },
-    "subject": "hhhhh",
-    "message": "hhhhhh",
-    "isRead": false,
-    "createdAt": "2025-12-27T13:18:39.779Z",
-    "replies": []
+    "subject": "ddzd",
+    "message": "dzdfbhjg",
+    "isRead": true,
+    "createdAt": "2025-12-28T08:16:52.635Z",
+    "replies": [
+      {
+        "id": "reply_1766909831686",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "jkkhjytrhjryjhry",
+        "createdAt": "2025-12-28T08:17:11.686Z"
+      },
+      {
+        "id": "reply_1766909845745",
+        "from": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+        "message": "aaaaaaaaaaaa",
+        "createdAt": "2025-12-28T08:17:25.745Z"
+      },
+      {
+        "id": "reply_1766909852402",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "createdAt": "2025-12-28T08:17:32.402Z"
+      },
+      {
+        "id": "reply_1766909857799",
+        "from": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+        "message": "ccccccccccccccccccc",
+        "createdAt": "2025-12-28T08:17:37.799Z"
+      },
+      {
+        "id": "reply_1766909865379",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "dddddddddddddddddddddddddddd",
+        "createdAt": "2025-12-28T08:17:45.379Z"
+      },
+      {
+        "id": "reply_1766909871758",
+        "from": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+        "message": "eeeeeeeeeeeeeeeeeeeeee",
+        "createdAt": "2025-12-28T08:17:51.758Z"
+      }
+    ],
+    "updatedAt": "2025-12-28T08:17:51.757Z"
   }
 ]

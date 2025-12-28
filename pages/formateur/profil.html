@@ -17,32 +17,30 @@
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-[#f8f9fc] font-sans antialiased text-gray-800">
 
     <!-- Navbar -->
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
+    <nav class="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-gray-100 shadow-sm transition-all duration-300">
         <div class="container mx-auto px-6 h-20 flex items-center justify-between">
-            <a href="../../index.html" class="flex items-center gap-2">
-                <div
-                    class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-200">
-                    E</div>
-                <span
-                    class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">EduSpace</span>
+            <a href="../../index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-200 group-hover:shadow-indigo-300 transition-all transform group-hover:scale-105">E</div>
+                <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">EduSpace</span>
             </a>
             <div class="hidden md:flex items-center gap-8">
-                <a href="../../index.html"
-                    class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Accueil</a>
-                <a href="../etudiant/catalogue.html"
-                    class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Catalogue</a>
+                <a href="../../index.html" class="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors uppercase tracking-wide">Accueil</a>
+                <a href="../etudiant/catalogue.html" class="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors uppercase tracking-wide">Catalogue</a>
             </div>
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 py-8" id="profileContent">
+    <main class="container mx-auto px-4 py-8 max-w-7xl relative" id="profileContent">
         <!-- Loader -->
-        <div class="flex flex-col items-center justify-center min-h-[60vh]">
-            <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-            <p class="text-gray-500 font-medium">Chargement du profil...</p>
+        <div class="flex flex-col items-center justify-center min-h-[70vh]">
+            <div class="relative w-20 h-20">
+                <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <p class="mt-6 text-gray-400 font-medium tracking-wide animate-pulse">Chargement du profil...</p>
         </div>
     </main>
 
@@ -53,177 +51,330 @@
             lucide.createIcons();
             await dataManager.init();
 
-            // Récupérer l'ID depuis l'URL
             const urlParams = new URLSearchParams(window.location.search);
             const instructorId = urlParams.get('id') || localStorage.getItem('selectedInstructor');
 
             if (!instructorId) {
-                document.getElementById('profileContent').innerHTML = `
-                    <div class="text-center py-20">
-                        <h2 class="text-2xl font-bold text-gray-800">Formateur non trouvé</h2>
-                        <a href="../etudiant/catalogue.html" class="text-indigo-600 hover:underline mt-4 inline-block">Retour au catalogue</a>
-                    </div>
-                `;
+                showError("Aucun identifiant de formateur fourni.");
                 return;
             }
 
-            const instructor = await dataManager.getById('instructors', instructorId);
+            let instructor = await dataManager.getById('users', instructorId);
+            if (!instructor) instructor = await dataManager.getById('instructors', instructorId);
 
             if (instructor) {
+                enrichInstructorData(instructor);
                 renderProfile(instructor);
             } else {
-                // Fallback si l'ID n'est pas trouvé (pour demo)
-                renderProfile({
-                    name: 'Formateur Inconnu',
-                    specialty: 'Expert',
-                    image: `https://ui-avatars.com/api/?name=${instructorId}&background=random`,
-                    bio: 'Description non disponible',
-                    rating: '4.5',
-                    students: '0',
-                    cv: { education: [], experience: [], skills: [], languages: [] }
-                });
+                showError("Le profil demandé est introuvable.");
             }
         });
 
+        function showError(message) {
+            document.getElementById('profileContent').innerHTML = `
+                <div class="flex flex-col items-center justify-center py-32 text-center">
+                    <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-6 shadow-red-100">
+                        <i data-lucide="user-x" class="w-10 h-10"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">Oups !</h2>
+                    <p class="text-gray-500 text-lg mb-8 max-w-md mx-auto">${message}</p>
+                    <a href="../etudiant/catalogue.html" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all hover:-translate-y-1">
+                        Retour au catalogue
+                    </a>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function enrichInstructorData(instructor) {
+            // Placeholder Data
+            if (!instructor.bio) instructor.bio = "Professeur passionné avec plus de 10 ans d'expérience dans l'enseignement. J'aide mes étudiants à atteindre leur plein potentiel grâce à des méthodes pédagogiques innovantes.";
+            if (!instructor.image) instructor.image = `https://ui-avatars.com/api/?name=${encodeURIComponent(instructor.name)}&background=random&size=512`;
+            
+            // NOTE: We don't force a video here anymore to test the "Welcome Image" fallback
+            // But if users enters one in CreateCV, it will be used.
+            // instructor.presentationVideo = "https://www.youtube.com/watch?v=LXb3EKWsInQ"; 
+
+            // Simulation CV
+            if (!instructor.cv) {
+                instructor.cv = {
+                    experience: [
+                        { title: "Enseignant Senior", company: "Lycée Pilote", period: "2018 - Présent", description: "Responsable du département mathématiques." },
+                        { title: "Professeur", company: "Collège Espoir", period: "2015 - 2018", description: "Enseignement des bases et préparation aux examens." }
+                    ],
+                    education: [
+                        { degree: "Master en Pédagogie", school: "Université de Tunis", year: "2015" },
+                        { degree: "Licence Mathématiques", school: "FST", year: "2013" }
+                    ]
+                };
+            }
+
+            // Simulation Cours (Matières)
+            if (!instructor.coursesList) {
+                instructor.coursesList = [
+                    { title: "Algèbre Avancée", level: "Baccalauréat", icon: "sigma" },
+                    { title: "Géométrie dans l'espace", level: "3ème année", icon: "triangle" },
+                    { title: "Analyse", level: "Universitaire", icon: "activity" }
+                ];
+            }
+
+            // Simulation Classes (Groupes)
+            if (!instructor.classesList) {
+                instructor.classesList = [
+                    { name: "Groupe Alpha", students: 12, days: "Lundi, Jeudi" },
+                    { name: "Groupe Beta", students: 8, days: "Mardi, Vendredi" }
+                ];
+            }
+        }
+
+        function getYoutubeEmbed(url) {
+            if (!url) return null;
+            let videoId = null;
+            if (url.includes('youtube.com/watch?v=')) {
+                videoId = url.split('v=')[1];
+                const ampersandPosition = videoId.indexOf('&');
+                if (ampersandPosition !== -1) {
+                  videoId = videoId.substring(0, ampersandPosition);
+                }
+            } else if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1];
+            }
+            
+            if(videoId) {
+                return `https://www.youtube.com/embed/${videoId}`;
+            }
+            return null;
+        }
+
         function renderProfile(instructor) {
             const container = document.getElementById('profileContent');
-            const cv = instructor.cv || { education: [], experience: [], skills: [], languages: [] };
+            const cv = instructor.cv;
+            const embedUrl = getYoutubeEmbed(instructor.presentationVideo);
 
             container.innerHTML = `
-                <!-- Header Card -->
-                <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden mb-8 relative">
-                    <div class="h-48 profile-header-bg relative">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <!-- Hero Header -->
+                <div class="fixed top-0 left-0 w-full h-[500px] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 -z-10">
+                    <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" class="w-full h-full object-cover opacity-20 mix-blend-overlay">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#f8f9fc] via-[#f8f9fc]/80 to-transparent"></div>
+                </div>
+
+                <!-- Profile Info Card -->
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-white/50 mt-20 relative overflow-hidden animate-fade-in-up">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <i data-lucide="award" class="w-64 h-64 text-indigo-900 transform rotate-12"></i>
                     </div>
+
+                    <div class="flex flex-col md:flex-row gap-10 items-start relative z-10">
+                        <!-- Left Side: Avatar & Info -->
+                        <div class="flex-1 space-y-6">
+                            <div class="flex items-center gap-6">
+                                <div class="relative group">
+                                    <div class="w-32 h-32 rounded-[2rem] p-1 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-xl">
+                                        <img src="${instructor.image}" alt="${instructor.name}" class="w-full h-full object-cover rounded-[1.8rem] border-4 border-white bg-white">
+                                    </div>
+                                    <div class="absolute -bottom-2 -right-2 bg-white p-2 rounded-xl shadow-lg border border-gray-100 flex items-center gap-1 animate-bounce-slow">
+                                        <i data-lucide="check-circle" class="w-4 h-4 text-green-500 fill-current"></i>
+                                        <span class="font-bold text-gray-800 text-xs">Vérifié</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">${instructor.name}</h1>
+                                    <p class="text-lg text-indigo-600 font-bold flex items-center gap-2">
+                                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                                        ${instructor.specialty || 'Enseignant'}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-600 text-lg leading-relaxed max-w-xl">${instructor.bio}</p>
+
+                            <div class="flex flex-wrap gap-4">
+                                <div class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-bold flex items-center gap-2 border border-indigo-100 text-sm">
+                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    ${instructor.rating || '4.8'} Note
+                                </div>
+                                <div class="px-4 py-2 bg-purple-50 text-purple-700 rounded-xl font-bold flex items-center gap-2 border border-purple-100 text-sm">
+                                    <i data-lucide="users" class="w-4 h-4"></i>
+                                    ${instructor.students || '50+'} Élèves
+                                </div>
+                                <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl font-bold flex items-center gap-2 border border-emerald-100 text-sm">
+                                    <i data-lucide="clock" class="w-4 h-4"></i>
+                                    ${instructor.experience || '5 ans'} Exp.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Video Presentation or Welcome Image -->
+                        <div class="w-full md:w-[450px] aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border-4 border-white relative group">
+                            ${embedUrl ? `
+                                <iframe src="${embedUrl}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            ` : `
+                                <div class="w-full h-full relative">
+                                    <img src="${instructor.image}" class="w-full h-full object-cover opacity-60 group-hover:opacity-70 transition-opacity duration-500 transform group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent flex flex-col items-center justify-end pb-8 text-center p-6">
+                                        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl transform translate-y-0 group-hover:-translate-y-2 transition-transform duration-500">
+                                            <h3 class="text-white font-bold text-2xl mb-2 flex items-center justify-center gap-2">
+                                                <span>👋</span> Bienvenue !
+                                            </h3>
+                                            <p class="text-gray-100 text-sm font-medium">Découvrez mon univers pédagogique<br>et commencez votre apprentissage.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="flex justify-center mt-12 mb-8">
+                    <div class="bg-white p-1.5 rounded-2xl shadow-lg border border-gray-100 inline-flex flex-wrap justify-center gap-2" id="tabs-nav">
+                        <button onclick="switchTab('parcours')" class="tab-btn active px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-white bg-gray-900 shadow-md" data-tab="parcours">
+                            <i data-lucide="briefcase" class="w-4 h-4"></i> Parcours
+                        </button>
+                        <button onclick="switchTab('cours')" class="tab-btn px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-gray-500 hover:bg-gray-50 hover:text-gray-900" data-tab="cours">
+                            <i data-lucide="book" class="w-4 h-4"></i> Mes Cours
+                        </button>
+                        <button onclick="switchTab('classes')" class="tab-btn px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-gray-500 hover:bg-gray-50 hover:text-gray-900" data-tab="classes">
+                            <i data-lucide="users" class="w-4 h-4"></i> Classes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="space-y-8 min-h-[400px]">
                     
-                    <div class="px-8 pb-8">
-                        <div class="flex flex-col md:flex-row items-end -mt-16 mb-6 gap-6 relative z-10">
-                            <img src="${instructor.image}" alt="${instructor.name}" class="w-32 h-32 rounded-2xl border-4 border-white shadow-2xl object-cover bg-white">
-                            <div class="flex-1 text-white md:text-gray-900 mb-2 md:mb-0">
-                                <h1 class="text-4xl font-bold mb-1 drop-shadow-lg md:drop-shadow-none">${instructor.name}</h1>
-                                <p class="text-indigo-200 md:text-indigo-600 font-medium text-lg">${instructor.specialty}</p>
-                            </div>
-                            <div class="flex gap-3">
-                                <button onclick="window.location.href='../etudiant/messages.html'" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
-                                    <i data-lucide="message-circle" class="w-5 h-5"></i> Contacter
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 border-b border-gray-100 pb-8">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-600">
-                                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
-                                </div>
-                                <div>
-                                    <p class="text-2xl font-bold text-gray-900">${instructor.rating}</p>
-                                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Note Moyenne</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                                    <i data-lucide="users" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <p class="text-2xl font-bold text-gray-900">${instructor.students}</p>
-                                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Étudiants</p>
+                    <!-- PARCOURS TAB -->
+                    <div id="tab-parcours" class="tab-content block animate-fade-in-up">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Experience -->
+                            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                                    <div class="p-3 bg-purple-100 rounded-xl text-purple-600"><i data-lucide="briefcase" class="w-6 h-6"></i></div>
+                                    Expériences
+                                </h3>
+                                <div class="space-y-8 relative pl-8 border-l-2 border-purple-100 ml-4">
+                                    ${(cv.experience || []).map(exp => `
+                                        <div class="relative group">
+                                            <div class="absolute -left-[41px] top-1 w-5 h-5 bg-white border-4 border-purple-500 rounded-full group-hover:scale-125 transition-transform"></div>
+                                            <h4 class="font-bold text-lg text-gray-900">${exp.title}</h4>
+                                            <div class="text-purple-600 font-bold text-sm mb-2">${exp.company}</div>
+                                            <p class="text-gray-500 text-sm mb-2 font-mono bg-gray-50 inline-block px-2 py-1 rounded">${exp.period}</p>
+                                            <p class="text-gray-600 text-sm">${exp.description || ''}</p>
+                                        </div>
+                                    `).join('')}
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
-                                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                             <!-- Education -->
+                            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                                    <div class="p-3 bg-indigo-100 rounded-xl text-indigo-600"><i data-lucide="graduation-cap" class="w-6 h-6"></i></div>
+                                    Formation
+                                </h3>
+                                <div class="space-y-8 relative pl-8 border-l-2 border-indigo-100 ml-4">
+                                    ${(cv.education || []).map(edu => `
+                                        <div class="relative group">
+                                            <div class="absolute -left-[41px] top-1 w-5 h-5 bg-white border-4 border-indigo-500 rounded-full group-hover:scale-125 transition-transform"></div>
+                                            <h4 class="font-bold text-lg text-gray-900">${edu.degree}</h4>
+                                            <div class="text-indigo-600 font-bold text-sm mb-2">${edu.school}</div>
+                                            <p class="text-gray-500 text-sm font-mono bg-gray-50 inline-block px-2 py-1 rounded">${edu.year}</p>
+                                        </div>
+                                    `).join('')}
                                 </div>
-                                <div>
-                                    <p class="text-2xl font-bold text-gray-900">${instructor.experience || '5 ans'}</p>
-                                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Expérience</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                                    <i data-lucide="dollar-sign" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <p class="text-2xl font-bold text-gray-900">${instructor.price || '50 TND'}</p>
-                                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Taux Horaire</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <!-- Left Column: Bio & Skills -->
-                            <div class="space-y-8">
-                                <section>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">À Propos</h3>
-                                    <p class="text-gray-600 leading-relaxed">${instructor.bio || "Passionné par l'enseignement et expert dans mon domaine, je m'engage à fournir une éducation de qualité supérieure adaptée aux besoins de chaque étudiant."}</p>
-                                </section>
-
-                                <section>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Compétences</h3>
-                                    <div class="flex flex-wrap gap-2">
-                                        ${(cv.skills || ['Enseignement', 'Pédagogie', 'Coaching']).map(skill => `
-                                            <span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors">${skill}</span>
-                                        `).join('')}
-                                    </div>
-                                </section>
-                                
-                                <section>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Langues</h3>
-                                    <div class="space-y-2">
-                                        ${(cv.languages || ['Français', 'Anglais']).map(lang => `
-                                            <div class="flex items-center justify-between text-sm">
-                                                <span class="text-gray-700">${lang}</span>
-                                                <span class="text-green-600 font-bold">Courant</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </section>
-                            </div>
-
-                            <!-- Right Column: CV Timeline -->
-                            <div class="lg:col-span-2 space-y-8">
-                                <section>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                        <i data-lucide="graduation-cap" class="w-6 h-6 text-indigo-600"></i>
-                                        Parcours Académique
-                                    </h3>
-                                    <div class="space-y-6 border-l-2 border-indigo-100 pl-8 ml-3 relative">
-                                        ${(cv.education || [{ degree: 'Diplôme Supérieur', school: 'Université', year: '2015' }]).map(edu => `
-                                            <div class="relative">
-                                                <div class="absolute -left-[41px] top-1 w-5 h-5 bg-white border-4 border-indigo-600 rounded-full"></div>
-                                                <h4 class="font-bold text-lg text-gray-900">${edu.degree}</h4>
-                                                <p class="text-indigo-600 font-medium mb-1">${edu.school}</p>
-                                                <p class="text-gray-500 text-sm">${edu.year}</p>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                        <i data-lucide="briefcase" class="w-6 h-6 text-purple-600"></i>
-                                        Expérience Professionnelle
-                                    </h3>
-                                    <div class="space-y-6 border-l-2 border-purple-100 pl-8 ml-3 relative">
-                                        ${(cv.experience || [{ title: 'Expert', company: 'Freelance', period: '2018 - Présent' }]).map(exp => `
-                                            <div class="relative">
-                                                <div class="absolute -left-[41px] top-1 w-5 h-5 bg-white border-4 border-purple-600 rounded-full"></div>
-                                                <h4 class="font-bold text-lg text-gray-900">${exp.title}</h4>
-                                                <p class="text-purple-600 font-medium mb-1">${exp.company}</p>
-                                                <p class="text-gray-500 text-sm">${exp.period}</p>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </section>
                             </div>
                         </div>
                     </div>
+
+                    <!-- COURS TAB -->
+                    <div id="tab-cours" class="tab-content hidden animate-fade-in-up">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            ${(instructor.coursesList || []).map(course => `
+                                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
+                                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                        <i data-lucide="${course.icon || 'book-open'}" class="w-7 h-7"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-900 mb-2">${course.title}</h4>
+                                    <p class="text-gray-500 text-sm mb-4">Niveau: <span class="font-bold text-gray-700">${course.level}</span></p>
+                                    <button class="w-full py-3 rounded-xl bg-gray-50 text-gray-600 font-bold text-sm hover:bg-gray-100 transition-colors">Voir le programme</button>
+                                </div>
+                            `).join('')}
+                             <div class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center p-6 text-center hover:bg-gray-100 transition-colors cursor-default">
+                                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mb-4">
+                                    <i data-lucide="plus" class="w-6 h-6"></i>
+                                </div>
+                                <p class="text-gray-400 font-bold">Plus de cours à venir</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CLASSES TAB -->
+                    <div id="tab-classes" class="tab-content hidden animate-fade-in-up">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            ${(instructor.classesList || []).map(cls => `
+                                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-6 hover:shadow-lg transition-all">
+                                    <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 font-bold text-2xl">
+                                        ${cls.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-gray-900">${cls.name}</h4>
+                                        <p class="text-emerald-600 font-medium text-sm mb-2">${cls.students} Étudiants inscrits</p>
+                                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                                            ${cls.days}
+                                        </div>
+                                    </div>
+                                    <button class="ml-auto w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-emerald-500 hover:text-white transition-all">
+                                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
                 </div>
             `;
 
             lucide.createIcons();
+            
+            // Add style for animations
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-up {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Tab Switching Logic
+        window.switchTab = function(tabName) {
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.remove('text-gray-500', 'bg-transparent', 'hover:bg-gray-50');
+                    btn.classList.add('bg-gray-900', 'text-white', 'shadow-md');
+                } else {
+                    btn.classList.add('text-gray-500', 'bg-transparent', 'hover:bg-gray-50');
+                    btn.classList.remove('bg-gray-900', 'text-white', 'shadow-md');
+                }
+            });
+
+            // Update Content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            const selectedContent = document.getElementById('tab-' + tabName);
+            if(selectedContent) {
+                selectedContent.classList.remove('hidden');
+                // Re-trigger animation
+                selectedContent.classList.remove('animate-fade-in-up');
+                void selectedContent.offsetWidth; // Trigger reflow
+                selectedContent.classList.add('animate-fade-in-up');
+            }
         }
     </script>
 </body>

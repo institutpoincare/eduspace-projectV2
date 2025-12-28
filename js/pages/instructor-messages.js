@@ -9,17 +9,24 @@ class InstructorMessages {
         this.messages = [];
         this.selectedMessage = null;
         this.currentFilter = 'all';
+        this.refreshInterval = null;
+        this.previousUnreadCount = 0;
+        this.REFRESH_RATE = 3000; // تحديث كل 3 ثوانٍ
     }
 
     async init() {
         console.log('📧 Initialisation du système de messages...');
         await dataManager.init();
 
-        // Récupérer l'utilisateur actuel depuis la session
-        const user = sessionStorage.getItem('user');
-        if (user) {
-            this.currentUser = JSON.parse(user);
+        // Récupérer l'utilisateur actuel - vérifier localStorage puis sessionStorage
+        let userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+        
+        if (userStr) {
+            this.currentUser = JSON.parse(userStr);
+            // Synchroniser avec sessionStorage pour cohérence
+            sessionStorage.setItem('user', userStr);
         } else {
+            console.warn('⚠️ Aucun utilisateur trouvé, redirection...');
             window.location.href = '../../pages/login-formateur.html';
             return;
         }
@@ -34,6 +41,107 @@ class InstructorMessages {
 
         await this.loadMessages();
         this.updateUnreadCount();
+        this.startAutoRefresh();
+    }
+
+    /**
+     * بدء التحديث التلقائي للرسائل
+     */
+    startAutoRefresh() {
+        // إيقاف أي تحديث سابق
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+
+        // بدء التحديث الدوري
+        this.refreshInterval = setInterval(async () => {
+            await this.refreshMessages();
+        }, this.REFRESH_RATE);
+
+        console.log('🔄 Auto-refresh started: every', this.REFRESH_RATE / 1000, 'seconds');
+    }
+
+    /**
+     * إيقاف التحديث التلقائي
+     */
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+            console.log('⏸️ Auto-refresh stopped');
+        }
+    }
+
+    /**
+     * تحديث الرسائل في الخلفية
+     */
+    async refreshMessages() {
+        try {
+            const allMessages = await dataManager.getAll('messages');
+            const newMessages = allMessages.filter(msg => 
+                msg.to.id === this.currentUser.id || msg.from.id === this.currentUser.id
+            );
+
+            // ترتيب الرسائل حسب التاريخ (الأحدث أولاً)
+            newMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // التحقق من وجود رسائل جديدة أو تحديثات
+            const hasChanges = JSON.stringify(newMessages) !== JSON.stringify(this.messages);
+            
+            if (hasChanges) {
+                console.log('📬 New messages detected! Updating...');
+                
+                // حفظ الرسالة المحددة الحالية
+                const currentSelectedId = this.selectedMessage?.id;
+                
+                // حساب عدد الرسائل غير المقروءة الجديدة
+                const newUnreadCount = newMessages.filter(m => !m.isRead && m.to.id === this.currentUser.id).length;
+                const hasNewUnread = newUnreadCount > this.previousUnreadCount;
+                
+                this.messages = newMessages; // Already sorted((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // تحديث قائمة الرسائل
+                this.renderMessagesList();
+                this.updateUnreadCount();
+
+                // إظهار إشعار إذا كانت هناك رسائل جديدة
+                if (hasNewUnread) {
+                    this.showNotification(newUnreadCount - this.previousUnreadCount);
+                }
+
+                // إذا كانت هناك رسالة محددة، تحديث تفاصيلها دون مسح حقل الرد
+                if (currentSelectedId) {
+                    const updatedMessage = this.messages.find(m => m.id === currentSelectedId);
+                    if (updatedMessage) {
+                        // حفظ حالة حقل الرد قبل التحديث
+                        const replyInput = document.getElementById('reply-text');
+                        const savedReplyText = replyInput ? replyInput.value : '';
+                        const wasFocused = replyInput && document.activeElement === replyInput;
+                        const cursorPosition = replyInput ? replyInput.selectionStart : 0;
+                        
+                        this.selectedMessage = updatedMessage;
+                        this.renderMessageDetail();
+                        
+                        // استعادة حالة حقل الرد بعد التحديث
+                        if (savedReplyText || wasFocused) {
+                            const newReplyInput = document.getElementById('reply-text');
+                            if (newReplyInput) {
+                                // استعادة النص
+                                newReplyInput.value = savedReplyText;
+                                
+                                // استعادة التركيز وموضع المؤشر
+                                if (wasFocused) {
+                                    newReplyInput.focus();
+                                    newReplyInput.setSelectionRange(cursorPosition, cursorPosition);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error refreshing messages:', error);
+        }
     }
 
     async loadMessages() {
@@ -43,6 +151,9 @@ class InstructorMessages {
             this.messages = allMessages.filter(msg => 
                 msg.to.id === this.currentUser.id || msg.from.id === this.currentUser.id
             );
+            
+            // تهيئة عداد الرسائل غير المقروءة
+            this.previousUnreadCount = this.messages.filter(m => !m.isRead && m.to.id === this.currentUser.id).length;
             
             console.log('📧 Total messages dans la base:', allMessages.length);
             console.log('✅ Messages du formateur:', this.messages.length);
@@ -147,6 +258,10 @@ class InstructorMessages {
         const container = document.getElementById('message-detail-container');
         if (!container || !this.selectedMessage) return;
 
+        // إزالة كلاسات التوسيط الافتراضية
+        container.classList.remove('items-center', 'justify-center', 'text-gray-400', 'flex');
+        container.classList.add('block', 'h-full');
+
         const msg = this.selectedMessage;
         const roleIcon = msg.from.role === 'parent' ? 'users' : 'user';
         const roleLabel = msg.from.role === 'parent' ? 'Parent' : 'Étudiant';
@@ -186,15 +301,19 @@ class InstructorMessages {
                             <h4 class="font-bold text-gray-700 flex items-center gap-2">
                                 <i data-lucide="message-circle" class="w-4 h-4"></i> Réponses
                             </h4>
-                            ${msg.replies.map(reply => `
-                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 ml-8">
+                            ${msg.replies.map(reply => {
+                                const isMyReply = reply.from === this.currentUser.id;
+                                const replyFrom = isMyReply ? this.currentUser : msg.from;
+                                return `
+                                <div class="${isMyReply ? 'bg-blue-50 border-blue-200 ml-8' : 'bg-gray-50 border-gray-200 mr-8'} border rounded-xl p-4">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-bold text-blue-900">Vous</span>
-                                        <span class="text-xs text-blue-600">${this.formatDate(reply.createdAt)}</span>
+                                        <span class="font-bold ${isMyReply ? 'text-blue-900' : 'text-gray-900'}">${isMyReply ? 'Vous' : replyFrom.name}</span>
+                                        <span class="text-xs ${isMyReply ? 'text-blue-600' : 'text-gray-600'}">${this.formatDate(reply.createdAt)}</span>
                                     </div>
                                     <p class="text-gray-700 leading-relaxed whitespace-pre-line">${reply.message}</p>
                                 </div>
-                            `).join('')}
+                            `;
+                            }).join('')}
                         </div>
                     ` : ''}
                 </div>
@@ -217,6 +336,12 @@ class InstructorMessages {
         `;
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Scroll to bottom
+        const historyContainer = container.querySelector('.custom-scrollbar');
+        if (historyContainer) {
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+        }
     }
 
     async sendReply() {
@@ -246,11 +371,14 @@ class InstructorMessages {
     }
 
     updateUnreadCount() {
-        const unreadCount = this.messages.filter(m => !m.isRead).length;
+        const unreadCount = this.messages.filter(m => !m.isRead && m.to.id === this.currentUser.id).length;
         const countEl = document.getElementById('unread-count');
         if (countEl) {
             countEl.textContent = unreadCount;
         }
+
+        // تحديث العداد السابق
+        this.previousUnreadCount = unreadCount;
 
         // Update global notification badge
         this.updateGlobalNotification(unreadCount);
@@ -264,6 +392,73 @@ class InstructorMessages {
         
         // Store in localStorage for other pages
         localStorage.setItem('unreadMessagesCount', count);
+    }
+
+    /**
+     * إظهار إشعار عند وصول رسائل جديدة
+     */
+    showNotification(newMessagesCount) {
+        // إشعار صوتي
+        this.playNotificationSound();
+        
+        // إشعار مرئي في أعلى الصفحة
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-4 rounded-lg shadow-2xl z-50 animate-bounce';
+        notification.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i data-lucide="mail" class="w-6 h-6"></i>
+                <div>
+                    <p class="font-bold">Nouveau${newMessagesCount > 1 ? 'x' : ''} message${newMessagesCount > 1 ? 's' : ''}!</p>
+                    <p class="text-sm opacity-90">Vous avez ${newMessagesCount} nouveau${newMessagesCount > 1 ? 'x' : ''} message${newMessagesCount > 1 ? 's' : ''}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 hover:bg-blue-700 rounded p-1">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        
+        // إزالة الإشعار تلقائياً بعد 5 ثوانٍ
+        setTimeout(() => {
+            notification.style.transition = 'opacity 0.5s';
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 500);
+        }, 5000);
+        
+        // تحديث عنوان الصفحة
+        const originalTitle = document.title;
+        document.title = `(${newMessagesCount}) Nouveau${newMessagesCount > 1 ? 'x' : ''} message${newMessagesCount > 1 ? 's' : ''}!`;
+        setTimeout(() => {
+            document.title = originalTitle;
+        }, 5000);
+    }
+
+    /**
+     * تشغيل صوت الإشعار
+     */
+    playNotificationSound() {
+        // استخدام Web Audio API لإنشاء صوت بسيط
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (e) {
+            console.log('Notification sound not available');
+        }
     }
 
     filterMessages(filter) {
@@ -325,3 +520,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     await window.instructorMessages.init();
     lucide.createIcons();
 });
+

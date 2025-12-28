@@ -1,77 +1,51 @@
 [
   {
-    "id": "133fa808-933e-4d53-a8bf-4b59aab3746a",
-    "name": "ahmed",
-    "email": "d741face085f78973b288295029b0cd2:b0d1364d0b6400f4c6ee9038284cb245",
-    "password": "fa6907731b286065823354b063377f7e:ce2c95c2c9262302cf8acaf815c07d4e",
-    "role": "formateur",
-    "specialite": "français",
-    "createdAt": "2025-12-18T11:21:49.178Z"
-  },
-  {
-    "id": "598c39a1-9517-4f5a-9ba4-78da9cebd2a5",
-    "name": "monia boughanmi",
-    "email": "8e768063b68a1b45557ad5752d3366ab:74bc7d2946b81466f455e2c62510cbce",
-    "password": "c67fd711ce1e90098821e688bf1e9192:6d535c0c9f72ede37770de231c70ba93",
-    "role": "formateur",
-    "specialite": "anglais",
-    "createdAt": "2025-12-18T11:25:22.970Z"
-  },
-  {
-    "id": "bfbdc08e-64e8-4026-a662-7093d1e0a846",
-    "name": "Salma Trabelsi",
-    "email": "2a6e362da1f2102f35a50e6815a091c8:baf449a18b13553c15c13372948ac2c2e2664742fba915bfcbdc9a3637225a471c68ff892b1571c37aa739e67b488f8ff23664180a93948ac2f8d694f72d4464",
-    "password": "076fb986dda18a9b8daa210af7cf0b37:7cd6daacffd6fe3cb638118ac744746f7c7a511c216a944a7237ef8fe2f8a82d",
-    "role": "formateur",
-    "specialite": "Informatique",
-    "createdAt": "2025-12-18T11:29:06.997Z"
-  },
-  {
-    "id": "7c18df05-9a23-4af1-9049-83a093896ae3",
-    "name": "monji aboudi",
-    "email": "375cdbcc5c6552dcfbaa315ece68f774:6073dda3f09201da621cc01b0a663a6e",
-    "password": "fd77da8382322760314c6fe56f3d23ec:2376be5c53a7a7d7e65f2d37215aaabe",
-    "role": "formateur",
-    "specialite": "allemand",
-    "createdAt": "2025-12-18T11:34:09.814Z"
-  },
-  {
     "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-    "name": "ahmed aboudi",
-    "email": "744133ae899c2f744cfa71609b019fd6:1121e8e11c53fda2e892af725d6b4fd9b3b3b90643f14957c0431ce54a60ef79",
-    "password": "fc61166b8793a8eb0c467114cfa210b1:5a0348ca521c72af76c7ba45ce430271",
+    "name": "Ahmed Aboudi",
+    "email": "39dde5d494090f7243b3b3f7640d0a01:1135ff81b79ecd9b8d681a7ea609d500649ce23dab6523f4631389433ff70901",
+    "password": "a54d0266d0890cc0fd1fc4cd585f89bd:3ce8eb937e8f9de5916eb073685fc722",
     "role": "formateur",
     "specialite": "Anglais",
-    "createdAt": "2025-12-19T09:54:23.964Z"
+    "createdAt": "2025-12-19T09:54:23.964Z",
+    "services": {
+      "live": {
+        "url": "https://meet.google.com/abc-defg-hij",
+        "active": true
+      },
+      "videos": {
+        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "active": true
+      },
+      "presentiel": {
+        "active": false,
+        "location": "Tunis"
+      }
+    },
+    "specialty": "",
+    "bio": "",
+    "price": "",
+    "cv": {
+      "experience": [
+        {
+          "title": "Test Experience",
+          "company": "Test School",
+          "period": "2024"
+        }
+      ],
+      "education": []
+    },
+    "coursesList": [],
+    "videosList": [],
+    "updatedAt": "2025-12-27T19:56:02.810Z"
   },
   {
-    "id": "4b482bf4-d29c-41f9-a7de-49fe27509e91",
-    "name": "ahmed aboudi",
-    "email": "63919aee352354ad68c6774ad86e5d81:8a2f6afaa2f1d8b4732508ff7821e8cb167361d8cd3e691a098dc4aca4cc12d2",
-    "phone": "92bc0d973ba17b4dc78e4ed3f3d55556:8d7b8c9c5e4089c4326c15b3eae88706",
-    "password": "016736eab041a7fe1f9a3086a099ec80:f97293dc3b08bf88e3cdde5b69081ea3",
+    "id": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+    "name": "monji laagharr",
+    "email": "eb08df9ba42f5f87c8ff0762e3d9207d:f9f71782091c828df8d5a2fe8863694a10ac117baa3212fe06f41dc4234ecd20",
+    "phone": "da9b2efa34944325b23cbd5d276a2cd3:c2470f69fe8c68743590699281d38f49",
+    "password": "3770a0370d1d18594453d8bb2660119d:7b6fd1d07a4f1e630a82ceeadcf5604d",
     "role": "etudiant",
-    "joinedAt": "2025-12-23T20:16:07.882Z",
-    "createdAt": "2025-12-23T20:16:07.886Z"
-  },
-  {
-    "id": "4ef4fa6f-cabf-441a-8707-035a1232bb74",
-    "name": "TestStudent2",
-    "email": "7db83b6e4bfd2062e2e0fa4a494493d6:21e6cdad1cda2bb1da4d8ad9459de5bbd738e1c1d47b4e4b373e0c1e5740b4fa",
-    "phone": "d9710313b34d9d84db6272d008014aeb:642fbc500a26839b6bc56f84416f0768",
-    "password": "d59776b51e4af245167a800f29731ac4:0f1bb7113b5ec4b2d9ce2a463c84d27b",
-    "role": "etudiant",
-    "joinedAt": "2025-12-23T20:29:30.981Z",
-    "createdAt": "2025-12-23T20:29:30.982Z"
-  },
-  {
-    "id": "c164e1cd-9b68-4481-b07e-ffb6414c71a8",
-    "name": "monji laaghar",
-    "email": "ad50c5ed68800360e92a2fa4673d556b:e94285639e3b361e305160bebe558a90",
-    "phone": "253d76ba2758374aaab8f808c551c9b2:5244e4091f40e3cd7af166dd78d72967",
-    "password": "284a3445a2f6f1fb26ff71beb2541ed2:0bd4d64e0189d08140c9e71627ac3547",
-    "role": "etudiant",
-    "joinedAt": "2025-12-27T13:18:24.130Z",
-    "createdAt": "2025-12-27T13:18:24.133Z"
+    "joinedAt": "2025-12-27T13:38:25.789Z",
+    "createdAt": "2025-12-27T13:38:25.792Z"
   }
 ]
