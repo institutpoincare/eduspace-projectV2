@@ -247,6 +247,36 @@
         </main>
     </div>
 
+    <!-- Bank Config Modal -->
+    <div id="bank-config-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="instructorPayments.closeBankModal()"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 relative z-10 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-800">Configuration Bancaire</h3>
+                <button onclick="instructorPayments.closeBankModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nom de la Banque</label>
+                    <input type="text" id="config-bank-name" placeholder="Ex: BIAT, STB..." class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">RIB (20 chiffres)</label>
+                    <input type="text" id="config-bank-rib" placeholder="00 000 0000000000000 00" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nom du Bénéficiaire</label>
+                    <input type="text" id="config-bank-beneficiary" placeholder="Votre nom complet" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all">
+                </div>
+                <button onclick="instructorPayments.saveBankDetails()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all">
+                    Enregistrer les coordonnées
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Imports -->
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js?v=2"></script>

@@ -285,7 +285,67 @@ class InstructorPayments {
         await dataManager.delete('enrollments', enrollmentId);
         this.init();
     }
+    async loadBankDetails() {
+        if (this.currentInstructor.bankDetails) {
+            const { bankName, rib, beneficiaryName } = this.currentInstructor.bankDetails;
+            
+            // Update UI Card
+            const cardTitle = document.querySelector('.bg-white.rounded-2xl.p-6 .font-bold.text-slate-800');
+            const cardSub = document.querySelector('.bg-white.rounded-2xl.p-6 .text-sm.text-slate-500');
+            
+            if (cardTitle) cardTitle.textContent = bankName || 'Virement Bancaire';
+            if (cardSub) cardSub.textContent = (rib ? `RIB: ${rib}` : 'Non configuré');
+        }
+    }
+
+    openBankModal() {
+        const modal = document.getElementById('bank-config-modal');
+        if (!modal) return;
+        
+        // Pre-fill
+        if (this.currentInstructor.bankDetails) {
+            document.getElementById('config-bank-name').value = this.currentInstructor.bankDetails.bankName || '';
+            document.getElementById('config-bank-rib').value = this.currentInstructor.bankDetails.rib || '';
+            document.getElementById('config-bank-beneficiary').value = this.currentInstructor.bankDetails.beneficiaryName || '';
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    closeBankModal() {
+        document.getElementById('bank-config-modal').classList.add('hidden');
+    }
+
+    async saveBankDetails() {
+        const bankName = document.getElementById('config-bank-name').value;
+        const rib = document.getElementById('config-bank-rib').value;
+        const beneficiaryName = document.getElementById('config-bank-beneficiary').value;
+
+        if (!bankName || !rib || !beneficiaryName) {
+            alert("Veuillez remplir tous les champs.");
+            return;
+        }
+
+        // Update local object
+        this.currentInstructor.bankDetails = { bankName, rib, beneficiaryName };
+        
+        // Update Database
+        const allUsers = await dataManager.getAll('users');
+        const index = allUsers.findIndex(u => u.id === this.currentInstructor.id);
+        if (index !== -1) {
+            allUsers[index].bankDetails = this.currentInstructor.bankDetails;
+            await dataManager.saveAll('users', allUsers);
+            
+            // Update Session
+            sessionStorage.setItem('user', JSON.stringify(this.currentInstructor));
+            
+            this.loadBankDetails();
+            this.closeBankModal();
+            alert("Coordonnées bancaires enregistrées !");
+        }
+    }
 }
 
 const instructorPayments = new InstructorPayments();
+window.instructorPayments = instructorPayments;
 document.addEventListener('DOMContentLoaded', () => instructorPayments.init());
