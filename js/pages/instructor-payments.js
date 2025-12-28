@@ -231,9 +231,9 @@ class InstructorPayments {
                     <p class="text-xs text-gray-500">Virement Bancaire</p>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500">
-                    <div class="flex items-center gap-1 cursor-pointer hover:text-indigo-600" onclick="alert('Voir le reçu: ${req.receipt}')">
-                        <i data-lucide="file-text" class="w-4 h-4"></i>
-                        Reçu #${req.id.substring(0,4)}
+                    <div class="flex items-center gap-1 cursor-pointer text-indigo-600 hover:text-indigo-800 hover:underline" onclick="instructorPayments.viewReceipt('${req.receipt}')">
+                        <i data-lucide="eye" class="w-4 h-4"></i>
+                        Voir le reçu
                     </div>
                 </td>
                 <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
@@ -375,6 +375,41 @@ class InstructorPayments {
             console.error("Erreur lors de la sauvegarde:", error);
             alert("Une erreur est survenue lors de la sauvegarde: " + error.message);
         }
+    }
+
+    viewReceipt(receiptUrl) {
+        const modal = document.getElementById('receipt-modal');
+        const img = document.getElementById('receipt-image');
+        const error = document.getElementById('receipt-error');
+        const downloadBtn = document.getElementById('receipt-download');
+        
+        if (!modal || !img) return;
+
+        // Reset state
+        img.classList.remove('hidden');
+        error.classList.add('hidden');
+
+        // Handle path (simulation)
+        // In a real app, receiptUrl would be a full path or relative to uploads
+        // Here we simulate checking if it's the default string
+        let src = receiptUrl;
+        if (!src || src === 'recu_virement_simule.jpg') {
+             // For demo, let's use a placeholder if it's the default string
+             src = 'https://placehold.co/600x800/e2e8f0/475569?text=Reçu+Simulé'; 
+        }
+
+        img.src = src;
+        img.onerror = () => {
+            img.classList.add('hidden');
+            error.classList.remove('hidden');
+        };
+
+        downloadBtn.href = src;
+        modal.classList.remove('hidden');
+    }
+
+    closeReceiptModal() {
+        document.getElementById('receipt-modal').classList.add('hidden');
     }
 }
 
