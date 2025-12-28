@@ -255,32 +255,58 @@ window.handleTransferPayment = async (e) => {
     e.preventDefault();
     const user = dataManager.getCurrentUser();
     
-    // Simulate Upload
+    // Get File
+    const fileInput = document.getElementById('file-upload');
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Veuillez sélectionner un fichier (reçu).");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert("Le fichier est trop volumineux (max 5MB).");
+        return;
+    }
+
     const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.innerHTML;
     btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>`;
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    await new Promise(r => setTimeout(r, 1500));
+    // Convert to Base64
+    const toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 
-    // CREATE PENDING ENROLLMENT
-    const enrollment = {
-        id: dataManager.generateId(),
-        studentId: user.id,
-        courseId: currentCourse.id,
-        status: 'pending',
-        paymentMethod: 'transfer',
-        receipt: 'recu_virement_simule.jpg', // In real app, this would be the uploaded path
-        amountPaid: 0, // Not verified yet
-        requestDate: new Date().toISOString()
-    };
+    try {
+        const base64Receipt = await toBase64(file);
 
-    await dataManager.create('enrollments', enrollment);
+        // CREATE PENDING ENROLLMENT
+        const enrollment = {
+            id: dataManager.generateId(),
+            studentId: user.id,
+            courseId: currentCourse.id,
+            status: 'pending',
+            paymentMethod: 'transfer',
+            receipt: base64Receipt, // STORE THE IMAGE DATA
+            amountPaid: 0, // Not verified yet
+            requestDate: new Date().toISOString()
+        };
 
-    closePaymentModal();
-    alert("Votre demande a été envoyée ! Le formateur validera votre inscription sous peu.");
-    // Maybe redirect to 'mes-cours.html' or stay here?
-    window.location.href = 'mes-cours.html'; 
+        await dataManager.create('enrollments', enrollment);
+
+        closePaymentModal();
+        alert("Votre demande a été envoyée ! Le formateur validera votre inscription sous peu.");
+        window.location.href = 'mes-cours.html'; 
+
+    } catch (error) {
+        console.error("Erreur upload:", error);
+        alert("Erreur lors de l'envoi du reçu.");
+        btn.innerHTML = originalText;
+    }
 };
 
 // Update load logic to store current course

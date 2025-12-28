@@ -389,22 +389,29 @@ class InstructorPayments {
         img.classList.remove('hidden');
         error.classList.add('hidden');
 
-        // Handle path (simulation)
-        // In a real app, receiptUrl would be a full path or relative to uploads
-        // Here we simulate checking if it's the default string
         let src = receiptUrl;
+        
+        // Handle placeholders only if explicitly the old dummy or empty
         if (!src || src === 'recu_virement_simule.jpg') {
-             // For demo, let's use a placeholder if it's the default string
              src = 'https://placehold.co/600x800/e2e8f0/475569?text=Reçu+Simulé'; 
         }
+        // If it sends large Base64, it might fail in some console logs but works in src
 
         img.src = src;
         img.onerror = () => {
+            console.warn("Erreur chargement image:", src.substring(0, 50) + "...");
             img.classList.add('hidden');
             error.classList.remove('hidden');
         };
 
+        // For base64, download works better with a filename
         downloadBtn.href = src;
+        if (src.startsWith('data:')) {
+            downloadBtn.download = 'recu-paiement.png';
+        } else {
+            downloadBtn.removeAttribute('download'); // Let browser decide
+        }
+        
         modal.classList.remove('hidden');
     }
 
