@@ -63,6 +63,10 @@
             if (!instructor) instructor = await dataManager.getById('instructors', instructorId);
 
             if (instructor) {
+                // Fetch courses for this instructor
+                const allCourses = await dataManager.getAll('courses');
+                instructor.coursesList = allCourses.filter(c => c.instructorId === instructor.id);
+
                 enrichInstructorData(instructor);
                 renderProfile(instructor);
             } else {
@@ -109,13 +113,9 @@
                 };
             }
 
-            // Simulation Cours (Matières)
+            // Simulation Cours (Matières) - REMOVED (Now fetched from DB)
             if (!instructor.coursesList) {
-                instructor.coursesList = [
-                    { title: "Algèbre Avancée", level: "Baccalauréat", icon: "sigma" },
-                    { title: "Géométrie dans l'espace", level: "3ème année", icon: "triangle" },
-                    { title: "Analyse", level: "Universitaire", icon: "activity" }
-                ];
+                instructor.coursesList = [];
             }
 
             // Simulation Classes (Groupes)
@@ -290,12 +290,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             ${(instructor.coursesList || []).map(course => `
                                 <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-                                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                        <i data-lucide="${course.icon || 'book-open'}" class="w-7 h-7"></i>
+                                    <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                        <i data-lucide="video" class="w-7 h-7"></i>
                                     </div>
-                                    <h4 class="text-xl font-bold text-gray-900 mb-2">${course.title}</h4>
-                                    <p class="text-gray-500 text-sm mb-4">Niveau: <span class="font-bold text-gray-700">${course.level}</span></p>
-                                    <button class="w-full py-3 rounded-xl bg-gray-50 text-gray-600 font-bold text-sm hover:bg-gray-100 transition-colors">Voir le programme</button>
+                                    <h4 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2" title="${course.title}">${course.title}</h4>
+                                    <p class="text-gray-500 text-sm mb-4">Catégorie: <span class="font-bold text-gray-700">${course.category || 'Général'}</span></p>
+                                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                                        <span class="text-lg font-bold text-indigo-600">${course.price > 0 ? course.price + ' TND' : 'Gratuit'}</span>
+                                        <button class="px-4 py-2 rounded-xl bg-gray-50 text-gray-600 font-bold text-xs hover:bg-gray-100 transition-colors">Voir</button>
+                                    </div>
                                 </div>
                             `).join('')}
                              <div class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center p-6 text-center hover:bg-gray-100 transition-colors cursor-default">
