@@ -139,6 +139,26 @@
                 </div>
 
                 <div class="grid lg:grid-cols-3 gap-8">
+                     <!-- Access Requests (Pending Transfers) -->
+                    <div class="lg:col-span-3 mb-4 hidden" id="requests-container">
+                        <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 shadow-sm relative overflow-hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-lg text-amber-900 flex items-center gap-2">
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    Demandes d'accès (Virements)
+                                </h3>
+                                <span class="bg-amber-200 text-amber-800 px-3 py-1 rounded-full text-xs font-bold" id="requests-count">0 en attente</span>
+                            </div>
+                            <div class="bg-white rounded-xl border border-amber-100 overflow-hidden">
+                                <table class="w-full">
+                                    <tbody id="access-requests-list" class="divide-y divide-gray-100">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Transactions List -->
                     <div class="lg:col-span-2">
                         <div class="flex items-center justify-between mb-6">

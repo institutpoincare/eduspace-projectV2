@@ -122,11 +122,159 @@ window.toggleChapter = (index) => {
     }
 };
 
-window.buyCourse = () => {
-    const courseTitle = document.getElementById('course-title').textContent;
-    // Simulate purchase flow
-    alert(`Redirection vers la passerelle de paiement pour : ${courseTitle}`);
+// --- Modal & Payment Logic ---
+
+let currentCourse = null;
+
+window.buyCourse = async () => {
+    if (!currentCourse) return;
+
+    // Check if user is logged in
+    const user = dataManager.getCurrentUser();
+    if (!user) {
+        alert("Veuillez vous connecter pour acheter ce cours.");
+        // window.location.href = '/login.html'; // In real app
+        return;
+    }
+
+    // Check if already enrolled
+    const enrollments = await dataManager.getAll('enrollments');
+    const existing = enrollments.find(e => e.studentId === user.id && e.courseId === currentCourse.id);
+    
+    if (existing) {
+        if (existing.status === 'active') {
+             alert("Vous possédez déjà ce cours !");
+        } else if (existing.status === 'pending') {
+             alert("Votre demande d'inscription est en cours de validation.");
+        }
+        return;
+    }
+
+    // Open Modal
+    document.getElementById('modal-course-title').textContent = currentCourse.title;
+    document.getElementById('btn-amount-card').textContent = `${currentCourse.price} TND`;
+    document.getElementById('transfer-ref').textContent = `REF-${currentCourse.id.substring(0,6).toUpperCase()}`;
+    
+    document.getElementById('payment-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
 };
+
+window.closePaymentModal = () => {
+    document.getElementById('payment-modal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+};
+
+window.switchPaymentTab = (method) => {
+    const cardTab = document.getElementById('tab-payment-card');
+    const transferTab = document.getElementById('tab-payment-transfer');
+    const cardContent = document.getElementById('content-payment-card');
+    const transferContent = document.getElementById('content-payment-transfer');
+
+    if (method === 'card') {
+        cardTab.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'bg-indigo-50/50');
+        cardTab.classList.remove('text-gray-500');
+        transferTab.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'bg-indigo-50/50');
+        transferTab.classList.add('text-gray-500');
+        
+        cardContent.classList.remove('hidden');
+        transferContent.classList.add('hidden');
+    } else {
+        transferTab.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'bg-indigo-50/50');
+        transferTab.classList.remove('text-gray-500');
+        cardTab.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'bg-indigo-50/50');
+        cardTab.classList.add('text-gray-500');
+
+        transferContent.classList.remove('hidden');
+        cardContent.classList.add('hidden');
+    }
+};
+
+window.updateFileName = (input) => {
+    const fileName = document.getElementById('file-name');
+    if (input.files.length > 0) {
+        fileName.textContent = input.files[0].name;
+        fileName.classList.remove('hidden');
+    } else {
+        fileName.classList.add('hidden');
+    }
+};
+
+window.handleCardPayment = async (e) => {
+    e.preventDefault();
+    const user = dataManager.getCurrentUser();
+    
+    // Simulate Processing
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>`;
+    lucide.createIcons();
+
+    await new Promise(r => setTimeout(r, 1500)); // Fake delay
+
+    // CREATE ACTIVE ENROLLMENT
+    const enrollment = {
+        id: dataManager.generateId(),
+        studentId: user.id,
+        courseId: currentCourse.id,
+        status: 'active',
+        paymentMethod: 'card',
+        amountPaid: currentCourse.price,
+        enrolledAt: new Date().toISOString()
+    };
+    
+    await dataManager.add('enrollments', enrollment);
+    
+    // Also log payment transaction logic here if needed (skipping for brevity)
+    
+    closePaymentModal();
+    alert("Paiement réussi ! Vous avez maintenant accès au cours.");
+    window.location.href = 'mes-cours.html';
+};
+
+window.handleTransferPayment = async (e) => {
+    e.preventDefault();
+    const user = dataManager.getCurrentUser();
+    
+    // Simulate Upload
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>`;
+    lucide.createIcons();
+
+    await new Promise(r => setTimeout(r, 1500));
+
+    // CREATE PENDING ENROLLMENT
+    const enrollment = {
+        id: dataManager.generateId(),
+        studentId: user.id,
+        courseId: currentCourse.id,
+        status: 'pending',
+        paymentMethod: 'transfer',
+        receipt: 'recu_virement_simule.jpg', // In real app, this would be the uploaded path
+        amountPaid: 0, // Not verified yet
+        requestDate: new Date().toISOString()
+    };
+
+    await dataManager.add('enrollments', enrollment);
+
+    closePaymentModal();
+    alert("Votre demande a été envoyée ! Le formateur validera votre inscription sous peu.");
+    // Maybe redirect to 'mes-cours.html' or stay here?
+    window.location.href = 'mes-cours.html'; 
+};
+
+// Update load logic to store current course
+const originalLoad = loadCourseDetails;
+loadCourseDetails = async () => {
+    // Override to capture data
+    const params = new URLSearchParams(window.location.search);
+    const courseId = params.get('id');
+    if(courseId) {
+        currentCourse = await dataManager.getById('courses', courseId);
+    }
+    await originalLoad(); // Call original rendering
+};
+
 
 function showError(msg) {
     document.getElementById('loading-state').innerHTML = `<p class="text-red-500 font-bold">${msg}</p>`;

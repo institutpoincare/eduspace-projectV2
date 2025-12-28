@@ -62,6 +62,7 @@ class InstructorPayments {
 
             this.updateStats(totalRevenue, pendingAmount);
             this.renderTransactions(this.transactions);
+            this.loadAccessRequests(); // New function call
         } catch (error) {
             console.error('❌ Erreur chargement données paiements:', error);
             this.updateStats(0, 0);
@@ -173,6 +174,115 @@ class InstructorPayments {
         });
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    async loadAccessRequests() {
+        const container = document.getElementById('requests-container');
+        const list = document.getElementById('access-requests-list');
+        const countBadge = document.getElementById('requests-count');
+        
+        if (!container || !list) return;
+
+        // Fetch All Enrollments
+        const allEnrollments = await dataManager.getAll('enrollments');
+        // Filter: Pending + Transfer + Current Instructor's Course
+        // Need to get courses first to match instructorId
+        const allCourses = await dataManager.getAll('courses');
+        const myCourseIds = allCourses.filter(c => c.instructorId === this.currentInstructor.id).map(c => c.id);
+
+        const requests = allEnrollments.filter(e => 
+            e.status === 'pending' && 
+            e.paymentMethod === 'transfer' && 
+            myCourseIds.includes(e.courseId)
+        );
+
+        if (requests.length === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+
+        container.classList.remove('hidden');
+        countBadge.textContent = `${requests.length} en attente`;
+
+        // We need students names
+        const allUsers = await dataManager.getAll('users');
+
+        list.innerHTML = requests.map(req => {
+            const student = allUsers.find(u => u.id === req.studentId) || { name: 'Inconnu' };
+            const course = allCourses.find(c => c.id === req.courseId) || { title: 'Cours Inconnu' };
+            const date = new Date(req.requestDate).toLocaleDateString();
+
+            return `
+            <tr class="hover:bg-amber-50/50 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                            ${student.name.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900">${student.name}</p>
+                            <p class="text-xs text-gray-500">Étudiant</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <p class="text-sm font-medium text-gray-700">${course.title}</p>
+                    <p class="text-xs text-gray-500">Virement Bancaire</p>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="flex items-center gap-1 cursor-pointer hover:text-indigo-600" onclick="alert('Voir le reçu: ${req.receipt}')">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        Reçu #${req.id.substring(0,4)}
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                    <button onclick="instructorPayments.rejectAccess('${req.id}')" class="px-3 py-1.5 border border-red-200 text-red-600 rounded-lg text-xs font-bold hover:bg-red-50 transition-colors">
+                        Refuser
+                    </button>
+                    <button onclick="instructorPayments.approveAccess('${req.id}')" class="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all">
+                        Valider l'accès
+                    </button>
+                </td>
+            </tr>
+            `;
+        }).join('');
+        
+        lucide.createIcons();
+    }
+
+    async approveAccess(enrollmentId) {
+        if (!confirm("Confirmer la réception du paiement et débloquer l'accès ?")) return;
+
+        const allEnrollments = await dataManager.getAll('enrollments');
+        const index = allEnrollments.findIndex(e => e.id === enrollmentId);
+        
+        if (index !== -1) {
+            allEnrollments[index].status = 'active';
+            allEnrollments[index].activatedAt = new Date().toISOString();
+            
+            // Also create a payment record
+            const payment = {
+                id: dataManager.generateId(),
+                instructorId: this.currentInstructor.id,
+                amount: allEnrollments[index].amountPaid || 0, // Should be updated properly
+                status: 'paid',
+                date: new Date().toISOString(),
+                method: 'Virement',
+                description: 'Achat Cours (Validé)',
+                studentId: allEnrollments[index].studentId
+            };
+            await dataManager.add('payments', payment);
+            await dataManager.saveAll('enrollments', allEnrollments);
+            
+            this.init(); // Reload
+            alert("Accès validé avec succès !");
+        }
+    }
+
+    async rejectAccess(enrollmentId) {
+        if (!confirm("Refuser cette demande ?")) return;
+        await dataManager.delete('enrollments', enrollmentId);
+        this.init();
     }
 }
 
