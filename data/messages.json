@@ -75,5 +75,32 @@
       }
     ],
     "updatedAt": "2025-12-28T08:17:51.757Z"
+  },
+  {
+    "id": "msg_1767029298831",
+    "from": {
+      "id": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
+      "name": "monji laagharr",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "bonjour",
+    "message": "bonjour monsieur",
+    "isRead": true,
+    "createdAt": "2025-12-29T17:28:18.832Z",
+    "replies": [
+      {
+        "id": "reply_1767029311297",
+        "from": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+        "message": "bonjour monji labes",
+        "createdAt": "2025-12-29T17:28:31.297Z"
+      }
+    ],
+    "updatedAt": "2025-12-29T17:28:31.299Z"
   }
 ]

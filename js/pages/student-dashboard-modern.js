@@ -72,7 +72,7 @@ async function loadDashboardContent() {
                     ...course,
                     enrollment: enrollment,
                     progress: enrollment.progress || 0,
-                    paid: enrollment.paid || false,
+                    paid: enrollment.paid || enrollment.status === 'active',
                     amount: enrollment.amount || course.price || 0
                 };
             }
@@ -121,7 +121,7 @@ function renderStats() {
 
     // Unpaid amount
     const unpaidCourses = enrolledCourses.filter(c => !c.paid);
-    const totalUnpaid = unpaidCourses.reduce((sum, c) => sum + (c.amount || 0), 0);
+    const totalUnpaid = unpaidCourses.reduce((sum, c) => sum + Number(c.amount || 0), 0);
     document.getElementById('unpaidAmount').textContent = `${totalUnpaid} DT`;
 }
 

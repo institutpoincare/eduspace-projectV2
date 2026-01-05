@@ -162,13 +162,15 @@ function renderInstructors(instructors) {
                     ${instructor.bio || "Expert qualifié prêt à vous accompagner dans votre apprentissage et à booster vos compétences."}
                 </p>
 
-                <!-- Action Buttons -->
-                <div class="mt-auto flex gap-4">
-                    <button onclick="viewInstructorCV('${instructor.id}')" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 text-base">
-                        Voir CV <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                <!-- Actions -->
+                <div class="grid grid-cols-2 gap-3 pt-4 border-t border-gray-50 mt-auto">
+                    <button onclick="startChat('${instructor.id}', 'instructor')" class="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 bg-gray-50 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        Discuter
                     </button>
-                    <button onclick="startChat('${instructor.id}', 'instructor')" class="px-6 py-4 bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-100 hover:border-gray-200 rounded-xl font-bold transition-colors text-base hover:text-indigo-600">
-                        <i data-lucide="message-circle" class="w-6 h-6"></i>
+                    <button onclick="window.location.href='pages/formateur/profil.html?id=${instructor.id}'" class="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200 hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:scale-105 active:scale-95 duration-200">
+                        Voir CV
+                        <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
                     </button>
                 </div>
             </div>

@@ -31,72 +31,38 @@
 
         <!-- Main Content -->
         <main class="flex-1 ml-[280px] p-8 transition-all duration-300 main-content">
-            <!-- Header -->
-            <div class="space-y-2 mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Mon Espace d'Apprentissage</h1>
-                <p class="text-gray-500">Accédez à tous vos cours et suivez vos progrès</p>
-            </div>
+            <!-- Header Section -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Mes Cours</h1>
+                        <p class="text-gray-500 mt-2">Retrouvez tous vos cours et suivez votre progression</p>
+                    </div>
+                    
+                    <!-- Filter Tabs -->
+                    <div class="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm" id="course-filters">
+                        <button data-filter="all" class="px-4 py-2 text-sm font-medium rounded-lg bg-blue-50 text-blue-600 transition-colors">
+                            Tous
+                        </button>
+                        <button data-filter="in-progress" class="px-4 py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                            En cours
+                        </button>
+                        <button data-filter="completed" class="px-4 py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                            Terminés
+                        </button>
+                    </div>
+                </div>
 
-            <!-- Tab Navigation -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-2 mb-8">
-                <div class="flex gap-2">
-                    <button onclick="switchTab('live')" id="tab-live"
-                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all bg-blue-600 text-white shadow-lg shadow-blue-200">
-                        <i data-lucide="video" class="w-5 h-5"></i>
-                        Cours en direct
-                    </button>
-                    <button onclick="switchTab('recorded')" id="tab-recorded"
-                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all text-gray-600 hover:bg-gray-50">
-                        <i data-lucide="play-circle" class="w-5 h-5"></i>
-                        Cours enregistrés
-                    </button>
+                <!-- Search Bar -->
+                <div class="relative max-w-md">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                    <input type="text" placeholder="Rechercher un cours..." 
+                        class="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-sm placeholder-gray-400">
                 </div>
             </div>
 
-            <!-- Search and Filters -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
-                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <!-- Search Bar -->
-                    <div class="flex-1 w-full md:w-auto">
-                        <div class="relative">
-                            <i data-lucide="search"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
-                            <input type="text" placeholder="Rechercher un cours..."
-                                class="w-full pr-11 pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
-                        </div>
-                    </div>
-
-                    <!-- Filter Buttons -->
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="filter" class="w-4 h-4 text-gray-400"></i>
-                        <div class="flex gap-2">
-                            <button
-                                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white">Tous</button>
-                            <button
-                                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200">En
-                                cours</button>
-                            <button
-                                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200">Terminés</button>
-                        </div>
-                    </div>
-
-                    <!-- View Mode (Static for now) -->
-                    <div class="flex gap-2 border border-gray-200 rounded-lg p-1">
-                        <button class="p-2 rounded bg-blue-600 text-white"><i data-lucide="grid"
-                                class="w-4 h-4"></i></button>
-                        <button class="p-2 rounded text-gray-600 hover:bg-gray-100"><i data-lucide="list"
-                                class="w-4 h-4"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Course Grid (Live) -->
-            <div id="grid-live" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Dynamic Content -->
-            </div>
-
-            <!-- Course Grid (Recorded) - Hidden by default -->
-            <div id="grid-recorded" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+            <!-- Course Grid -->
+            <div id="grid-recorded" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
                  <!-- Dynamic Content -->
             </div>
 
@@ -107,33 +73,6 @@
     <script src="../../js/components/sidebar-etudiant.js"></script>
     <script>
         lucide.createIcons();
-
-        function switchTab(tab) {
-            const liveGrid = document.getElementById('grid-live');
-            const recordedGrid = document.getElementById('grid-recorded');
-            const liveTabBtn = document.getElementById('tab-live');
-            const recordedTabBtn = document.getElementById('tab-recorded');
-
-            if (tab === 'live') {
-                liveGrid.classList.remove('hidden');
-                recordedGrid.classList.add('hidden');
-
-                liveTabBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
-                liveTabBtn.classList.remove('text-gray-600', 'hover:bg-gray-50');
-
-                recordedTabBtn.classList.remove('bg-purple-600', 'text-white', 'shadow-lg', 'shadow-purple-200');
-                recordedTabBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
-            } else {
-                liveGrid.classList.add('hidden');
-                recordedGrid.classList.remove('hidden');
-
-                liveTabBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
-                liveTabBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
-
-                recordedTabBtn.classList.add('bg-purple-600', 'text-white', 'shadow-lg', 'shadow-purple-200');
-                recordedTabBtn.classList.remove('text-gray-600', 'hover:bg-gray-50');
-            }
-        }
     </script>
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>

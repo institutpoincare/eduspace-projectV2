@@ -36,19 +36,14 @@ const sidebarHTML = `
             <span class="font-medium group-hover:text-gray-900 sidebar-text">Mes Cours</span>
         </a>
 
-        <a href="live.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
-            <i data-lucide="video" class="w-5 h-5 group-hover:text-red-600 group-hover:scale-110 transition-all"></i>
-            <span class="font-medium group-hover:text-gray-900 sidebar-text">Direct</span>
+        <a href="classes.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
+            <i data-lucide="users" class="w-5 h-5 group-hover:text-indigo-600 group-hover:scale-110 transition-all"></i>
+            <span class="font-medium group-hover:text-gray-900 sidebar-text">Mes Classes</span>
         </a>
 
         <a href="schedule.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
             <i data-lucide="calendar" class="w-5 h-5 group-hover:text-green-600 group-hover:scale-110 transition-all"></i>
             <span class="font-medium group-hover:text-gray-900 sidebar-text">Emploi du temps</span>
-        </a>
-
-        <a href="mes-profs.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group">
-            <i data-lucide="graduation-cap" class="w-5 h-5 group-hover:text-indigo-600 group-hover:scale-110 transition-all"></i>
-            <span class="font-medium group-hover:text-gray-900 sidebar-text">Mes Profs</span>
         </a>
 
         <a href="messages.html" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-all group relative">

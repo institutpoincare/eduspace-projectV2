@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visionneuse de Cours - EduSpace</title>
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1', // Indigo 500
+                        secondary: '#8b5cf6', // Violet 500
+                        dark: '#0f172a',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'glow': '0 0 20px rgba(99, 102, 241, 0.5)',
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .glass-sidebar {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-[#0f172a] dark:text-slate-200 h-screen flex flex-col overflow-hidden font-sans selection:bg-indigo-100 selection:text-indigo-900 dark:selection:bg-violet-500 dark:selection:text-white">
+
+    <!-- Navbar (Glass Dark) -->
+    <!-- Navbar (Glass Light/Dark) -->
+    <nav class="h-16 shrink-0 bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 flex items-center justify-between px-4 lg:px-6 z-50 sticky top-0 transition-colors duration-300">
+        <div class="flex items-center gap-4 min-w-0">
+            <a href="mes-cours.html" class="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-all shrink-0">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </a>
+            <div class="h-6 w-[1px] bg-gray-200 dark:bg-white/10 mx-2 hidden sm:block"></div>
+            <div class="min-w-0 flex-1">
+                 <p class="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-0.5 hidden sm:block">Lecture en cours</p>
+                 <h1 class="font-bold text-sm sm:text-lg truncate text-gray-900 dark:text-white leading-tight" id="course-title">Chargement...</h1>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-4 shrink-0">
+            <div class="hidden md:flex flex-col items-end">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Votre Progression</span>
+                <div class="w-32 lg:w-48 h-1.5 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div id="course-progress-bar" class="h-full bg-gradient-to-r from-violet-500 to-indigo-500 shadow-[0_0_15px_rgba(139,92,246,0.5)] rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Theme Toggle -->
+            <button 
+                onclick="document.documentElement.classList.toggle('dark')" 
+                class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                title="Changer de mode"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </button>
+
+            <!-- Sidebar Toggle Button (Modernized) -->
+            <button onclick="toggleSidebar()" id="sidebar-toggle-btn" class="bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 border border-transparent dark:border-white/20 text-gray-700 dark:text-white p-2.5 rounded-xl transition-all flex items-center justify-center group shadow-sm dark:shadow-glow hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]" title="Menu Programme">
+                 <i data-lucide="menu" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Layout (Split View) -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Left Column: Player Area (Scrollable) -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-[#0f172a] relative z-10 order-1 lg:order-none transition-all duration-300 ease-in-out" id="main-content-area">
+            <div class="p-4 md:p-6 lg:p-10 max-w-[1600px] mx-auto w-full space-y-8">
+                
+                <!-- Video Player Container (Float & Glow) -->
+                <div class="w-full relative group">
+                     <!-- Ambient Glow -->
+                     <div class="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                     
+                     <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center bg-[url('../../assets/pattern-dark.svg')] bg-cover" id="video-container">
+                        <!-- Poster -->
+                        <img id="video-poster" src="" class="absolute inset-0 w-full h-full object-cover opacity-50 transition-opacity duration-700" alt="Cover">
+                        
+                        <!-- Play Button -->
+                         <button id="btn-play-overlay" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/40 dark:border-white/20 rounded-full flex items-center justify-center text-white shadow-[0_0_30px_rgba(0,0,0,0.3)] hover:scale-110 hover:bg-white/30 dark:hover:bg-white/20 transition-all duration-300 cursor-pointer z-20 group-hover:shadow-[0_0_50px_rgba(139,92,246,0.4)]">
+                                <i data-lucide="play" class="w-8 h-8 md:w-10 md:h-10 fill-current ml-1 text-white"></i>
+                        </button>
+
+                        <!-- Iframe -->
+                        <iframe id="video-player" class="absolute inset-0 w-full h-full hidden" src="" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Tabs & Details (Glass Card) -->
+                <div class="bg-white dark:bg-white/[0.02] backdrop-blur-xl border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden min-h-[400px] shadow-sm dark:shadow-none transition-colors duration-300">
+                    <!-- Tabs -->
+                    <div class="flex border-b border-gray-200 dark:border-white/5 px-6 pt-4">
+                        <button onclick="switchTab('overview')" id="tab-overview" class="pb-4 px-6 text-sm font-bold text-violet-400 border-b-2 border-violet-500 transition-all">
+                            Aperçu
+                        </button>
+                        <button onclick="switchTab('resources')" id="tab-resources" class="pb-4 px-6 text-sm font-bold text-gray-500 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-slate-300 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-white/10 transition-all relative">
+                            Ressources
+                            <span id="badge-resources" class="absolute top-1 right-0 bg-violet-600 text-white px-1.5 py-0.5 rounded text-[9px] hidden font-bold shadow-lg">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-6 md:p-8">
+                        <div id="content-overview" class="space-y-6 animate-fade-in">
+                            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight" id="lesson-title">Titre de la leçon</h2>
+                            <div class="prose prose-slate dark:prose-invert prose-violet max-w-none text-gray-600 dark:text-slate-400 leading-relaxed" id="lesson-description">
+                                <p>Sélectionnez une leçon pour commencer.</p>
+                            </div>
+                        </div>
+
+                        <div id="content-resources" class="hidden space-y-6">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i data-lucide="folder-open" class="w-5 h-5 text-violet-400"></i> Fichiers & Téléchargements
+                            </h3>
+                            <div id="resources-list" class="grid gap-3">
+                                <!-- Dynamic -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Right Column: Sidebar (Glass Accordion) -->
+        <!-- Fixed width on Desktop (w-96), Full width on Mobile, Collapsible via w-0 -->
+        <!-- Right Column: Sidebar (Glass Accordion) -->
+        <aside id="course-sidebar" class="w-full lg:w-96 shrink-0 bg-white/80 dark:bg-[#151e32]/80 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-white/5 flex flex-col order-2 lg:order-none h-[400px] lg:h-auto z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.2)] transition-all duration-300 ease-in-out transform origin-right overflow-hidden">
+            <div class="min-w-[24rem] h-full flex flex-col"> <!-- Fixed Width & Height Wrapper -->
+                <div class="p-5 border-b border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md z-30 shrink-0">
+                    <h3 class="font-bold text-gray-900 dark:text-white text-md flex items-center gap-2">
+                        <i data-lucide="list-video" class="w-4 h-4 text-violet-400"></i>
+                        Programme
+                    </h3>
+                    <span class="text-xs font-medium text-gray-500 dark:text-slate-500 bg-gray-200 dark:bg-white/5 px-2 py-1 rounded-md" id="total-lessons-count">... Leçons</span>
+                </div>
+                
+                <!-- Curriculum List -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-0" id="curriculum-container">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Quiz Modal (Udemy Style Overlay) -->
+    <div id="quiz-modal" class="fixed inset-0 z-[60] hidden bg-gray-900 flex flex-col animate-fade-in">
+        <!-- Quiz Header -->
+        <div class="h-16 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-6 shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold" id="quiz-progress-text">1/5</div>
+                <div>
+                    <h2 class="text-white font-bold text-lg leading-tight" id="quiz-modal-title">Titre du Quiz</h2>
+                    <p class="text-gray-400 text-xs font-medium">Question <span id="current-question-num">1</span></p>
+                </div>
+            </div>
+            <button onclick="closeQuizModal()" class="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- Quiz Content -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar flex items-center justify-center p-4">
+            <div id="quiz-question-wrapper" class="w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[400px] flex flex-col">
+                <!-- Question Container -->
+                <div id="quiz-question-container" class="p-8 md:p-12 flex-1 flex flex-col justify-center">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-8 leading-relaxed" id="question-text">
+                        ...
+                    </h3>
+                    
+                    <div class="space-y-3" id="options-container">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+
+                <!-- Footer / Nav -->
+                <div class="bg-gray-50 border-t border-gray-100 p-6 flex items-center justify-between">
+                    <button onclick="prevQuestion()" id="btn-prev-question" class="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i> Précédent
+                    </button>
+                    
+                    <button onclick="nextQuestion()" id="btn-next-question" class="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-black hover:-translate-y-1 transition-all">
+                        Suivant <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                    
+                     <button onclick="finishQuiz()" id="btn-finish-quiz" class="hidden flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all">
+                        Terminer <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Result View (Hidden by default) -->
+            <div id="quiz-result-container" class="hidden w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-10 text-center">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
+                    <i data-lucide="trophy" class="w-12 h-12"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-2">Félicitations !</h2>
+                <p class="text-gray-500 mb-8">Vous avez complété ce quiz.</p>
+                
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="p-4 bg-gray-50 rounded-2xl">
+                        <span class="block text-2xl font-bold text-indigo-600" id="result-score">80%</span>
+                        <span class="text-xs text-gray-400 uppercase font-bold">Score</span>
+                    </div>
+                     <div class="p-4 bg-gray-50 rounded-2xl">
+                        <span class="block text-2xl font-bold text-green-600" id="result-correct">4</span>
+                        <span class="text-xs text-gray-400 uppercase font-bold">Correct</span>
+                    </div>
+                     <div class="p-4 bg-gray-50 rounded-2xl">
+                        <span class="block text-2xl font-bold text-red-500" id="result-wrong">1</span>
+                        <span class="text-xs text-gray-400 uppercase font-bold">Incorrect</span>
+                    </div>
+                </div>
+
+                <button onclick="closeQuizModal()" class="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">
+                    Retour au cours
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/utils/sidebar-manager.js"></script>
+    <script src="../../js/pages/course-view.js"></script>
+</body>
+</html>

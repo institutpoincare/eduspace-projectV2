@@ -152,6 +152,12 @@ function handleApiRequest(req, res) {
         try { if (body) payload = JSON.parse(body); } catch (e) { }
 
         try {
+            // GESTION SPÉCIALE POUR LES CATÉGORIES PERSONNALISÉES
+            if (collection === 'custom-categories') {
+                handleCustomCategories(req, res, payload, id);
+                return;
+            }
+            
             // GET 
             if (req.method === 'GET' && !id) {
                 const data = readJSON(collection);
@@ -228,6 +234,137 @@ function handleApiRequest(req, res) {
             res.end(JSON.stringify({ error: err.message }));
         }
     });
+}
+
+// --- HANDLER POUR LES CATÉGORIES PERSONNALISÉES ---
+function handleCustomCategories(req, res, payload, id) {
+    const filePath = path.join(DATA_DIR, 'custom-categories.json');
+    
+    // Initialiser le fichier s'il n'existe pas
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, JSON.stringify({
+            categories: [],
+            lastUpdated: new Date().toISOString()
+        }, null, 2));
+    }
+    
+    // Lire les données
+    const readData = () => {
+        try {
+            const raw = fs.readFileSync(filePath, 'utf8');
+            return JSON.parse(raw);
+        } catch (e) {
+            return { categories: [], lastUpdated: new Date().toISOString() };
+        }
+    };
+    
+    // Écrire les données
+    const writeData = (data) => {
+        data.lastUpdated = new Date().toISOString();
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    };
+    
+    try {
+        // GET - Récupérer toutes les catégories
+        if (req.method === 'GET' && !id) {
+            const data = readData();
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(data));
+            return;
+        }
+        
+        // POST - Ajouter une nouvelle catégorie
+        if (req.method === 'POST') {
+            const data = readData();
+            
+            // Validation
+            if (!payload || !payload.value || !payload.label) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Les champs value et label sont requis' }));
+                return;
+            }
+            
+            // Vérifier si la catégorie existe déjà
+            const exists = data.categories.find(cat => cat.value === payload.value);
+            if (exists) {
+                res.writeHead(409, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Cette catégorie existe déjà' }));
+                return;
+            }
+            
+            // Ajouter la nouvelle catégorie
+            const newCategory = {
+                value: payload.value,
+                label: payload.label,
+                createdAt: payload.createdAt || new Date().toISOString(),
+                usageCount: 0
+            };
+            
+            data.categories.push(newCategory);
+            writeData(data);
+            
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                category: newCategory
+            }));
+            return;
+        }
+        
+        // PUT - Incrémenter le compteur d'utilisation
+        if (req.method === 'PUT' && id && req.url.includes('/increment')) {
+            const data = readData();
+            const category = data.categories.find(cat => cat.value === id);
+            
+            if (!category) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Catégorie non trouvée' }));
+                return;
+            }
+            
+            category.usageCount = (category.usageCount || 0) + 1;
+            category.lastUsed = new Date().toISOString();
+            
+            writeData(data);
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                category
+            }));
+            return;
+        }
+        
+        // DELETE - Supprimer une catégorie
+        if (req.method === 'DELETE' && id) {
+            const data = readData();
+            const initialLength = data.categories.length;
+            data.categories = data.categories.filter(cat => cat.value !== id);
+            
+            if (data.categories.length === initialLength) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Catégorie non trouvée' }));
+                return;
+            }
+            
+            writeData(data);
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                message: 'Catégorie supprimée avec succès'
+            }));
+            return;
+        }
+        
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Endpoint non trouvé' }));
+        
+    } catch (error) {
+        console.error('Erreur dans handleCustomCategories:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: error.message }));
+    }
 }
 
 server.listen(PORT, () => {

@@ -33,7 +33,7 @@ class MesCoursPage {
         try {
             // Récupérer mes inscriptions
             const allEnrollments = await dataManager.getAll('enrollments');
-            this.enrollments = allEnrollments.filter(e => e.userId === this.currentStudent.id);
+            this.enrollments = allEnrollments.filter(e => e.studentId === this.currentStudent.id);
 
             // Charger les cours correspondants
             this.myCourses = await Promise.all(

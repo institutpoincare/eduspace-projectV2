@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cours Enregistrés - EduSpace Formateur</title>
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -53,13 +57,23 @@
             border-color: #10b981;
         }
 
-        /* Custom Scrollbar for Chapters */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         .animate-enter { animation: slideUp 0.4s ease-out forwards; }
+        
+        /* Animation shake pour les erreurs */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 overflow-x-hidden">
@@ -115,22 +129,21 @@
                         </button>
                         <div>
                             <h1 class="text-2xl font-bold text-gray-900" id="wizard-title">Créer un nouveau cours</h1>
-                            <p class="text-sm text-gray-500">Complétez les 3 étapes pour publier.</p>
+                            <p class="text-sm text-gray-500">Complétez les 4 étapes pour publier.</p>
                         </div>
                     </div>
                     <!-- Steps Indicator -->
-                    <div class="flex items-center gap-4 bg-white px-6 py-3 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3 bg-white px-6 py-3 rounded-2xl shadow-sm border border-gray-100">
                         <div class="step-item active flex items-center gap-2" id="step-ind-1">
                             <div class="step-number w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center font-bold text-sm text-gray-400 transition-colors">1</div>
                             <span class="text-sm font-bold text-gray-600 hidden md:block">Infos</span>
                         </div>
-                        <div class="w-8 h-0.5 bg-gray-200"></div>
+                        <div class="w-6 h-0.5 bg-gray-200"></div>
                         <div class="step-item flex items-center gap-2" id="step-ind-2">
                             <div class="step-number w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center font-bold text-sm text-gray-400 transition-colors">2</div>
                             <span class="text-sm font-bold text-gray-400 hidden md:block">Contenu</span>
                         </div>
-                        <div class="w-8 h-0.5 bg-gray-200"></div>
-                        <div class="step-item flex items-center gap-2" id="step-ind-3">
+                        <div class="step-item flex items-center gap-2" id="step-ind-4">
                             <div class="step-number w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center font-bold text-sm text-gray-400 transition-colors">3</div>
                             <span class="text-sm font-bold text-gray-400 hidden md:block">Vente</span>
                         </div>
@@ -148,26 +161,64 @@
                         <div class="space-y-6">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Titre du cours</label>
-                                <input type="text" id="w-title" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-bold text-lg" placeholder="Ex: Maîtriser Python en 30 jours">
+                                <input type="text" id="w-title" oninput="updatePreview()" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-bold text-lg" placeholder="Ex: Maîtriser Python en 30 jours">
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Catégorie -->
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
-                                    <select id="w-cat" onchange="updateSubcategoryOptionsRec()" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium">
-                                        <option value="mathematiques">Mathématiques</option>
-                                        <option value="physique">Physique</option>
-                                        <option value="informatique">Informatique</option>
-                                        <option value="langues">Langues</option>
-                                    </select>
+                                    <div class="relative group">
+                                        <i data-lucide="folder" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors pointer-events-none"></i>
+                                        <select id="w-cat" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                                            <option value="">Sélectionner une catégorie</option>
+                                            <option value="langue">Langue</option>
+                                            <option value="suivi-scolaire">Suivi Scolaire</option>
+                                            <option value="sciences">Sciences</option>
+                                            <option value="informatique">Informatique</option>
+                                            <option value="arts">Arts</option>
+                                            <option value="business">Business</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                                    </div>
                                 </div>
+
+                                <!-- Matière (géré dynamiquement) -->
                                 <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Niveau</label>
-                                    <select id="w-lvl" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium">
-                                        <option>Débutant</option>
-                                        <option>Intermédiaire</option>
-                                        <option>Avancé</option>
-                                    </select>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                                        Matière
+                                        <span class="text-xs text-gray-400 font-normal ml-1">(selon catégorie)</span>
+                                    </label>
+                                    <div class="relative group">
+                                        <i data-lucide="book-open" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-600 transition-colors pointer-events-none"></i>
+                                        <select id="w-subject" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                                            <option value="">Sélectionner une matière</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                    <p class="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                                        <i data-lucide="info" class="w-3 h-3"></i>
+                                        Sélectionnez d'abord une catégorie
+                                    </p>
+                                </div>
+
+                                <!-- Niveau (géré dynamiquement) -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                                        Niveau
+                                        <span class="text-xs text-gray-400 font-normal ml-1">(selon catégorie)</span>
+                                    </label>
+                                    <div class="relative group">
+                                        <i data-lucide="trending-up" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-amber-600 transition-colors pointer-events-none"></i>
+                                        <select id="w-lvl" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-50 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                                            <option value="">Sélectionner un niveau</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                    <p class="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                                        <i data-lucide="info" class="w-3 h-3"></i>
+                                        Adapté à la catégorie choisie
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -206,15 +257,48 @@
 
                         <div class="flex justify-between pt-6 border-t border-gray-100">
                             <button id="btn-step2-back" type="button" onclick="nextStep(1)" class="px-6 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Retour</button>
-                            <button id="btn-step2-next" type="button" onclick="nextStep(3)" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 group">
-                                Suivant <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                            <button id="btn-step2-next" type="button" onclick="nextStep(4)" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 group">
+                                Suivant: Vente <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- STEP 3: VENTE -->
+                <!-- STEP 3: QUIZ -->
                 <div id="step-3" class="form-section hidden flex-1 animate-enter">
+                    <div class="premium-card p-8 rounded-3xl border-t-4 border-t-purple-500 max-w-5xl mx-auto h-full flex flex-col min-h-[500px]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <span class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i data-lucide="brain" class="w-5 h-5"></i></span>
+                                Quiz & Évaluations
+                            </h2>
+                            <button onclick="addQuiz()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold text-sm shadow-lg flex items-center gap-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Ajouter un Quiz
+                            </button>
+                        </div>
+
+                        <div id="quiz-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2 mb-6">
+                            <!-- Empty State -->
+                            <div class="flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
+                                <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
+                                    <i data-lucide="help-circle" class="w-6 h-6 text-gray-400"></i>
+                                </div>
+                                <p class="text-gray-500 font-medium">Aucun quiz pour le moment.</p>
+                                <button onclick="addQuiz()" class="text-purple-600 font-bold text-sm mt-1 hover:underline">Commencer à ajouter</button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between pt-6 border-t border-gray-100">
+                            <button id="btn-step3-back" type="button" onclick="nextStep(2)" class="px-6 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Retour</button>
+                            <button id="btn-step3-next" type="button" onclick="nextStep(4)" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg shadow-purple-200 transition-all flex items-center gap-2 group">
+                                Suivant: Vente <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: VENTE -->
+                <div id="step-4" class="form-section hidden flex-1 animate-enter">
                     <!-- ... (Step 3 Content) ... -->
                      <div class="premium-card p-8 rounded-3xl border-t-4 border-t-green-500 max-w-6xl mx-auto">
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -251,11 +335,11 @@
                                     <div id="price-inputs" class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-xs font-bold text-gray-500 mb-1">Prix Standard (TND)</label>
-                                            <input type="number" id="w-price" class="w-full p-3 bg-white border border-gray-200 rounded-lg outline-none font-bold" placeholder="49">
+                                            <input type="number" id="w-price" oninput="updatePreview()" class="w-full p-3 bg-white border border-gray-200 rounded-lg outline-none font-bold" placeholder="49">
                                         </div>
                                         <div>
                                             <label class="block text-xs font-bold text-red-400 mb-1">Promo (Optionnel)</label>
-                                            <input type="number" id="w-promo" class="w-full p-3 bg-white border border-red-200 rounded-lg outline-none font-bold text-red-500 placeholder-red-200" placeholder="29">
+                                            <input type="number" id="w-promo" oninput="updatePreview()" class="w-full p-3 bg-white border border-red-200 rounded-lg outline-none font-bold text-red-500 placeholder-red-200" placeholder="29">
                                         </div>
                                     </div>
                                 </div>
@@ -263,7 +347,7 @@
                                 <!-- Description -->
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Description courte</label>
-                                    <textarea id="w-desc" rows="3" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white transition-all resize-none" placeholder="Donnez envie aux étudiants..."></textarea>
+                                    <textarea id="w-desc" oninput="updatePreview()" rows="3" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white transition-all resize-none" placeholder="Donnez envie aux étudiants..."></textarea>
                                 </div>
 
                                 <!-- Course Content Summary -->
@@ -294,12 +378,14 @@
                                             </div>
                                         </div>
                                         <div class="p-5">
-                                            <h4 class="font-bold text-lg mb-2 line-clamp-2">Titre du cours ici</h4>
-                                            <p class="text-sm text-gray-500 mb-4 line-clamp-2">Le description de votre cours apparaîtra ici de manière élégante.</p>
+                                            <h4 id="prev-card-title" class="font-bold text-lg mb-2 line-clamp-2">Titre du cours ici</h4>
+                                            <p id="prev-card-desc" class="text-sm text-gray-500 mb-4 line-clamp-2">La description de votre cours apparaîtra ici de manière élégante.</p>
                                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                                 <div>
+                                                <div id="prev-card-price">
                                                     <span class="text-xs text-gray-400 font-bold uppercase">Prix</span>
                                                     <div class="font-bold text-xl text-blue-600">49 <span class="text-xs">TND</span></div>
+                                                </div>
                                                 </div>
                                                 <button class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-200">
                                                     <i data-lucide="arrow-right" class="w-5 h-5"></i>
@@ -314,7 +400,7 @@
                                             <i data-lucide="check-circle" class="w-5 h-5"></i> Publier Maintenant
                                         </button>
                                         <button id="btn-step3-back" type="button" onclick="nextStep(2)" class="w-full mt-3 py-3 text-gray-400 font-bold hover:text-white transition-colors text-sm">
-                                            Retour aux chapitres
+                                            Retour au Contenu
                                         </button>
                                     </div>
                                 </div>
@@ -341,56 +427,38 @@
                     <input type="text" id="l-title" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition-all font-medium" placeholder="Ex: Introduction au chapitre">
                 </div>
 
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Type de contenu</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="cursor-pointer label-type block relative">
-                            <input type="radio" name="l-type" value="video" class="peer sr-only" checked onchange="toggleLessonInputs()">
-                            <div class="p-3 border border-gray-200 rounded-xl flex items-center gap-2 peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-600 text-gray-600 hover:bg-gray-50 transition-all">
-                                <i data-lucide="video" class="w-4 h-4"></i> <span class="text-sm font-bold">Vidéo</span>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer label-type block relative">
-                            <input type="radio" name="l-type" value="pdf" class="peer sr-only" onchange="toggleLessonInputs()">
-                            <div class="p-3 border border-gray-200 rounded-xl flex items-center gap-2 peer-checked:bg-red-50 peer-checked:border-red-500 peer-checked:text-red-600 text-gray-600 hover:bg-gray-50 transition-all">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> <span class="text-sm font-bold">Document / PDF</span>
-                            </div>
-                        </label>
-                    </div>
+                <!-- Type Selection (Hidden User Requested Single Mode) -->
+                <div class="hidden mb-6">
+                    <label>
+                        <input type="radio" name="l-type" value="video" checked onchange="toggleLessonInputs()">
+                    </label>
+                    <label>
+                        <input type="radio" name="l-type" value="pdf" onchange="toggleLessonInputs()">
+                    </label>
                 </div>
 
                 <div id="section-video" class="space-y-4">
-                    <label class="block text-sm font-bold text-gray-700">Source de la vidéo</label>
-                    <div class="flex gap-4 mb-2">
-                        <label class="cursor-pointer flex items-center gap-2">
-                            <input type="radio" name="video-source" value="link" class="w-4 h-4 text-indigo-600" checked onchange="toggleVideoSource()">
-                            <span class="text-sm font-medium text-gray-700">Lien Externe (YouTube/Drive)</span>
-                        </label>
-                        <label class="cursor-pointer flex items-center gap-2">
-                            <input type="radio" name="video-source" value="upload" class="w-4 h-4 text-indigo-600" onchange="toggleVideoSource()">
-                            <span class="text-sm font-medium text-gray-700">Importer (Upload)</span>
-                        </label>
-                    </div>
-
-                    <div id="v-input-link">
-                        <input type="text" id="l-video-url" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition-all font-medium" placeholder="Ex: https://youtube.com/...">
-                    </div>
-
-                    <div id="v-input-upload" class="hidden">
-                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors relative cursor-pointer" onclick="document.getElementById('l-video-file').click()">
-                            <input type="file" id="l-video-file" accept="video/*" class="hidden" onchange="updateVideoFileName(this)">
-                            <div class="flex flex-col items-center">
-                                <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-500 mb-2"></i>
-                                <span class="text-sm font-bold text-gray-700" id="vid-file-name">Cliquez pour choisir une vidéo</span>
-                                <span class="text-xs text-gray-400 mt-1">MP4, MOV, WebM (Max 500MB)</span>
-                            </div>
-                        </div>
+                    <label class="block text-sm font-bold text-gray-700">Lien de la vidéo</label>
+                    <div id="v-input-link" class="relative">
+                        <i data-lucide="youtube" class="absolute left-4 top-1/2 -translate-y-1/2 text-red-500 w-5 h-5"></i>
+                        <input type="text" id="l-video-url" class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition-all font-medium" placeholder="Ex: https://youtube.com/watch?v=...">
                     </div>
                 </div>
 
                 <div id="input-file" class="hidden">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Fichier PDF</label>
-                    <input type="file" id="l-file" accept=".pdf" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl outline-none text-sm cursor-pointer">
+                    <div id="d-input-upload">
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors relative cursor-pointer group" onclick="document.getElementById('l-file').click()">
+                            <input type="file" id="l-file" accept=".pdf" class="hidden" onchange="document.getElementById('pdf-name-display').innerText = this.files[0] ? this.files[0].name : 'Cliquez pour importer le PDF'">
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="p-3 bg-orange-50 text-orange-600 rounded-full group-hover:scale-110 transition-transform">
+                                    <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-bold text-gray-700" id="pdf-name-display">Cliquez pour importer le PDF</span>
+                                <span class="text-xs text-gray-400">PDF uniquement (Max 10MB)</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -405,9 +473,122 @@
         </main>
     </div>
 
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 bg-gray-900/60 hidden flex items-center justify-center backdrop-blur-sm px-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 lg:p-8 animate-[slideUp_0.2s_ease-out] flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Configurer le Quiz</h3>
+                <button type="button" onclick="closeQuizModal()" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Titre de l'évaluation</label>
+                    <input type="text" id="q-title" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-purple-500 transition-all font-medium" placeholder="Ex: Évaluation fin de chapitre">
+                </div>
+
+                <!-- Chapter Selector -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Associer au Chapitre (Optionnel)</label>
+                    <div class="relative">
+                         <i data-lucide="folder" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                         <select id="q-chapter" class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-purple-500 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                             <option value="">-- Aucun (Quiz Global) --</option>
+                         </select>
+                         <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Type Selector -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Type d'évaluation</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="q-type" value="native" class="peer sr-only" checked onchange="toggleQuizType()">
+                            <div class="p-4 border border-gray-200 rounded-xl flex flex-col items-center gap-2 peer-checked:bg-purple-50 peer-checked:border-purple-500 peer-checked:text-purple-600 text-gray-600 hover:bg-gray-50 transition-all text-center h-full">
+                                <i data-lucide="list-checks" class="w-6 h-6"></i>
+                                <span class="text-xs font-bold">Quiz QCM</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="q-type" value="link" class="peer sr-only" onchange="toggleQuizType()">
+                            <div class="p-4 border border-gray-200 rounded-xl flex flex-col items-center gap-2 peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-600 text-gray-600 hover:bg-gray-50 transition-all text-center h-full">
+                                <i data-lucide="link" class="w-6 h-6"></i>
+                                <span class="text-xs font-bold">Lien Externe</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="q-type" value="file" class="peer sr-only" onchange="toggleQuizType()">
+                            <div class="p-4 border border-gray-200 rounded-xl flex flex-col items-center gap-2 peer-checked:bg-orange-50 peer-checked:border-orange-500 peer-checked:text-orange-600 text-gray-600 hover:bg-gray-50 transition-all text-center h-full">
+                                <i data-lucide="file-up" class="w-6 h-6"></i>
+                                <span class="text-xs font-bold">Devoir / PDF</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- SECTION: NATIVE (QCM) -->
+                <div id="sec-q-native" class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <label class="block text-sm font-bold text-gray-700">Questions du QCM</label>
+                        <button onclick="addQuestion()" class="text-sm font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Ajouter Question
+                        </button>
+                    </div>
+                    
+                    <div id="questions-container" class="space-y-4">
+                        <!-- Questions injected here -->
+                    </div>
+                </div>
+
+                <!-- SECTION: LINK -->
+                <div id="sec-q-link" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Lien vers le Quiz (Google Forms, Kahoot, etc.)</label>
+                        <div class="relative">
+                            <i data-lucide="link" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                            <input type="url" id="q-link-url" class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium" placeholder="https://docs.google.com/forms/...">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl flex items-start gap-3">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                        <p class="text-xs text-blue-800 font-medium">L'étudiant sera redirigé vers ce lien pour passer l'évaluation. Assurez-vous que le lien est accessible publiquement.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION: FILE -->
+                <div id="sec-q-file" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Fichier à télécharger (PDF, Docx)</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors relative cursor-pointer group" onclick="document.getElementById('q-file-input').click()">
+                            <input type="file" id="q-file-input" class="hidden" onchange="updateQuizFileName(this)">
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                    <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-bold text-gray-700" id="q-file-name">Cliquez pour choisir un fichier</span>
+                                <span class="text-xs text-gray-400 mt-1">PDF, Word, Excel (Max 10MB)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Instructions pour l'étudiant</label>
+                        <textarea id="q-file-instr" rows="3" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 transition-all resize-none text-sm" placeholder="Expliquez ce que l'étudiant doit faire avec ce fichier..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onclick="closeQuizModal()" class="px-5 py-2.5 font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">Annuler</button>
+                <button type="button" onclick="saveQuiz()" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold shadow-lg shadow-purple-200 transition-all">Enregistrer le Quiz</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js"></script>
+    <script src="../../js/pages/dynamic-filters.js"></script>
     <script src="../../js/pages/instructor-recordings.js"></script>
 </body>
 </html>

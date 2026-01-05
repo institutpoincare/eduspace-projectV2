@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Classes - EduSpace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-[280px]">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+                <div class="px-8 py-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Mes Classes</h1>
+                            <p class="text-gray-500 mt-1">Les classes auxquelles vous êtes inscrit</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <input type="text" id="search-input" placeholder="Rechercher une classe..."
+                                    class="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-64">
+                                <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="p-8">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm font-medium mb-1">Total Classes</p>
+                                <h3 class="text-3xl font-bold" id="stat-total">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium mb-1">Classes Actives</p>
+                                <h3 class="text-3xl font-bold" id="stat-active">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100 text-sm font-medium mb-1">Prochaine Séance</p>
+                                <h3 class="text-lg font-bold" id="stat-next">Aucune</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="calendar" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classes Grid -->
+                <div id="classes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Dynamic content -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden text-center py-16">
+                    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="users" class="w-12 h-12 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Aucune classe trouvée</h3>
+                    <p class="text-gray-500">Vous n'êtes inscrit à aucune classe pour le moment.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/components/sidebar-etudiant.js"></script>
+    <script src="../../js/pages/student-classes.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

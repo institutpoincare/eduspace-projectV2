@@ -161,7 +161,7 @@
   <div id="create-modal" class="fixed inset-0 z-50 bg-gray-900/60 hidden flex items-center justify-center backdrop-blur-sm px-4">
       <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-[scaleIn_0.2s_ease-out]">
           <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 class="text-xl font-bold text-gray-900">Nouvelle Classe</h3>
+              <h3 id="modal-title" class="text-xl font-bold text-gray-900">Nouvelle Classe</h3>
               <button onclick="closeModal()" class="p-2 hover:bg-gray-200 rounded-full text-gray-500"><i data-lucide="x" class="w-5 h-5"></i></button>
           </div>
           
@@ -172,45 +172,169 @@
                       <label class="block text-sm font-bold text-gray-700 mb-2">Nom de la classe</label>
                       <input type="text" id="w-name" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium" placeholder="Ex: Groupe A - Mathématiques">
                   </div>
+                  <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                    <textarea id="w-desc" rows="3" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium" placeholder="Décrivez le contenu et les objectifs de la classe..."></textarea>
+                  </div>
+                  <!-- Dynamic Filters Row 1 -->
+                  <div>
+                      <label class="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
+                      <div class="relative group">
+                          <i data-lucide="folder" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors pointer-events-none"></i>
+                          <select id="w-cat" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                              <option value="">Sélectionner une catégorie</option>
+                          </select>
+                          <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                      </div>
+                  </div>
+
+                  <!-- Dynamic Filters Row 2 -->
+                  <div class="grid grid-cols-2 gap-4">
+                      <!-- Subject -->
+                      <div>
+                          <label class="block text-sm font-bold text-gray-700 mb-2">Matière</label>
+                          <div class="relative group">
+                              <i data-lucide="book-open" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-600 transition-colors pointer-events-none"></i>
+                              <select id="w-subject" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                                  <option value="">Sélectionner une matière</option>
+                              </select>
+                              <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                          </div>
+                      </div>
+
+                      <!-- Level -->
+                      <div>
+                          <label class="block text-sm font-bold text-gray-700 mb-2">Niveau</label>
+                          <div class="relative group">
+                              <i data-lucide="trending-up" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-amber-600 transition-colors pointer-events-none"></i>
+                              <select id="w-lvl" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-50 transition-all font-medium text-gray-700 appearance-none cursor-pointer">
+                                  <option value="">Sélectionner un niveau</option>
+                              </select>
+                              <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Meeting Link -->
+                  <div>
+                      <label class="block text-sm font-bold text-gray-700 mb-2">Lien de la réunion</label>
+                      <div class="relative">
+                          <i data-lucide="video" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                          <input type="url" id="w-meet-link" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium" placeholder="https://meet.google.com/...">
+                      </div>
+                  </div>
+
+                  <!-- Recordings Folder -->
+                  <div>
+                      <label class="block text-sm font-bold text-gray-700 mb-2">Dossier Drive des Enregistrements</label>
+                      <div class="relative">
+                          <i data-lucide="folder-play" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                          <input type="url" id="w-drive-folder" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium" placeholder="https://drive.google.com/drive/folders/...">
+                      </div>
+                      <p class="text-xs text-gray-500 mt-1 ml-1">Lien vers le dossier où vous déposerez les enregistrements.</p>
+                  </div>
+
+                  <!-- Pricing Strategy -->
                   <div class="grid grid-cols-2 gap-4">
                       <div>
-                          <label class="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
-                          <select id="w-category" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none font-medium">
-                              <option value="scolaire">Scolaire</option>
-                              <option value="universitaire">Universitaire</option>
-                              <option value="formation">Formation Pro</option>
+                          <label class="block text-sm font-bold text-gray-700 mb-2">Type de tarification</label>
+                          <select id="w-price-type" onchange="updatePriceLabel(this.value)" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none font-medium appearance-none cursor-pointer">
+                              <option value="monthly">Par Mois</option>
+                              <option value="full_course">Forfait Global</option>
+                              <option value="hourly">Par Heure</option>
                           </select>
                       </div>
                       <div>
-                          <label class="block text-sm font-bold text-gray-700 mb-2">Prix (TND)</label>
-                          <input type="number" id="w-price" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none font-medium" placeholder="150">
+                          <label id="lbl-price" class="block text-sm font-bold text-gray-700 mb-2">Prix Mensuel (TND)</label>
+                          <input type="number" id="w-price" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none font-medium text-lg" placeholder="150">
                       </div>
                   </div>
-              </div>
 
-              <!-- Resources Section (Replaces Old Steps) -->
-              <div class="border-t border-gray-100 pt-6">
-                  <h4 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <i data-lucide="folder-open" class="w-5 h-5 text-blue-600"></i> Ressources & Enregistrements
-                  </h4>
-                  <p class="text-sm text-gray-500 mb-4">Ajoutez les liens Google Drive ou documents PDF pour cette classe.</p>
-                  
-                  <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <select id="res-type" class="p-3 rounded-lg border border-blue-200 text-sm font-bold text-blue-800 outline-none">
-                              <option value="drive">Google Drive / Video</option>
-                              <option value="pdf">Document PDF</option>
-                          </select>
-                          <input type="text" id="res-title" placeholder="Titre (ex: Séance 1)" class="p-3 rounded-lg border border-blue-200 text-sm outline-none">
-                          <input type="text" id="res-link" placeholder="Lien URL" class="p-3 rounded-lg border border-blue-200 text-sm outline-none">
+                  <!-- Schedule Builder -->
+                  <div class="border-t border-gray-100 pt-6">
+                      <h4 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <i data-lucide="calendar" class="w-5 h-5 text-orange-600"></i> Emploi du temps
+                      </h4>
+                      
+                      <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4">
+                          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                              <select id="sch-day" class="p-3 rounded-lg border border-orange-200 text-sm font-bold text-orange-800 outline-none">
+                                  <option value="Lundi">Lundi</option>
+                                  <option value="Mardi">Mardi</option>
+                                  <option value="Mercredi">Mercredi</option>
+                                  <option value="Jeudi">Jeudi</option>
+                                  <option value="Vendredi">Vendredi</option>
+                                  <option value="Samedi">Samedi</option>
+                                  <option value="Dimanche">Dimanche</option>
+                              </select>
+                              <input type="time" id="sch-start" class="p-3 rounded-lg border border-orange-200 text-sm outline-none">
+                              <input type="time" id="sch-end" class="p-3 rounded-lg border border-orange-200 text-sm outline-none">
+                              <button onclick="addSession()" class="bg-orange-600 text-white rounded-lg text-sm font-bold hover:bg-orange-700 transition-colors flex items-center justify-center gap-1">
+                                  <i data-lucide="plus" class="w-4 h-4"></i> Ajouter
+                              </button>
+                          </div>
                       </div>
-                      <button onclick="addResource()" class="w-full mt-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">Ajouter la ressource</button>
+                      
+                      <div id="schedule-list" class="space-y-2">
+                          <!-- Schedule Items -->
+                      </div>
                   </div>
-                  
-                  <div id="resources-list" class="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                      <!-- Resources List -->
+
+                  <!-- Student Invitations -->
+                  <div class="border-t border-gray-100 pt-6">
+                      <h4 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <i data-lucide="users" class="w-5 h-5 text-green-600"></i> Inviter des étudiants
+                      </h4>
+                      
+                      <div class="flex gap-3 mb-4">
+                          <input type="email" id="inv-email" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-green-500 transition-all font-medium" placeholder="Email de l'étudiant">
+                          <button onclick="addInvite()" class="px-6 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 flex items-center gap-2">
+                              <i data-lucide="mail" class="w-4 h-4"></i> Inviter
+                          </button>
+                      </div>
+                      
+                      <div id="invites-list" class="flex flex-wrap gap-2">
+                          <!-- Invited Tags -->
+                      </div>
                   </div>
-              </div>
+
+                  <!-- Resources & Folders Section -->
+                  <div id="resources-container" class="border-t border-gray-100 pt-6">
+                      <h4 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <i data-lucide="folder-open" class="w-5 h-5 text-blue-600"></i> Ressources & Dossiers
+                      </h4>
+                      
+                      <!-- Folder Creation -->
+                      <div class="flex gap-3 mb-4">
+                          <input type="text" id="fol-name" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium" placeholder="Nouveau Dossier (Ex: Chapitre 1)">
+                          <button onclick="addFolder()" class="px-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 flex items-center gap-2">
+                              <i data-lucide="folder-plus" class="w-4 h-4"></i> Créer
+                          </button>
+                      </div>
+
+                      <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                              <!-- Folder Select -->
+                               <select id="res-folder" class="p-3 rounded-lg border border-blue-200 text-sm font-bold text-blue-800 outline-none">
+                                  <option value="">(Racine / Aucun Dossier)</option>
+                                  <!-- Folders injected here -->
+                              </select>
+                              <select id="res-type" class="p-3 rounded-lg border border-blue-200 text-sm font-bold text-blue-800 outline-none">
+                                  <option value="drive">Google Drive / Video</option>
+                                  <option value="pdf">Document PDF</option>
+                              </select>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <input type="text" id="res-title" placeholder="Titre (ex: Séance 1)" class="p-3 rounded-lg border border-blue-200 text-sm outline-none">
+                              <input type="text" id="res-link" placeholder="Lien URL" class="p-3 rounded-lg border border-blue-200 text-sm outline-none">
+                          </div>
+                          <button onclick="addResource()" class="w-full mt-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">Ajouter la ressource</button>
+                      </div>
+                      
+                      <div id="resources-list" class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                          <!-- Resources List with Folders -->
+                      </div>
+                  </div>
           </div>
 
           <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
@@ -221,7 +345,8 @@
   </div>
 
   <script src="../../js/core/data-manager.js"></script>
-  <script src="../../js/pages/instructor-classes.js"></script>
+  <script src="../../js/pages/dynamic-filters.js"></script>
+  <script src="../../js/pages/instructor-classes.js?v=3"></script>
   <script src="../../js/components/sidebar-formateur.js?v=2"></script>
 </body>
 </html>

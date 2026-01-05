@@ -259,21 +259,28 @@ class InstructorPayments {
             const enrollment = await dataManager.getById('enrollments', enrollmentId);
             
             if (enrollment) {
-                // Update Enrollment Status
+                // Get the course to fetch the actual price
+                const course = await dataManager.getById('courses', enrollment.courseId);
+                const actualAmount = course ? course.price : 0;
+                
+                // Update Enrollment Status with the actual amount
                 await dataManager.update('enrollments', enrollmentId, {
                     status: 'active',
+                    amountPaid: actualAmount,
                     activatedAt: new Date().toISOString()
                 });
                 
                 // Create Payment Record
                 const payment = {
-                    id: dataManager.generateId ? dataManager.generateId() : crypto.randomUUID(), // Fallback if generateId missing
+                    id: dataManager.generateId ? dataManager.generateId() : crypto.randomUUID(),
                     instructorId: this.currentInstructor.id,
-                    amount: enrollment.amountPaid || 0, // Should be updated properly from course price if 0
+                    amount: actualAmount,
                     status: 'paid',
                     date: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
                     method: 'Virement',
                     description: 'Achat Cours (Validé)',
+                    courseName: course ? course.title : 'Cours',
                     studentId: enrollment.studentId
                 };
                 
@@ -393,7 +400,8 @@ class InstructorPayments {
         
         // Handle placeholders only if explicitly the old dummy or empty
         if (!src || src === 'recu_virement_simule.jpg') {
-             src = 'https://placehold.co/600x800/e2e8f0/475569?text=Reçu+Simulé'; 
+             // Professional placeholder for empty receipt
+             src = 'https://placehold.co/600x800/f1f5f9/64748b?text=Aucun+Re%C3%A7u+Disponible&font=raleway'; 
         }
         // If it sends large Base64, it might fail in some console logs but works in src
 

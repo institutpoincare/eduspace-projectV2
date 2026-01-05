@@ -15,68 +15,112 @@ async function loadCourseDetails() {
     }
 
     // Fetch Data
-    const course = await dataManager.getById('courses', courseId);
-    if (!course) {
+    currentCourse = await dataManager.getById('courses', courseId);
+    if (!currentCourse) {
         showError("Cours introuvable.");
         return;
     }
 
-    const instructor = await dataManager.getById('users', course.instructorId);
+    const instructor = await dataManager.getById('users', currentCourse.instructorId);
 
     // Update Browser Title
-    document.title = `${course.title} - EduSpace`;
+    document.title = `${currentCourse.title} - EduSpace`;
 
     // Render Header
-    document.getElementById('course-title').textContent = course.title;
-    document.getElementById('course-description-short').textContent = course.description;
+    document.getElementById('course-title').textContent = currentCourse.title;
+    document.getElementById('course-description-short').textContent = currentCourse.description;
     
-    document.getElementById('breadcrumb-title').textContent = course.title;
-    document.getElementById('breadcrumb-category').textContent = course.category;
+    document.getElementById('breadcrumb-title').textContent = currentCourse.title;
+    document.getElementById('breadcrumb-category').textContent = currentCourse.category;
 
     // Instructor info
     if (instructor) {
         document.getElementById('instructor-name').textContent = instructor.name;
         document.getElementById('instructor-bio-name').textContent = instructor.name;
         document.getElementById('instructor-bio-role').textContent = instructor.specialite || 'Formateur EduSpace';
-        document.getElementById('instructor-bio-text').textContent = instructor.bio || `Formateur passionné spécialisé en ${course.category}.`;
+        document.getElementById('instructor-bio-text').textContent = instructor.bio || `Formateur passionné spécialisé en ${currentCourse.category}.`;
         
         // Avatars
-        // Use a placeholder if no image, or logic to find initials
         const avatarSrc = instructor.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(instructor.name)}&background=random`;
         document.getElementById('instructor-avatar').src = avatarSrc;
         document.getElementById('instructor-bio-avatar').src = avatarSrc;
     }
 
     // Cover Image
-    const coverUrl = course.cover || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800';
+    const coverUrl = currentCourse.cover || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800';
     document.getElementById('course-cover-mobile').src = coverUrl;
     document.getElementById('course-cover-sidebar').src = coverUrl;
-    document.getElementById('course-category-badge-mobile').textContent = course.category;
+    document.getElementById('course-category-badge-mobile').textContent = currentCourse.category;
 
     // Price
-    const priceDisplay = course.price > 0 ? `${course.price} TND` : 'Gratuit';
+    const priceDisplay = currentCourse.price > 0 ? `${currentCourse.price} TND` : 'Gratuit';
     document.getElementById('course-price').textContent = priceDisplay;
 
-    // Full Description (simulate simpler paragraph split if needed, or raw text)
-    document.getElementById('course-description-full').innerHTML = `<p>${course.description}</p><p>Ce cours est conçu pour vous aider à maîtriser ${course.category} de manière efficace et structurée. Vous avancerez étape par étape à travers des modules pratiques.</p>`;
+    // Enrollment Status Check (UI Update)
+    await checkEnrollmentStatus();
+
+    // Full Description
+    document.getElementById('course-description-full').innerHTML = `<p>${currentCourse.description}</p><p>Ce cours est conçu pour vous aider à maîtriser ${currentCourse.category} de manière efficace et structurée. Vous avancerez étape par étape à travers des modules pratiques.</p>`;
 
     // Curriculum
-    renderCurriculum(course.chapters || []);
+    renderCurriculum(currentCourse);
 
     // Show Content
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('course-content').classList.remove('hidden');
 }
 
-function renderCurriculum(chapters) {
+async function checkEnrollmentStatus() {
+    const user = dataManager.getCurrentUser();
+    if (!user) return;
+
+    const enrollments = await dataManager.getAll('enrollments');
+    const enrollment = enrollments.find(e => e.studentId === user.id && e.courseId === currentCourse.id);
+
+    if (enrollment) {
+        const btnBuy = document.getElementById('btn-buy-course');
+        const btnCart = document.getElementById('btn-add-cart');
+
+        if (enrollment.status === 'active') {
+            // Already Purchased
+            if (btnBuy) {
+                btnBuy.innerHTML = `<span>Accéder au cours</span><i data-lucide="play-circle" class="w-5 h-5"></i>`;
+                btnBuy.className = "w-full py-4 bg-green-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-green-200 hover:bg-green-700 transition-all mb-4 flex items-center justify-center gap-2";
+                btnBuy.onclick = () => window.location.href = `course-view.html?id=${currentCourse.id}`;
+            }
+            if (btnCart) btnCart.style.display = 'none';
+        } else if (enrollment.status === 'pending') {
+            // Pending Verification
+            if (btnBuy) {
+                btnBuy.innerHTML = `<span>En attente</span><i data-lucide="clock" class="w-5 h-5"></i>`;
+                btnBuy.className = "w-full py-4 bg-amber-500 text-white rounded-xl font-bold text-lg shadow-xl shadow-amber-200 cursor-not-allowed mb-4 flex items-center justify-center gap-2";
+                btnBuy.onclick = null;
+            }
+            if (btnCart) btnCart.style.display = 'none';
+        }
+    }
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderCurriculum(course) {
+    const chapters = course.chapters || [];
+    const quizzes = course.quizzes || [];
     const container = document.getElementById('course-curriculum');
     
-    if (chapters.length === 0) {
+    if (chapters.length === 0 && quizzes.length === 0) {
         container.innerHTML = `<div class="p-6 bg-gray-50 rounded-xl text-gray-500 text-center">Aucun contenu disponible pour ce cours.</div>`;
         return;
     }
+    
+    let html = '';
 
-    container.innerHTML = chapters.map((chapter, index) => `
+    // 1. Render Chapters with integrated Quizzes
+    html += chapters.map((chapter, index) => {
+        // Find quizzes for this chapter
+        const chapterQuizzes = quizzes.filter(q => q.chapterId === chapter.id);
+        const itemCount = (chapter.lessons ? chapter.lessons.length : 0) + chapterQuizzes.length;
+        
+        return `
         <div class="border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-sm">
             <button class="w-full flex items-center justify-between p-5 bg-gray-50 hover:bg-gray-100 transition-colors text-left" onclick="toggleChapter(${index})">
                 <div class="flex items-center gap-4">
@@ -86,27 +130,93 @@ function renderCurriculum(chapters) {
                     <span class="font-bold text-gray-900 text-lg">${chapter.title}</span>
                 </div>
                 <div class="flex items-center gap-4 text-sm text-gray-500">
-                    <span>${chapter.lessons ? chapter.lessons.length : 0} leçons</span>
+                    <span>${itemCount} éléments</span>
                     <i data-lucide="chevron-down" id="icon-chapter-${index}" class="w-5 h-5 transition-transform"></i>
                 </div>
             </button>
             <div id="content-chapter-${index}" class="hidden border-t border-gray-100 bg-white">
                 <ul class="divide-y divide-gray-50">
                     ${(chapter.lessons || []).map(lesson => `
-                        <li class="p-4 pl-16 flex items-center justify-between hover:bg-indigo-50/30 transition-colors group cursor-pointer">
+                        <li class="p-4 pl-16 flex items-center justify-between hover:bg-indigo-50/30 transition-colors group cursor-pointer" onclick="alert('Lecture vidéo bientôt disponible')">
                             <div class="flex items-center gap-3">
                                 <i data-lucide="play-circle" class="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform"></i>
                                 <span class="text-gray-700 font-medium group-hover:text-indigo-700">${lesson.title}</span>
                             </div>
-                            <span class="text-xs text-gray-400">10:00</span> <! -- Placeholder duration -->
+                            <span class="text-xs text-gray-400">Vidéo</span>
+                        </li>
+                    `).join('')}
+                    
+                    ${chapterQuizzes.map(quiz => `
+                        <li class="p-4 pl-16 flex items-center justify-between hover:bg-purple-50/30 transition-colors group cursor-pointer" onclick="startQuiz('${quiz.id}')">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="${getQuizIcon(quiz.type)}" class="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-gray-700 font-medium group-hover:text-purple-700">${quiz.title}</span>
+                            </div>
+                            <span class="text-xs font-bold text-purple-600 border border-purple-200 px-2 py-0.5 rounded-full bg-purple-50">Quiz</span>
                         </li>
                     `).join('')}
                 </ul>
             </div>
         </div>
-    `).join('');
+    `}).join('');
     
+    // 2. Render Global Quizzes (No Chapter Associated)
+    const globalQuizzes = quizzes.filter(q => !q.chapterId);
+    if(globalQuizzes.length > 0) {
+        html += `
+        <div class="border border-purple-100 rounded-2xl overflow-hidden bg-white shadow-sm mt-4">
+            <button class="w-full flex items-center justify-between p-5 bg-purple-50 hover:bg-purple-100 transition-colors text-left" onclick="toggleChapter('global')">
+                <div class="flex items-center gap-4">
+                    <span class="w-8 h-8 rounded-full bg-white border border-purple-200 flex items-center justify-center text-sm font-bold text-purple-600">
+                        <i data-lucide="award" class="w-4 h-4"></i>
+                    </span>
+                    <span class="font-bold text-gray-900 text-lg">Évaluations Finales</span>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <span>${globalQuizzes.length} quiz</span>
+                    <i data-lucide="chevron-down" id="icon-chapter-global" class="w-5 h-5 transition-transform"></i>
+                </div>
+            </button>
+            <div id="content-chapter-global" class="hidden border-t border-purple-100 bg-white">
+                <ul class="divide-y divide-gray-50">
+                    ${globalQuizzes.map(quiz => `
+                        <li class="p-4 pl-16 flex items-center justify-between hover:bg-purple-50/30 transition-colors group cursor-pointer" onclick="startQuiz('${quiz.id}')">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="${getQuizIcon(quiz.type)}" class="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-gray-700 font-medium group-hover:text-purple-700">${quiz.title}</span>
+                            </div>
+                           <span class="text-xs font-bold text-purple-600 border border-purple-200 px-2 py-0.5 rounded-full bg-purple-50">Quiz</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        </div>
+        `;
+    }
+
+    container.innerHTML = html;
     lucide.createIcons();
+}
+
+function getQuizIcon(type) {
+    if(type === 'link') return 'link';
+    if(type === 'file') return 'file-up';
+    return 'help-circle';
+}
+
+window.startQuiz = (quizId) => {
+    if(!currentCourse) return;
+    const quiz = currentCourse.quizzes.find(q => q.id == quizId); // Intentional weak equality
+    if(!quiz) return;
+    
+    if(quiz.type === 'link') {
+        window.open(quiz.content, '_blank');
+    } else if (quiz.type === 'file') {
+        alert(`Instructions : ${quiz.instructions || 'Aucune'}\n\nFichier à télécharger : ${quiz.content} (Simulation)`);
+    } else {
+        // Native Quiz
+        alert(`Lancement du Quiz : ${quiz.title}\n\nCette fonctionnalité ouvrira bientôt le lecteur de quiz interactif !`);
+    }
 }
 
 window.toggleChapter = (index) => {
@@ -309,17 +419,7 @@ window.handleTransferPayment = async (e) => {
     }
 };
 
-// Update load logic to store current course
-const originalLoad = loadCourseDetails;
-loadCourseDetails = async () => {
-    // Override to capture data
-    const params = new URLSearchParams(window.location.search);
-    const courseId = params.get('id');
-    if(courseId) {
-        currentCourse = await dataManager.getById('courses', courseId);
-    }
-    await originalLoad(); // Call original rendering
-};
+// End of file
 
 
 function showError(msg) {

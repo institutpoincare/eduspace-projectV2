@@ -8,14 +8,16 @@ let wizStep = 1;
 
 // Temporary Data for Wizard
 let tempSlots = [];
-let tempResources = []; // New: For Drive/PDFs
+let tempSchedule = []; // New: Live Class Schedule
+let tempInvites = []; // New: Invited Students
+let tempFolders = []; // New: Folders for Resources
+let tempResources = []; // For Drive/PDFs
 let tempStudents = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (window.dataManager) await dataManager.init();
     lucide.createIcons();
     loadClasses();
-    setupWizard();
 });
 
 // --- Main Loads ---
@@ -145,6 +147,8 @@ function renderRequestsList(classes, enrollments, users) {
     container.innerHTML = pending.map(req => {
         const student = users.find(u => u.id === req.studentId) || { name: 'Inconnu', email: 'N/A' };
         const course = classes.find(c => c.id === req.courseId);
+        const hasReceipt = req.receipt && req.receipt.length > 0;
+
         return `
         <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center gap-4">
@@ -158,6 +162,11 @@ function renderRequestsList(classes, enrollments, users) {
                         <span class="w-1 h-1 rounded-full bg-gray-300"></span>
                         <span>${new Date(req.requestDate).toLocaleDateString()}</span>
                     </div>
+                    ${hasReceipt ? `
+                        <button onclick="viewReceipt('${req.id}')" class="mt-2 text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                            <i data-lucide="file-text" class="w-3 h-3"></i> Voir le reçu
+                        </button>
+                    ` : ''}
                 </div>
             </div>
             <div class="flex gap-2">
@@ -166,6 +175,7 @@ function renderRequestsList(classes, enrollments, users) {
             </div>
         </div>`;
     }).join('');
+    lucide.createIcons();
 }
 
 function renderPaymentsList(classes, enrollments, users) {
@@ -213,17 +223,30 @@ function renderPaymentsList(classes, enrollments, users) {
 
 // --- Actions ---
 
-window.acceptRequest = async (enrollmentId) => {
-    // In a real DB, update status. Here we simulate edit.
-    // Ideally update 'enrollments'
+window.viewReceipt = async (enrollmentId) => {
     const enrollments = await dataManager.getAll("enrollments");
-    const idx = enrollments.findIndex(e => e.id === enrollmentId);
-    if (idx !== -1) {
-        enrollments[idx].status = 'active';
-        enrollments[idx].joinDate = new Date().toISOString();
-        await dataManager.saveAll("enrollments", enrollments);
+    const req = enrollments.find(e => e.id === enrollmentId);
+    if (req && req.receipt) {
+        // Handle if receipt is array or string
+        const url = Array.isArray(req.receipt) ? req.receipt[0] : req.receipt;
+        if(url) window.open(url, '_blank');
+        else showToast("Lien du reçu invalide", "error");
+    } else {
+        showToast("Aucun reçu trouvé", "error");
+    }
+};
+
+window.acceptRequest = async (enrollmentId) => {
+    try {
+        await dataManager.update("enrollments", enrollmentId, {
+            status: 'active',
+            joinDate: new Date().toISOString()
+        });
         showToast("Demande acceptée !", "success");
         loadClasses();
+    } catch (error) {
+        console.error("Error accepting request:", error);
+        showToast("Erreur lors de l'acceptation", "error");
     }
 };
 
@@ -240,7 +263,71 @@ window.rejectRequest = async (enrollmentId) => {
 window.openCreateModal = () => {
     isEditing = false;
     document.getElementById("create-modal").classList.remove("hidden");
+    const titleEl = document.getElementById("modal-title");
+    if(titleEl) titleEl.textContent = "Nouvelle Classe";
     resetWizard();
+};
+
+window.editClass = async (id) => {
+    isEditing = true;
+    editingId = id;
+    
+    const allCourses = await dataManager.getAll("courses");
+    const course = allCourses.find(c => c.id === id);
+    if(!course) return;
+
+    document.getElementById("create-modal").classList.remove("hidden");
+    
+    // Set Title
+    const titleEl = document.getElementById("modal-title");
+    if(titleEl) titleEl.textContent = `Gérer la Classe: ${course.title}`;
+
+    // Fill basic
+    document.getElementById("w-name").value = course.title;
+    document.getElementById("w-desc").value = course.description || "";
+    document.getElementById("w-meet-link").value = course.meetLink || "";
+    document.getElementById("w-drive-folder").value = course.recordingsFolderUrl || course.recordingsFolder || "";
+    
+    // Fill Pricing
+    if(course.pricing) {
+        document.getElementById("w-price-type").value = course.pricing.type || "monthly";
+        document.getElementById("w-price").value = course.pricing.price || 0;
+        updatePriceLabel(course.pricing.type);
+    } else {
+        document.getElementById("w-price").value = course.price || 0;
+    }
+    
+    // Fill Dynamic Filters
+    const catSelect = document.getElementById("w-cat");
+    if(catSelect) {
+        catSelect.value = course.category || "";
+        
+        // Trigger generic change logic or manually update
+        if(window.dynamicFilters && course.category) {
+            window.dynamicFilters.updateSubjects(course.category);
+            window.dynamicFilters.updateLevels(course.category);
+            
+            // Set Subject & Level after update
+            setTimeout(() => {
+                const subSelect = document.getElementById("w-subject");
+                const lvlSelect = document.getElementById("w-lvl");
+                
+                if(course.subject && subSelect) subSelect.value = course.subject;
+                if(course.level && lvlSelect) lvlSelect.value = course.level;
+            }, 50);
+        }
+    }
+    
+    // Fill Arrays
+    tempResources = course.resources || [];
+    tempSchedule = course.schedule || [];
+    tempInvites = (course.students && course.students.invited) ? course.students.invited : [];
+    tempFolders = course.folders || [];
+    
+    renderTempFoldersSelect();
+    renderTempResources();
+    renderTempSchedule();
+    renderTempInvites();
 };
 
 window.closeModal = () => {
@@ -249,20 +336,165 @@ window.closeModal = () => {
 
 function resetWizard() {
     document.getElementById("w-name").value = "";
+    document.getElementById("w-desc").value = "";
+    document.getElementById("w-meet-link").value = "";
+    document.getElementById("w-drive-folder").value = "";
     document.getElementById("w-price").value = "";
+    document.getElementById("w-price-type").value = "monthly";
+    updatePriceLabel("monthly");
+    
+    const catSelect = document.getElementById("w-cat");
+    if(catSelect) {
+        catSelect.value = "";
+        if(window.dynamicFilters) {
+             window.dynamicFilters.updateSubjects("");
+             window.dynamicFilters.updateLevels("");
+        }
+    }
+
     tempResources = [];
+    tempFolders = [];
+    tempSchedule = [];
+    tempInvites = [];
+    
+    renderTempFoldersSelect();
     renderTempResources();
+    renderTempSchedule();
+    renderTempInvites();
 }
 
+// --- New Features Logic ---
+
+window.updatePriceLabel = (type) => {
+    const lbl = document.getElementById('lbl-price');
+    if(type === 'monthly') lbl.textContent = "Prix Mensuel (TND)";
+    else if(type === 'hourly') lbl.textContent = "Prix Par Heure (TND)";
+    else lbl.textContent = "Prix Global (TND)";
+};
+
+// Schedule Logic
+window.addSession = () => {
+    console.log("addSession clicked");
+    const day = document.getElementById('sch-day').value;
+    const start = document.getElementById('sch-start').value;
+    const end = document.getElementById('sch-end').value;
+    
+    if(!day || !start || !end) {
+        alert("Veuillez remplir jour et horaires");
+        return;
+    }
+    
+    tempSchedule.push({ day, startTime: start, endTime: end });
+    renderTempSchedule();
+    
+    // Reset times but keep day for easier multi-entry
+    document.getElementById('sch-start').value = '';
+    document.getElementById('sch-end').value = '';
+};
+
+window.removeSession = (index) => {
+    tempSchedule.splice(index, 1);
+    renderTempSchedule();
+};
+
+function renderTempSchedule() {
+    const el = document.getElementById('schedule-list');
+    if(!el) return;
+    
+    if(tempSchedule.length === 0) {
+        el.innerHTML = '<div class="text-sm text-gray-400 italic">Aucune séance planifiée.</div>';
+        return;
+    }
+    
+    el.innerHTML = tempSchedule.map((s, i) => `
+        <div class="flex items-center justify-between p-2 bg-orange-50 rounded-lg border border-orange-100 text-sm animate-enter">
+            <div>
+                <span class="font-bold text-orange-800 uppercase text-xs w-20 inline-block">${s.day}</span>
+                <span class="text-gray-700 font-mono">${s.startTime} - ${s.endTime}</span>
+            </div>
+            <button onclick="removeSession(${i})" class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+    `).join('');
+    lucide.createIcons();
+}
+
+// Invite Logic
+window.addInvite = () => {
+    const email = document.getElementById('inv-email').value;
+    if(!email || !email.includes('@')) {
+        alert("Email invalide");
+        return;
+    }
+    if(tempInvites.includes(email)) {
+        alert("Déjà ajouté");
+        return;
+    }
+    
+    tempInvites.push(email); // In real app, we might search userID here
+    document.getElementById('inv-email').value = '';
+    renderTempInvites();
+};
+
+window.removeInvite = (email) => {
+    tempInvites = tempInvites.filter(e => e !== email);
+    renderTempInvites();
+};
+
+function renderTempInvites() {
+    const el = document.getElementById('invites-list');
+    if(!el) return;
+    
+    el.innerHTML = tempInvites.map(email => `
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full border border-green-100 text-xs font-bold animate-enter">
+            <i data-lucide="mail" class="w-3 h-3"></i>
+            ${email}
+            <button onclick="removeInvite('${email}')" class="hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button>
+        </div>
+    `).join('');
+    lucide.createIcons();
+}
+
+
 // --- Resource Management ---
+
+// --- Folder Management ---
+
+window.addFolder = () => {
+    const name = document.getElementById('fol-name').value;
+    if(!name) return;
+    
+    const newFolder = { id: Date.now().toString(), name: name };
+    tempFolders.push(newFolder);
+    document.getElementById('fol-name').value = '';
+    
+    renderTempFoldersSelect();
+    renderTempResources(); // Re-render to show empty folder (optional) or just to update UI
+};
+
+window.renderTempFoldersSelect = () => {
+    const select = document.getElementById('res-folder');
+    if(!select) return;
+    
+    // Keep first option (Root)
+    const rootOpt = select.options[0];
+    select.innerHTML = '';
+    select.appendChild(rootOpt);
+    
+    tempFolders.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+    });
+};
 
 window.addResource = () => {
     const type = document.getElementById('res-type').value;
     const title = document.getElementById('res-title').value;
     const link = document.getElementById('res-link').value;
+    const folderId = document.getElementById('res-folder').value || null; // New: Folder ID
     
     if(!title || !link) {
-        // Use a simple alert or toast if available
         alert("Veuillez remplir le titre et le lien");
         return;
     }
@@ -271,10 +503,10 @@ window.addResource = () => {
         id: Date.now(), 
         type, 
         title, 
-        link 
+        link,
+        folderId // Save folder
     });
 
-    // Reset inputs
     document.getElementById('res-title').value = '';
     document.getElementById('res-link').value = '';
     
@@ -286,73 +518,159 @@ window.removeResource = (id) => {
     renderTempResources();
 };
 
+window.removeFolder = (id) => {
+    if(confirm("Supprimer ce dossier et son contenu ?")) {
+        tempFolders = tempFolders.filter(f => f.id !== id);
+        // Move resources from this folder to root or delete them? Usually delete or move to root.
+        // Let's move them to root (folderId = null) for safety
+        tempResources.forEach(r => {
+             if(r.folderId === id) r.folderId = null; 
+        });
+        
+        renderTempFoldersSelect();
+        renderTempResources();
+    }
+};
+
 function renderTempResources() {
     const el = document.getElementById('resources-list');
     if(!el) return;
     
-    if(tempResources.length === 0) {
-        el.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Aucune ressource ajoutée</div>';
-        return;
+    el.innerHTML = '';
+
+    // Render Folders First
+    tempFolders.forEach(folder => {
+        const folderResources = tempResources.filter(r => r.folderId === folder.id);
+        
+        el.innerHTML += `
+        <div class="border border-gray-200 rounded-xl overflow-hidden mb-2">
+            <div class="bg-gray-50 p-3 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2 font-bold text-gray-700">
+                    <i data-lucide="folder" class="w-4 h-4 text-blue-500"></i> ${folder.name}
+                    <span class="text-xs text-gray-400 font-normal">(${folderResources.length} éléments)</span>
+                </div>
+                <button onclick="removeFolder('${folder.id}')" class="text-xs text-red-400 hover:text-red-600">Supprimer</button>
+            </div>
+            <div class="p-2 space-y-2 bg-white">
+                ${folderResources.length === 0 ? '<div class="text-xs text-gray-400 italic px-2">Dossier vide</div>' : 
+                  folderResources.map(r => renderResourceItem(r)).join('')}
+            </div>
+        </div>`;
+    });
+
+    // Render Root Resources (No folder)
+    const rootResources = tempResources.filter(r => !r.folderId);
+    if(rootResources.length > 0) {
+        el.innerHTML += `
+        <div class="p-2 space-y-2">
+             <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fichiers à la racine</div>
+             ${rootResources.map(r => renderResourceItem(r)).join('')}
+        </div>`;
+    }
+    
+    if(tempFolders.length === 0 && rootResources.length === 0) {
+         el.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Aucune ressource ajoutée</div>';
     }
 
-    el.innerHTML = tempResources.map(r => `
-        <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 shadow-sm animate-enter">
-            <div class="flex items-center gap-3">
-                <div class="p-2 ${r.type === 'drive' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'} rounded-lg border border-gray-100">
-                    <i data-lucide="${r.type === 'drive' ? 'video' : 'file-text'}" class="w-4 h-4"></i>
-                </div>
-                <div>
-                    <div class="text-sm font-bold text-gray-900">${r.title}</div>
-                    <div class="text-xs text-gray-400 flex items-center gap-1">
-                        <i data-lucide="link" class="w-3 h-3"></i> ${r.link.substring(0, 30)}...
-                    </div>
-                </div>
-            </div>
-            <button onclick="removeResource(${r.id})" class="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-        </div>
-    `).join('');
     lucide.createIcons();
 }
 
+function renderResourceItem(r) {
+    return `
+        <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-100 shadow-sm group">
+            <div class="flex items-center gap-3">
+                <div class="p-1.5 ${r.type === 'drive' ? 'bg-purple-50 text-purple-600' : 'bg-red-50 text-red-600'} rounded-lg">
+                    <i data-lucide="${r.type === 'drive' ? 'video' : 'file-text'}" class="w-4 h-4"></i>
+                </div>
+                <div>
+                     <div class="text-sm font-bold text-gray-900">${r.title}</div>
+                     <div class="text-xs text-gray-400 flex items-center gap-1">
+                        ${r.link.substring(0, 25)}...
+                     </div>
+                </div>
+            </div>
+            <button onclick="removeResource(${r.id})" class="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    `;
+}
+
 window.finishCreate = async () => {
+    // Basic Info
     const title = document.getElementById("w-name").value;
-    const category = document.getElementById("w-category").value;
-    const price = parseFloat(document.getElementById("w-price").value) || 0;
+    const description = document.getElementById("w-desc").value;
+    const category = document.getElementById("w-cat").value;
+    const subject = document.getElementById("w-subject").value;
+    const level = document.getElementById("w-lvl").value;
+    
+    // Meet Link
+    const meetLink = document.getElementById("w-meet-link").value;
+    const recordingsFolderUrl = document.getElementById("w-drive-folder").value;
+    
+    // Pricing Object
+    const priceType = document.getElementById("w-price-type").value;
+    const priceVal = parseFloat(document.getElementById("w-price").value) || 0;
+    const pricing = {
+        type: priceType,
+        price: priceVal,
+        currency: 'TND'
+    };
+    
+    // Schedule
+    // tempSchedule is already accurate from UI state
+
+    // Students Object
+    const students = {
+        enrolled: isEditing ? (await getExistingEnrolled(editingId)) : [],
+        invited: [...tempInvites] // Use spread to avoid reference issues
+    };
     
     if(!title) { alert("Titre requis"); return; }
-
-    // Ensure resources are saved correctly
-    const resourcesToSave = [...tempResources];
+    if(!category) { alert("Catégorie requise"); return; }
 
     const newClass = {
         id: isEditing ? editingId : dataManager.generateId(),
         instructorId: dataManager.getCurrentUser().id,
         type: 'class',
-        title: title, // Handle both 'title' and 'name' for compatibility
+        title: title,
+        description: description,
         name: title,
         category,
-        price,
-        resources: resourcesToSave,
+        subject,
+        level,
+        subject,
+        level,
+        meetLink,
+        recordingsFolderUrl,
+        pricing,
+        price: priceVal, // Legacy support for grids showing flat price
+        schedule: tempSchedule,
+        students: students,
+        resources: [...tempResources],
+        folders: [...tempFolders],
         updatedAt: new Date().toISOString()
     };
 
     if(!isEditing) {
         newClass.createdAt = new Date().toISOString();
-        await dataManager.add("courses", newClass);
+        await dataManager.create("courses", newClass);
     } else {
-        // Merge with existing to keep other fields if any
         let existing = (await dataManager.getAll("courses")).find(c => c.id === editingId) || {};
         const updated = { ...existing, ...newClass };
         await dataManager.update("courses", updated);
     }
     
     closeModal();
-    // Assuming showToast is defined or use alert
     alert(isEditing ? "Classe mise à jour !" : "Classe créée avec succès !");
     loadClasses();
 };
+
+async function getExistingEnrolled(classId) {
+    const all = await dataManager.getAll("courses");
+    const existing = all.find(c => c.id === classId);
+    return (existing && existing.students) ? existing.students.enrolled : [];
+}
 
 // Utils
 function showToast(msg, type='success') {
@@ -369,6 +687,11 @@ window.switchTab = (tab) => {
     document.getElementById(`tab-${tab}`).classList.add('active', 'border-blue-600', 'text-blue-600');
     document.getElementById(`tab-${tab}`).classList.remove('border-transparent', 'text-gray-500');
     
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.querySelector('.tab-content:not(.hidden)').classList.add('hidden');
     document.getElementById(`content-${tab}`).classList.remove('hidden');
+};
+
+window.manageResources = (id) => {
+    // Redirect to the new Full Page Dashboard
+    window.location.href = `class-dashboard.html?id=${id}`;
 };

@@ -128,6 +128,127 @@
                 <!-- GLASSMORPHIC FILTER SIDEBAR -->
                 <aside class="w-full lg:w-72 flex-shrink-0 space-y-6">
 
+                    <!-- Filter: Catégorie -->
+                    <div class="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50 hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="font-bold text-gray-900 mb-5 flex items-center gap-2 text-lg">
+                            <div class="p-2 bg-blue-100 rounded-lg text-blue-600"><i data-lucide="folder"
+                                    class="w-5 h-5"></i></div>
+                            Catégorie
+                        </h3>
+                        <div class="relative group">
+                            <i data-lucide="chevron-down"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors pointer-events-none"></i>
+                            <select id="filter-category"
+                                class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-inner appearance-none cursor-pointer font-medium text-gray-700">
+                                <option value="">Toutes les catégories</option>
+                                <option value="langue">Langue</option>
+                                <option value="suivi-scolaire">Suivi Scolaire</option>
+                                <option value="sciences">Sciences</option>
+                                <option value="informatique">Informatique</option>
+                                <option value="arts">Arts</option>
+                                <option value="business">Business</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter: Matière -->
+                    <div class="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50 hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="font-bold text-gray-900 mb-5 flex items-center gap-2 text-lg">
+                            <div class="p-2 bg-emerald-100 rounded-lg text-emerald-600"><i data-lucide="book-open"
+                                    class="w-5 h-5"></i></div>
+                            Matière
+                        </h3>
+                        <div class="relative group">
+                            <i data-lucide="chevron-down"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-600 transition-colors pointer-events-none"></i>
+                            <select id="filter-subject"
+                                class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none transition-all shadow-inner appearance-none cursor-pointer font-medium text-gray-700">
+                                <option value="">Toutes les matières</option>
+                                <!-- Langues -->
+                                <optgroup label="Langues">
+                                    <option value="francais">Français</option>
+                                    <option value="anglais">Anglais</option>
+                                    <option value="arabe">Arabe</option>
+                                    <option value="allemand">Allemand</option>
+                                    <option value="espagnol">Espagnol</option>
+                                    <option value="italien">Italien</option>
+                                </optgroup>
+                                <!-- Sciences -->
+                                <optgroup label="Sciences">
+                                    <option value="mathematiques">Mathématiques</option>
+                                    <option value="physique">Physique</option>
+                                    <option value="chimie">Chimie</option>
+                                    <option value="svt">SVT (Sciences de la Vie)</option>
+                                </optgroup>
+                                <!-- Informatique -->
+                                <optgroup label="Informatique">
+                                    <option value="informatique">Informatique</option>
+                                    <option value="programmation">Programmation</option>
+                                </optgroup>
+                                <!-- Autres -->
+                                <optgroup label="Autres">
+                                    <option value="histoire-geo">Histoire-Géographie</option>
+                                    <option value="philosophie">Philosophie</option>
+                                    <option value="economie">Économie</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter: Niveau -->
+                    <div class="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50 hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="font-bold text-gray-900 mb-5 flex items-center gap-2 text-lg">
+                            <div class="p-2 bg-amber-100 rounded-lg text-amber-600"><i data-lucide="trending-up"
+                                    class="w-5 h-5"></i></div>
+                            Niveau
+                        </h3>
+                        <div class="relative group">
+                            <i data-lucide="chevron-down"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-amber-600 transition-colors pointer-events-none"></i>
+                            <select id="filter-level"
+                                class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-amber-100 focus:border-amber-500 outline-none transition-all shadow-inner appearance-none cursor-pointer font-medium text-gray-700">
+                                <option value="">Tous les niveaux</option>
+                                <!-- Niveaux de langue (CECR) -->
+                                <optgroup label="Niveaux de Langue (CECR)">
+                                    <option value="a1.1">A1.1 - Débutant</option>
+                                    <option value="a1.2">A1.2 - Débutant</option>
+                                    <option value="a2.1">A2.1 - Élémentaire</option>
+                                    <option value="a2.2">A2.2 - Élémentaire</option>
+                                    <option value="b1.1">B1.1 - Intermédiaire</option>
+                                    <option value="b1.2">B1.2 - Intermédiaire</option>
+                                    <option value="b2.1">B2.1 - Intermédiaire Avancé</option>
+                                    <option value="b2.2">B2.2 - Intermédiaire Avancé</option>
+                                    <option value="c1">C1 - Avancé</option>
+                                    <option value="c2">C2 - Maîtrise</option>
+                                </optgroup>
+                                <!-- Niveaux scolaires tunisiens -->
+                                <optgroup label="Niveaux Scolaires">
+                                    <option value="1ere-annee">1ère année de base</option>
+                                    <option value="2eme-annee">2ème année de base</option>
+                                    <option value="3eme-annee">3ème année de base</option>
+                                    <option value="4eme-annee">4ème année de base</option>
+                                    <option value="5eme-annee">5ème année de base</option>
+                                    <option value="6eme-annee">6ème année de base</option>
+                                    <option value="7eme-annee">7ème année de base</option>
+                                    <option value="8eme-annee">8ème année de base</option>
+                                    <option value="9eme-annee">9ème année de base</option>
+                                    <option value="1ere-secondaire">1ère année secondaire</option>
+                                    <option value="2eme-secondaire">2ème année secondaire</option>
+                                    <option value="3eme-secondaire">3ème année secondaire</option>
+                                    <option value="4eme-secondaire">4ème année secondaire (Bac)</option>
+                                </optgroup>
+                                <!-- Niveaux universitaires -->
+                                <optgroup label="Niveaux Universitaires">
+                                    <option value="licence-1">Licence 1</option>
+                                    <option value="licence-2">Licence 2</option>
+                                    <option value="licence-3">Licence 3</option>
+                                    <option value="master-1">Master 1</option>
+                                    <option value="master-2">Master 2</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Search Input -->
                     <div
                         class="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50 hover:shadow-xl transition-shadow duration-300">
