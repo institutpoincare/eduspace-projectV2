@@ -220,11 +220,46 @@
         "type": "pdf",
         "title": "manuel",
         "link": "https://drive.google.com/file/d/1CSFt8Nnt7BlmfF6TCFZd3vvehBbKxy2_/view?usp=drive_link"
+      },
+      {
+        "id": 1767608178341,
+        "type": "video",
+        "title": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view",
+        "link": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view",
+        "folderId": "1767608158561"
+      },
+      {
+        "id": 1767627887494,
+        "type": "video",
+        "title": "vidéo",
+        "link": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view",
+        "folderId": null
       }
     ],
-    "updatedAt": "2026-01-03T18:06:07.489Z",
+    "updatedAt": "2026-01-05T18:38:24.006Z",
     "createdAt": "2026-01-02T19:09:10.057Z",
     "recordingsFolderUrl": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link",
-    "recordings": []
+    "recordings": [
+      {
+        "id": 1767638246772,
+        "title": "cours",
+        "url": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link",
+        "link": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link",
+        "type": "drive",
+        "date": "2026-01-05T18:37:26.772Z"
+      }
+    ],
+    "folders": [
+      {
+        "id": "1767601001767",
+        "name": "cours enregistré",
+        "link": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link"
+      },
+      {
+        "id": "1767608158561",
+        "name": "cours enregistré test 2",
+        "link": null
+      }
+    ]
   }
 ]

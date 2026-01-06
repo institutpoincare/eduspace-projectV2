@@ -198,143 +198,15 @@ class StudentClassDashboard {
     }
 
     renderResourcesSection() {
-        const resources = this.course.resources || [];
-        const recordingsUrl = this.course.recordingsFolderUrl || this.course.recordingsFolder;
-        
-        // Filter Data
-        // Includes: pdf, doc, text
-        const pdfResources = resources.filter(r => ['file-text', 'pdf', 'doc'].includes(r.type));
-        
-        // Everything else (videos, links, zips, generic drive) goes to the Main Resource Folder
-        const otherResources = resources.filter(r => !['file-text', 'pdf', 'doc', 'recording'].includes(r.type));
-
         let content = '';
 
         if (this.currentFolder === null) {
-            // ROOT VIEW: 3 MAIN FOLDERS
-            const recordings = this.course.recordings || [];
-            
+            // ROOT VIEW: EMPTY (No folders displayed)
             content = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-fade-in-up">
-                    <!-- Folder 1: Enregistrements (Séances) -->
-                    <div onclick="dashboard.openFolder('v-recordings')" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-red-200 cursor-pointer transition-all group flex flex-col items-center text-center gap-4">
-                        <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                            <i data-lucide="monitor-play" class="w-8 h-8 text-red-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-lg group-hover:text-red-700">Enregistrements</h3>
-                            <p class="text-xs text-gray-500 mt-1">${recordings.length} vidéos</p>
-                        </div>
-                    </div>
-
-                    <!-- Folder 2: Supports de Cours (PDFs from 'resources' with type pdf) -->
-                    <div onclick="dashboard.openFolder('v-pdf')" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-200 cursor-pointer transition-all group flex flex-col items-center text-center gap-4">
-                        <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                            <i data-lucide="file-text" class="w-8 h-8 text-green-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-lg group-hover:text-green-700">Supports PDF</h3>
-                            <p class="text-xs text-gray-500 mt-1">${pdfResources.length} documents</p>
-                        </div>
-                    </div>
-
-                    <!-- Folder 3: Ressources Diverses (Others) -->
-                    <div onclick="dashboard.openFolder('v-resources')" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 cursor-pointer transition-all group flex flex-col items-center text-center gap-4">
-                        <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                            <i data-lucide="box" class="w-8 h-8 text-blue-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-lg group-hover:text-blue-700">Ressources & Liens</h3>
-                            <p class="text-xs text-gray-500 mt-1">${otherResources.length + (this.course.folders || []).length} éléments</p>
-                        </div>
-                    </div>
+                <div class="flex justify-center items-center py-20">
+                    <p class="text-gray-400 text-sm italic">Aucun contenu à afficher</p>
                 </div>
             `;
-        } 
-        else if (this.currentFolder === 'v-recordings') {
-             // VIEW: RECORDINGS (Iframe via renderRecordings)
-             content = `
-                 <div class="mb-6 flex flex-col items-start">
-                    <button onclick="dashboard.openFolder(null)" class="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 font-medium transition-colors mb-4">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour à l'accueil
-                    </button>
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-red-100 rounded-lg"><i data-lucide="monitor-play" class="w-6 h-6 text-red-600"></i></div>
-                        <h2 class="text-2xl font-bold text-gray-900">Enregistrements des Séances</h2>
-                    </div>
-                </div>
-                <div id="recordings-container" class="w-full min-h-[400px]">Chargement...</div>
-            `;
-        }
-        else if (this.currentFolder === 'v-resources') {
-            // VIEW: OTHER RESOURCES + SUBFOLDERS
-            const folders = this.course.folders || [];
-
-            content = `
-                <div class="mb-6">
-                    <button onclick="dashboard.openFolder(null)" class="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 font-medium transition-colors">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour à l'accueil
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-900 mt-4 flex items-center gap-3">
-                        <div class="p-2 bg-blue-100 rounded-lg"><i data-lucide="box" class="w-6 h-6 text-blue-600"></i></div>
-                        Ressources & Liens
-                    </h2>
-                </div>
-
-                ${folders.length > 0 ? `
-                <div class="mb-6">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Dossiers</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${folders.map(f => `
-                        <div class="flex flex-col items-center justify-center p-4 bg-white border border-gray-100 rounded-xl hover:border-blue-300 cursor-pointer transition-all group" onclick="dashboard.openRealFolder('${f.id}')">
-                            <i data-lucide="folder" class="w-10 h-10 text-blue-200 group-hover:text-blue-500 fill-current mb-2"></i>
-                            <span class="font-bold text-gray-700 group-hover:text-blue-700 text-center text-sm line-clamp-1">${f.name}</span>
-                        </div>`).join('')}
-                    </div>
-                </div>` : ''}
-
-                <div>
-                     <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Fichiers Divers</h3>
-                     ${this.renderFilesList(otherResources)}
-                </div>
-            `;
-        }
-
-        else if (this.currentFolder === 'v-pdf') {
-            // VIEW: PDF ONLY
-            content = `
-                <div class="mb-6">
-                    <button onclick="dashboard.openFolder(null)" class="flex items-center gap-2 text-sm text-gray-500 hover:text-green-600 font-medium transition-colors">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour à l'accueil
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-900 mt-4 flex items-center gap-3">
-                        <div class="p-2 bg-green-100 rounded-lg"><i data-lucide="file-text" class="w-6 h-6 text-green-600"></i></div>
-                        Supports de Cours (PDF)
-                    </h2>
-                </div>
-                ${this.renderFilesList(pdfResources)}
-            `;
-        }
-        else if (this.currentFolder) {
-             // VIEW: REAL SUB-FOLDER (Inside v-resources logic essentially, but technically separate id)
-             // We need a back button that goes to 'v-resources' probably? Or Root? 
-             // Let's go Root for simplicity, or we can track history.
-             const folder = (this.course.folders || []).find(f => f.id === this.currentFolder);
-             if(folder) {
-                 const folderResources = resources.filter(r => r.folderId === folder.id);
-                 content = `
-                    <div class="mb-6">
-                        <button onclick="dashboard.openFolder('v-resources')" class="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 font-medium transition-colors">
-                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour aux Ressources
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-900 mt-4 flex items-center gap-3">
-                            <i data-lucide="folder-open" class="w-6 h-6 text-blue-400"></i>
-                            ${folder.name}
-                        </h2>
-                    </div>
-                    ${this.renderFilesList(folderResources)}
-                 `;
-             }
         }
 
         return `
@@ -344,56 +216,46 @@ class StudentClassDashboard {
         `;
     }
 
-    // Helper for Real Folders
-    openRealFolder(id) {
-        this.openFolder(id);
-    }
-
     renderFilesList(resources) {
         if(resources.length === 0) return '<p class="text-gray-400 italic">Dossier vide</p>';
         
+        // POINCARÉ STYLE GRID
         return `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in-up">
-            ${resources.map(r => {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
+            ${resources.map((r, i) => {
                 const isVideo = r.type === 'video' || r.type === 'drive';
-                const icon = isVideo ? 'play-circle' : 'file-text';
-                const color = isVideo ? 'purple' : 'red';
-                const action = isVideo ? `dashboard.playVideo('${r.link}', '${r.title.replace(/'/g, "\\'")}')` : `window.open('${r.link}', '_blank')`;
-                
-                // Different layout for video? User liked the big cards.
-                if(isVideo) {
+
+                if (isVideo) {
                     return `
-                        <div class="flex flex-col gap-3 p-4 bg-white border border-gray-100 rounded-2xl hover:border-purple-300 hover:shadow-xl hover:-translate-y-1 transition-all group cursor-pointer" onclick="${action}">
-                            <div class="aspect-video bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors relative overflow-hidden">
-                                <i data-lucide="${icon}" class="w-12 h-12 relative z-10 group-hover:scale-110 transition-transform"></i>
-                                <div class="absolute inset-0 bg-gradient-to-tr from-purple-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div onclick="openPoincareModal('${r.link}', '${r.title.replace(/'/g, "&apos;")}')" 
+                         class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all">
+                         
+                         <div class="h-44 bg-slate-900 flex items-center justify-center relative group-hover:bg-slate-800 transition-colors">
+                            <div class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+                                <span class="text-white text-2xl font-bold">▶</span>
                             </div>
-                            <div class="min-w-0">
-                                <h4 class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-2 leading-tight">${r.title}</h4>
-                                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                                    <i data-lucide="monitor-play" class="w-3 h-3"></i> Vidéo
-                                </p>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                     return `
-                        <div class="flex items-start gap-4 p-4 bg-white border border-gray-100 rounded-xl hover:border-red-200 hover:shadow-md transition-all group cursor-pointer" onclick="${action}">
-                            <div class="p-3 bg-red-50 text-red-600 rounded-xl group-hover:bg-red-100 transition-colors">
-                                <i data-lucide="${icon}" class="w-6 h-6"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">${r.title}</h4>
-                                <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                    <i data-lucide="download-cloud" class="w-3 h-3"></i> Document
-                                </p>
-                            </div>
-                            <button class="text-gray-400 group-hover:text-blue-600">
-                                <i data-lucide="download" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                    `;
+                         </div>
+
+                         <div class="p-4">
+                            <h5 class="font-bold text-gray-800 line-clamp-1">${r.title || `Séance ${i+1}`}</h5>
+                            <p class="text-xs text-indigo-600 font-bold mt-2 uppercase tracking-wide">Lecture Interne</p>
+                         </div>
+                    </div>`;
                 }
+
+                // Standard File Card (unchanged)
+                return `
+                <div class="flex items-start gap-4 p-4 bg-white border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-md transition-all group cursor-pointer" onclick="window.open('${r.link}', '_blank')">
+                    <div class="p-3 bg-red-50 text-red-600 rounded-xl group-hover:bg-red-100 transition-colors">
+                        <i data-lucide="file-text" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">${r.title}</h4>
+                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                            <i data-lucide="download-cloud" class="w-3 h-3"></i> Document externe
+                        </p>
+                    </div>
+                </div>`;
             }).join('')}
         </div>`;
     }
@@ -421,70 +283,56 @@ class StudentClassDashboard {
 }
 
 // --- GLOBAL INTERNAL VIDEO PLAYER (Custom Popup) ---
-window.playInternalVideo = (driveUrl, title = 'Lecture Vidéo') => {
-    // 1. Intelligent URL Conversion to "Preview" (Embeddable)
-    let previewUrl = driveUrl;
-
-    // Google Drive
-    if (driveUrl.includes('drive.google.com')) {
-        const idMatch = driveUrl.match(/[-\w]{25,}/);
-        if (idMatch) {
-            // Convert to /preview which allows embedding and avoids layout
-            previewUrl = `https://drive.google.com/file/d/${idMatch[0]}/preview`;
-        } else {
-            // Fallback
-             previewUrl = driveUrl.replace(/\/view.*/, '/preview').replace(/\/edit.*/, '/preview');
-        }
+// --- POINCARE STYLE MODAL (The Magic Fix) ---
+// --- POINCARE STYLE MODAL (The Magic Fix) ---
+window.openPoincareModal = (url, title) => {
+    // 0. CHECK IF IT IS ACTUALLY A FOLDER
+    if (url.includes('/folders/') || url.includes('drive.google.com/drive/u/')) {
+        window.openDriveFolderModal(url);
+        return;
     }
-    // YouTube
-    else if (driveUrl.includes('youtube.com') || driveUrl.includes('youtu.be')) {
+
+    // 1. Force Preview Mode for Embed
+    // Fix: Handle both /view and /edit links, converting to /preview. 
+    // Ensuring we don't double-append /preview if logic is complex.
+    // User requested simple regex: .replace(/\/view.*/, '/preview').replace(/\/edit.*/, '/preview')
+    let embedUrl = url;
+    if (url.includes('drive.google.com')) {
+         // Standardize Drive Links
+         embedUrl = url.replace(/\/view.*/, '/preview').replace(/\/edit.*/, '/preview');
+         // Fallback if no view/edit found but it's a file link (e.g. just ID)
+         if (!embedUrl.includes('/preview')) {
+             if (embedUrl.includes('/file/d/')) embedUrl += '/preview';
+         }
+    } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+         // Keep youtube support just in case
         let videoId = null;
-        if (driveUrl.includes('v=')) videoId = driveUrl.split('v=')[1].split('&')[0];
-        else if (driveUrl.includes('youtu.be/')) videoId = driveUrl.split('youtu.be/')[1].split('?')[0];
-        
-        if (videoId) previewUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        if (url.includes('v=')) videoId = url.split('v=')[1].split('&')[0];
+        else if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
+        if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
     }
 
-    // 2. Remove existing
-    const existingPopup = document.getElementById('video-popup');
-    if (existingPopup) existingPopup.remove();
+    // 2. Remove old modal
+    if (document.getElementById('video-modal')) document.getElementById('video-modal').remove();
 
-    // 3. Create the Glass Modal
+    // 3. Inject Modal (Poincaré Style)
+    // Note: User requested bg-black/95 and specific styles.
     const modalHTML = `
-    <div id="video-popup" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-        <div class="relative w-full max-w-6xl bg-slate-900/95 rounded-2xl shadow-2xl overflow-hidden border border-gray-700 flex flex-col" style="max-height: 90vh;">
-            
-            <!-- Header -->
-            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-700 bg-gradient-to-r from-purple-900/40 to-transparent">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">🎥</span>
-                    <h3 class="text-lg font-bold text-white">${title}</h3>
-                </div>
-                <button onclick="document.getElementById('video-popup').remove(); document.body.style.overflow = 'auto';" 
-                        class="p-2 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition-all">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+    <div id="video-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-in fade-in duration-200">
+        <div class="relative w-full max-w-5xl aspect-video bg-black rounded-xl border border-gray-800 shadow-2xl flex flex-col">
+            <div class="flex justify-between items-center px-4 py-2 bg-gray-900 border-b border-gray-800">
+                <span class="text-white font-medium truncate pr-4">${title}</span>
+                <button onclick="document.getElementById('video-modal').remove()" class="text-white hover:text-red-500 font-bold p-2 transition-colors">✕</button>
             </div>
-            
-            <!-- Video Player -->
-            <div class="flex-1 bg-black relative" style="aspect-ratio: 16/9;">
-                <iframe 
-                    src="${previewUrl}" 
-                    class="absolute inset-0 w-full h-full border-0" 
-                    allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
-                    sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
-                    allowfullscreen
-                    frameborder="0">
-                </iframe>
-            </div>
+            <iframe src="${embedUrl}" class="flex-1 w-full border-0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
         </div>
     </div>`;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    document.body.style.overflow = 'hidden';
 };
+
+// Keep alias for compatibility if needed
+window.playInternalVideo = window.openPoincareModal;
 
 // --- LEGACY PLAYER FUNCTIONS (Kept for backward compatibility) ---
 window.playDriveVideo = (url, title = 'Lecture Vidéo') => {
