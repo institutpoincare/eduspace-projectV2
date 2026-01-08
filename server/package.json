@@ -13,9 +13,12 @@
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "fs-extra": "^11.3.2",
+    "googleapis": "^169.0.0",
     "jsonwebtoken": "^9.0.3",
+    "node-cron": "^3.0.3",
     "uuid": "^13.0.0"
   }
 }

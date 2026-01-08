@@ -173,9 +173,10 @@ class JsonDB {
     getSensitiveFields(collection) {
         const map = {
             'users': ['password', 'email', 'phone'],
-            'students': ['email', 'phone', 'amountPaid'], // amountPaid peut être sensible ?
+            'students': ['email', 'phone', 'amountPaid'],
             'enrollments': ['amountPaid'],
-            'instructors': ['email', 'phone']
+            'instructors': ['email', 'phone'],
+            'teacherTokens': ['access_token', 'refresh_token']
         };
         return map[collection] || [];
     }

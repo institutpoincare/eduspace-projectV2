@@ -1,0 +1,25 @@
+[
+  {
+    "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+    "name": "Ahmed Aboudi",
+    "specialty": "Anglais",
+    "location": "Tunis",
+    "image": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5",
+    "isLive": true,
+    "students": 150,
+    "rating": 5,
+    "joinedDate": "2025-12-19T09:54:23.964Z",
+    "bio": "Enseignant passionné d'Anglais avec une méthode pédagogique interactive.",
+    "services": [
+      "live",
+      "videos"
+    ],
+    "cv": {
+      "experience": [
+        {
+          "description": "Professeur certifié"
+        }
+      ]
+    }
+  }
+]

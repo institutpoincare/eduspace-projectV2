@@ -1,0 +1,138 @@
+[
+  {
+    "id": "course_example_1",
+    "name": "Mathématiques - 7ème année",
+    "category": "scolaire",
+    "level": "7ème",
+    "price": 150,
+    "weeksDuration": "8",
+    "slots": [
+      {
+        "day": "Lundi",
+        "start": "16:00",
+        "end": "18:00"
+      },
+      {
+        "day": "Mercredi",
+        "start": "16:00",
+        "end": "18:00"
+      }
+    ],
+    "contents": [],
+    "sessionMappings": [],
+    "accessCode": "CLASS-7891",
+    "studentIds": [
+      {
+        "id": "student-1",
+        "name": "Ahmed Ben Salem",
+        "email": "ahmed@example.com",
+        "amountPaid": 150,
+        "payment": "Payé",
+        "paymentMethod": "virement",
+        "enrolledAt": "2025-12-15T10:00:00.000Z"
+      },
+      {
+        "id": "student-2",
+        "name": "Fatma Mansour",
+        "email": "fatma@example.com",
+        "amountPaid": 75,
+        "payment": "Partiel",
+        "paymentMethod": "cash",
+        "enrolledAt": "2025-12-18T14:30:00.000Z"
+      },
+      {
+        "id": "student-3",
+        "name": "Mohamed Trabelsi",
+        "email": "mohamed@example.com",
+        "amountPaid": 0,
+        "payment": "Non Payé",
+        "paymentMethod": "",
+        "enrolledAt": "2025-12-19T09:15:00.000Z"
+      }
+    ],
+    "status": "active",
+    "image": "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=800",
+    "createdAt": "2025-12-10T08:00:00.000Z",
+    "instructorId": "formateur-demo-1"
+  },
+  {
+    "id": "course_example_2",
+    "name": "Physique - Bac Sciences",
+    "category": "scolaire",
+    "level": "Bac",
+    "price": 200,
+    "weeksDuration": "12",
+    "slots": [
+      {
+        "day": "Mardi",
+        "start": "18:00",
+        "end": "20:00"
+      },
+      {
+        "day": "Jeudi",
+        "start": "18:00",
+        "end": "20:00"
+      }
+    ],
+    "contents": [],
+    "sessionMappings": [],
+    "accessCode": "CLASS-4521",
+    "studentIds": [
+      {
+        "id": "student-4",
+        "name": "Salma Hamdi",
+        "email": "salma@example.com",
+        "amountPaid": 200,
+        "payment": "Payé",
+        "paymentMethod": "virement",
+        "enrolledAt": "2025-12-12T11:00:00.000Z"
+      },
+      {
+        "id": "student-5",
+        "name": "Karim Jebali",
+        "email": "karim@example.com",
+        "amountPaid": 200,
+        "payment": "Payé",
+        "paymentMethod": "cheque",
+        "enrolledAt": "2025-12-14T15:20:00.000Z"
+      }
+    ],
+    "status": "active",
+    "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800",
+    "createdAt": "2025-12-05T10:00:00.000Z",
+    "instructorId": "formateur-demo-1"
+  },
+  {
+    "id": "course_example_3",
+    "name": "Français - Niveau Intermédiaire",
+    "category": "scolaire",
+    "level": "9ème",
+    "price": 120,
+    "weeksDuration": "6",
+    "slots": [
+      {
+        "day": "Samedi",
+        "start": "10:00",
+        "end": "12:00"
+      }
+    ],
+    "contents": [],
+    "sessionMappings": [],
+    "accessCode": "CLASS-9834",
+    "studentIds": [
+      {
+        "id": "student-6",
+        "name": "Ines Ayari",
+        "email": "ines@example.com",
+        "amountPaid": 60,
+        "payment": "Partiel",
+        "paymentMethod": "cash",
+        "enrolledAt": "2025-12-20T08:00:00.000Z"
+      }
+    ],
+    "status": "active",
+    "image": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800",
+    "createdAt": "2025-12-18T13:00:00.000Z",
+    "instructorId": "formateur-demo-1"
+  }
+]
