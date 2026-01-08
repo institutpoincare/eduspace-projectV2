@@ -12,6 +12,9 @@
     "body-parser": "^1.20.2",
     "nodemon": "^3.0.1",
     "fs-extra": "^11.1.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
     "cookie-parser": "^1.4.7",
     "googleapis": "^169.0.0"
   },
