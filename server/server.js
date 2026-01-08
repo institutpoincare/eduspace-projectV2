@@ -155,17 +155,19 @@ app.delete('/api/:collection/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// ----------------------------------------------------
-// ajout important : servir le frontend depuis le backend
-// ----------------------------------------------------
+// ==========================================
+// زيد البارتي هذي باش السيت يتحل (Frontend)
+// ==========================================
+// const path = require('path'); // Déjà déclaré en haut du fichier
 
-// 1. servir les fichiers statiques (css, js, images) du dossier parent
+// 1. نقولو للسرفير يقرأ الملفات من الدوسي الرئيسي
 app.use(express.static(path.join(__dirname, '../')));
 
-// 2. servir index.html pour la racin
+// 2. أي رابط ما يفهموش السرفير، يرجعلو الصفحة الرئيسية
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../index.html'));
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
+// ==========================================
 
 // Start Server
 app.listen(PORT, () => {
