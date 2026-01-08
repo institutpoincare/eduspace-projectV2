@@ -1,0 +1,31 @@
+{
+  "name": "eduspace-vanilla",
+  "version": "1.0.0",
+  "description": "EduSpace - Plateforme éducative",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "googleapis": "^169.0.0",
+    "nodemon": "^3.1.11"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/institutpoincare/eduspace-projectV2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/institutpoincare/eduspace-projectV2/issues"
+  },
+  "homepage": "https://github.com/institutpoincare/eduspace-projectV2#readme"
+}
