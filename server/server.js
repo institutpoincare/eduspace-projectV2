@@ -1,16 +1,35 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const db = require('./db-manager');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
+const driveRoutes = require('./routes/drive');
+const authRoutes = require('./routes/auth');
 
 const app = express();
-const PORT = 3000;
-const SECRET_KEY = "eduspace_jwt_secret_key"; // À mettre dans .env
+const PORT = process.env.PORT || 3001; // Port dynamique pour l'hébergement
+const SECRET_KEY = process.env.JWT_SECRET || "eduspace_jwt_secret_key";
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(cookieParser());
+
+// Serve Static Files from Root
+app.use(express.static(path.join(__dirname, '../'))); // Serve frontend files
+
+// Mount Routes
+app.use('/api', driveRoutes);
+app.use('/api', authRoutes);
+
+// Init Cron Jobs
+const { initCronJobs } = require('./cron/webhookRenewal');
+initCronJobs();
 
 // --- MIDDLEWARE AUTH ---
 const authenticateToken = (req, res, next) => {
@@ -66,7 +85,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.post('/api/register', async (req, res) => {
-    const { email, password, role, name } = req.body;
+    const { email, password, role, name, phone } = req.body;
     const users = await db.findAll('users');
 
     if (users.find(u => u.email === email)) {
@@ -78,14 +97,14 @@ app.post('/api/register', async (req, res) => {
     // Pour l'instant on stocke en clair pour faciliter vos tests si vous regardez les fichiers JSON
     // Vous avez demandé du cryptage : db-manager s'en charge.
 
-    const newUser = await db.insert('users', { email, password, role, name, joinedAt: new Date() });
+    const newUser = await db.insert('users', { email, password, role, name, phone, joinedAt: new Date() });
     res.json({ message: "Utilisateur créé", user: newUser });
 });
 
 // --- GENERIC CRUD ROUTES ---
 
-// GET ALL
-app.get('/api/:collection', authenticateToken, async (req, res) => {
+// GET ALL (Public - No Auth Required for Demo)
+app.get('/api/:collection', async (req, res) => {
     try {
         const data = await db.findAll(req.params.collection);
         res.json(data);
@@ -94,8 +113,8 @@ app.get('/api/:collection', authenticateToken, async (req, res) => {
     }
 });
 
-// GET ONE
-app.get('/api/:collection/:id', authenticateToken, async (req, res) => {
+// GET ONE (Public - No Auth Required for Demo)
+app.get('/api/:collection/:id', async (req, res) => {
     try {
         const items = await db.findAll(req.params.collection);
         const item = items.find(i => i.id === req.params.id);
@@ -134,6 +153,18 @@ app.delete('/api/:collection/:id', authenticateToken, async (req, res) => {
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
+});
+
+// ----------------------------------------------------
+// ajout important : servir le frontend depuis le backend
+// ----------------------------------------------------
+
+// 1. servir les fichiers statiques (css, js, images) du dossier parent
+app.use(express.static(path.join(__dirname, '../')));
+
+// 2. servir index.html pour la racin
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 // Start Server
