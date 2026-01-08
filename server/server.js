@@ -156,14 +156,14 @@ app.delete('/api/:collection/:id', authenticateToken, async (req, res) => {
 });
 
 // ==========================================
-// زيد البارتي هذي باش السيت يتحل (Frontend)
+// FIX: Serve Frontend Files
 // ==========================================
-// const path = require('path'); // Déjà déclaré en haut du fichier
+// const path = require('path'); // path is already defined at the top
 
-// 1. نقولو للسرفير يقرأ الملفات من الدوسي الرئيسي
+// 1. قول للسرفير يقرأ الملفات (CSS, JS, HTML) من الدوسي الرئيسي
 app.use(express.static(path.join(__dirname, '../')));
 
-// 2. أي رابط ما يفهموش السرفير، يرجعلو الصفحة الرئيسية
+// 2. أي واحد يدخل للرابط الرئيسي '/'، رجعلو index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
