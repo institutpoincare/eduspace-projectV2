@@ -68,22 +68,45 @@ class StudentMessages {
         msg.from.id === this.currentUser.id || msg.to.id === this.currentUser.id
       );
 
-      // التحقق من وجود رسائل جديدة أو تحديثات
+      // Detection des nouveaux messages
+      if (this.messages.length > 0) {
+          const oldIds = new Set(this.messages.map(m => m.id));
+          const brandNew = newMessages.filter(m => !oldIds.has(m.id) && m.from.id !== this.currentUser.id);
+          
+          if (brandNew.length > 0) {
+              const senderName = brandNew[0].from.name;
+              this.showVisualNotification(`Nouveau message de ${senderName}`);
+          } else {
+             // Check replies
+             newMessages.forEach(newMsg => {
+                 const oldMsg = this.messages.find(m => m.id === newMsg.id);
+                 if (oldMsg && newMsg.replies && newMsg.replies.length > (oldMsg.replies ? oldMsg.replies.length : 0)) {
+                     // Last reply is not from me?
+                     const lastReply = newMsg.replies[newMsg.replies.length - 1];
+                     if (lastReply && lastReply.from !== this.currentUser.id) {
+                         this.showVisualNotification(`Nouvelle réponse dans: ${newMsg.subject}`);
+                     }
+                 }
+             });
+          }
+      }
+
+      // Check change
       const hasChanges = JSON.stringify(newMessages) !== JSON.stringify(this.messages);
       
       if (hasChanges) {
         console.log('📬 New messages detected! Updating...');
         this.messages = newMessages;
         
-        // تحديث قائمة الرسائل
+        // Update List
         this.renderMessagesList();
         this.updateUnreadCount();
 
-        // إذا كانت هناك رسالة محددة، تحديث تفاصيلها دون مسح حقل الرد
+        // Update Active Conversation Non-Destructively
         if (this.selectedMessage) {
           const updatedMessage = this.messages.find(m => m.id === this.selectedMessage.id);
           if (updatedMessage) {
-            // حفظ حالة حقل الرد قبل التحديث
+            // Save Input State
             const replyInput = document.getElementById('reply-input');
             const savedReplyText = replyInput ? replyInput.value : '';
             const wasFocused = replyInput && document.activeElement === replyInput;
@@ -92,14 +115,11 @@ class StudentMessages {
             this.selectedMessage = updatedMessage;
             this.renderMessageDetail();
             
-            // استعادة حالة حقل الرد بعد التحديث
+            // Restore Input State
             if (savedReplyText || wasFocused) {
               const newReplyInput = document.getElementById('reply-input');
               if (newReplyInput) {
-                // استعادة النص
                 newReplyInput.value = savedReplyText;
-                
-                // استعادة التركيز وموضع المؤشر
                 if (wasFocused) {
                   newReplyInput.focus();
                   newReplyInput.setSelectionRange(cursorPosition, cursorPosition);
@@ -323,9 +343,9 @@ class StudentMessages {
         <!-- Reply Form -->
         <div class="p-6 border-t border-gray-200 bg-gray-50">
           <form id="reply-form" class="flex gap-3">
-            <textarea id="reply-input" rows="2" required
-              class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="Écrivez votre réponse..."></textarea>
+            <textarea id="reply-input" rows="5" required
+              class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[120px]"
+              placeholder="Écrivez votre réponse ici..."></textarea>
             <button type="submit"
               class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center gap-2 self-end">
               <i data-lucide="send" class="w-4 h-4"></i>
@@ -510,6 +530,34 @@ class StudentMessages {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  playNotificationSound() {
+    // Son de notification (Petit "Ping" agréable)
+    // Utilisation d'un fichier audio hébergé ou base64 si nécessaire.
+    // Ici on utilise une URL publique fiable pour l'exemple
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio autoplay bloqué (interaction requise):", e));
+  }
+
+  showVisualNotification(text) {
+    // Création d'un toast notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-6 right-6 bg-blue-600 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-bounce cursor-pointer';
+    toast.innerHTML = `<i data-lucide="bell" class="w-6 h-6"></i> <span class="font-bold">${text}</span>`;
+    toast.onclick = () => { toast.remove(); window.focus(); };
+    
+    document.body.appendChild(toast);
+    if(window.lucide) lucide.createIcons();
+
+    // Sound
+    this.playNotificationSound();
+
+    // Auto remove
+    setTimeout(() => {
+        if(toast.parentElement) toast.remove();
+    }, 4000);
   }
 }
 
