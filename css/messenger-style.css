@@ -16,13 +16,13 @@
 
 /* 2. تصميم الرسائل (Bubbles) كيما Messenger */
 .message-bubble {
-    max-width: 80%; /* كبرناه من 70% */
-    padding: 14px 18px; /* زدنا شوية في الـ padding */
-    font-size: 15px;
-    line-height: 1.5;
-    border-radius: 20px;
+    max-width: 85% !important; /* كبرناه أكثر */
+    padding: 16px 20px !important; /* زدنا الـ padding */
+    font-size: 16px !important; /* كبرنا الخط */
+    line-height: 1.6 !important;
+    border-radius: 20px !important;
     position: relative;
-    margin-bottom: 5px;
+    margin-bottom: 8px !important;
     word-wrap: break-word;
     animation: slideIn 0.2s ease-out;
 }
@@ -56,12 +56,12 @@
 
 /* 3. تكبير وتزيين مساحة الكتابة (Input Area) */
 .chat-input-area {
-    background-color: white;
-    padding: 20px;
-    border-top: 1px solid #e4e6eb;
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
+    background-color: white !important;
+    padding: 24px !important; /* كبرنا الـ padding */
+    border-top: 1px solid #e4e6eb !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    gap: 15px !important; /* زدنا المسافة */
     position: sticky;
     bottom: 0;
     z-index: 10;
@@ -69,27 +69,27 @@
 
 /* تكبير المستطيل متاع الكتابة */
 .chat-input-area textarea {
-    width: 100%;
-    background-color: #f0f2f5;
-    border: none;
-    border-radius: 20px;
-    padding: 16px 20px;
-    font-size: 16px;
-    font-family: 'Outfit', sans-serif;
-    min-height: 100px; /* كبرناه من 80px */
-    max-height: 250px; /* زدنا الحد الأقصى */
-    resize: none;
-    outline: none;
-    transition: background-color 0.2s;
-    line-height: 1.5;
+    width: 100% !important;
+    background-color: #f0f2f5 !important;
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    font-family: 'Outfit', sans-serif !important;
+    min-height: 120px !important; /* كبرناه أكثر */
+    max-height: 300px !important; /* زدنا الحد الأقصى */
+    resize: none !important;
+    outline: none !important;
+    transition: background-color 0.2s !important;
+    line-height: 1.5 !important;
 }
 
 .chat-input-area textarea:focus {
-    background-color: #e8eaed;
+    background-color: #e8eaed !important;
 }
 
 .chat-input-area textarea::placeholder {
-    color: #8a8d91;
+    color: #8a8d91 !important;
 }
 
 /* تزيين زر الإرسال (Send Button) */
