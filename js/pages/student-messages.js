@@ -233,9 +233,9 @@ class StudentMessages {
               <p class="text-sm font-medium text-gray-700 truncate mb-1">${msg.subject}</p>
               <p class="text-sm text-gray-500 truncate">${msg.message}</p>
               <div class="flex items-center gap-3 mt-2">
-                ${isUnread ? '<span class="text-xs font-medium text-blue-600 flex items-center gap-1"><i data-lucide="circle" class="w-2 h-2 fill-current"></i> Nouveau</span>' : ''}
-                ${isSent ? '<span class="text-xs text-gray-400 flex items-center gap-1"><i data-lucide="send" class="w-3 h-3"></i> Envoyé</span>' : ''}
-                ${hasReplies ? `<span class="text-xs text-gray-400 flex items-center gap-1"><i data-lucide="message-circle" class="w-3 h-3"></i> ${msg.replies.length}</span>` : ''}
+                ${isUnread ? '<span class="text-xs font-medium text-blue-600 flex items-center gap-1">Nouveau</span>' : ''}
+                ${isSent ? '<span class="text-xs text-gray-400 flex items-center gap-1">Envoyé</span>' : ''}
+                ${hasReplies ? `<span class="text-xs text-gray-400 flex items-center gap-1">${msg.replies.length} réponse(s)</span>` : ''}
               </div>
             </div>
           </div>
@@ -325,8 +325,8 @@ class StudentMessages {
         <!-- Input Area (Instructor Style) -->
         <div class="chat-input-area">
           <textarea id="reply-input" rows="1" placeholder="Écrivez un message..."></textarea>
-          <button onclick="window.studentMessages.sendReply()" class="btn-send">
-            <i data-lucide="send"></i>
+          <button onclick="window.studentMessages.sendReply()" class="btn-send font-bold text-sm px-4 w-auto rounded-full">
+            Envoyer
           </button>
         </div>
       </div>
