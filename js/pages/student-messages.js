@@ -267,89 +267,82 @@ class StudentMessages {
 
     // إزالة كلاسات التوسيط الافتراضية لضمان أن المحتوى يأخذ كامل المساحة
     container.classList.remove('items-center', 'justify-center', 'text-gray-400');
-    container.classList.add('block', 'h-full'); // ضمان أن الحاوية تأخذ الارتفاع الكامل
+    container.classList.add('block', 'h-full');
 
     const isSent = this.selectedMessage.from.id === this.currentUser.id;
     const otherPerson = isSent ? this.selectedMessage.to : this.selectedMessage.from;
 
     container.innerHTML = `
       <div class="flex flex-col h-full">
-        <!-- Message Header -->
-        <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
-          <div class="flex items-center gap-4 mb-3">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-              ${otherPerson.name.charAt(0)}
-            </div>
-            <div class="flex-1">
-              <h3 class="font-bold text-lg text-gray-900">${otherPerson.name}</h3>
-              <p class="text-sm text-gray-500">${otherPerson.role === 'formateur' ? 'Formateur' : 'Étudiant'}</p>
-            </div>
-            <span class="text-sm text-gray-500">${this.formatDate(this.selectedMessage.createdAt)}</span>
+        <!-- Message Header - Messenger Style -->
+        <div class="message-header">
+          <div class="message-header-avatar">
+            ${otherPerson.name.charAt(0)}
           </div>
-          <h2 class="text-xl font-bold text-gray-900">${this.selectedMessage.subject}</h2>
+          <div class="message-header-info">
+            <div class="message-header-name">${otherPerson.name}</div>
+            <div class="message-header-role">${otherPerson.role === 'formateur' ? 'Formateur' : 'Étudiant'}</div>
+          </div>
+          <span class="text-sm text-gray-500">${this.formatDate(this.selectedMessage.createdAt)}</span>
         </div>
 
-        <!-- Message Content -->
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
-          <!-- Original Message -->
-          <div class="mb-6">
-            <div class="flex items-start gap-3 mb-2">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                ${this.selectedMessage.from.name.charAt(0)}
+        <!-- Messages Area - Messenger Style Bubbles -->
+        <div class="chat-messages flex-1">
+          <!-- Subject Header -->
+          <div class="message-time-divider">
+            <span><strong>${this.selectedMessage.subject}</strong></span>
+          </div>
+
+          <!-- Original Message Bubble -->
+          <div class="flex flex-col ${isSent ? 'items-end' : 'items-start'} mb-4">
+            ${!isSent ? `
+              <div class="message-sender-info">
+                <div class="message-sender-avatar">${this.selectedMessage.from.name.charAt(0)}</div>
+                <span class="message-sender-name">${this.selectedMessage.from.name}</span>
               </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="font-semibold text-gray-900">${this.selectedMessage.from.name}</span>
-                  <span class="text-xs text-gray-500">${this.formatDate(this.selectedMessage.createdAt)}</span>
-                </div>
-                <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                  <p class="text-gray-700 leading-relaxed">${this.selectedMessage.message}</p>
-                </div>
-              </div>
+            ` : ''}
+            <div class="message-bubble ${isSent ? 'message-sent' : 'message-received'}">
+              ${this.selectedMessage.message}
+            </div>
+            <div class="message-timestamp ${isSent ? 'text-right' : 'text-left'}">
+              ${this.getTimeAgo(this.selectedMessage.createdAt)}
             </div>
           </div>
 
-          <!-- Replies -->
-          ${this.selectedMessage.replies && this.selectedMessage.replies.length > 0 ? `
-            <div class="space-y-4">
-              <h4 class="font-semibold text-gray-700 flex items-center gap-2">
-                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                Réponses (${this.selectedMessage.replies.length})
-              </h4>
-              ${this.selectedMessage.replies.map(reply => {
-                const replyFrom = reply.from === this.currentUser.id ? this.currentUser : otherPerson;
-                const isMyReply = reply.from === this.currentUser.id;
-                return `
-                  <div class="flex items-start gap-3 ${isMyReply ? 'flex-row-reverse' : ''}">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br ${isMyReply ? 'from-green-500 to-emerald-600' : 'from-blue-500 to-purple-600'} flex items-center justify-center text-white font-bold flex-shrink-0">
-                      ${replyFrom.name.charAt(0)}
+          <!-- Replies as Bubbles -->
+          ${this.selectedMessage.replies && this.selectedMessage.replies.length > 0 ? 
+            this.selectedMessage.replies.map(reply => {
+              const replyFrom = reply.from === this.currentUser.id ? this.currentUser : otherPerson;
+              const isMyReply = reply.from === this.currentUser.id;
+              
+              return `
+                <div class="flex flex-col ${isMyReply ? 'items-end' : 'items-start'} mb-4">
+                  ${!isMyReply ? `
+                    <div class="message-sender-info">
+                      <div class="message-sender-avatar">${replyFrom.name.charAt(0)}</div>
+                      <span class="message-sender-name">${replyFrom.name}</span>
                     </div>
-                    <div class="flex-1 max-w-md">
-                      <div class="flex items-center gap-2 mb-1 ${isMyReply ? 'flex-row-reverse' : ''}">
-                        <span class="font-semibold text-gray-900 text-sm">${replyFrom.name}</span>
-                        <span class="text-xs text-gray-500">${this.getTimeAgo(reply.createdAt)}</span>
-                      </div>
-                      <div class="bg-${isMyReply ? 'blue-500 text-white' : 'gray-50 text-gray-700'} rounded-2xl p-3 border ${isMyReply ? 'border-blue-600' : 'border-gray-200'}">
-                        <p class="text-sm leading-relaxed">${reply.message}</p>
-                      </div>
-                    </div>
+                  ` : ''}
+                  <div class="message-bubble ${isMyReply ? 'message-sent' : 'message-received'}">
+                    ${reply.message}
                   </div>
-                `;
-              }).join('')}
-            </div>
-          ` : ''}
+                  <div class="message-timestamp ${isMyReply ? 'text-right' : 'text-left'}">
+                    ${this.getTimeAgo(reply.createdAt)}
+                  </div>
+                </div>
+              `;
+            }).join('')
+          : ''}
         </div>
 
-        <!-- Reply Form -->
-        <div class="p-6 border-t border-gray-200 bg-gray-50">
-          <form id="reply-form" class="flex gap-3">
-            <textarea id="reply-input" rows="5" required
-              class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[120px]"
-              placeholder="Écrivez votre réponse ici..."></textarea>
-            <button type="submit"
-              class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center gap-2 self-end">
-              <i data-lucide="send" class="w-4 h-4"></i>
-              Envoyer
+        <!-- Reply Input Area - Messenger Style -->
+        <div class="chat-input-area">
+          <form id="reply-form" class="flex gap-3 w-full items-end">
+            <textarea id="reply-input" rows="3" required
+              class="flex-1"
+              placeholder="Écrivez un message..."></textarea>
+            <button type="submit" class="btn-send">
+              <i data-lucide="send" class="w-5 h-5"></i>
             </button>
           </form>
         </div>
@@ -367,10 +360,19 @@ class StudentMessages {
       });
     }
 
+    // Auto-resize textarea
+    const textarea = document.getElementById('reply-input');
+    if (textarea) {
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+      });
+    }
+
     // Scroll to bottom
-    const historyContainer = container.querySelector('.custom-scrollbar');
-    if (historyContainer) {
-      historyContainer.scrollTop = historyContainer.scrollHeight;
+    const messagesContainer = container.querySelector('.chat-messages');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
   }
 

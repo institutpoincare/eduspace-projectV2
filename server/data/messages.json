@@ -102,5 +102,25 @@
       }
     ],
     "updatedAt": "2025-12-29T17:28:31.299Z"
+  },
+  {
+    "id": "msg_1767952055512",
+    "from": {
+      "id": "2119a0ab-0fd1-4a3d-b463-cf662a82a61f",
+      "name": "Institut Poincare",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "bonjour",
+    "message": "gg",
+    "isRead": false,
+    "createdAt": "2026-01-09T09:47:35.517Z",
+    "replies": [],
+    "updatedAt": "2026-01-09T09:47:35.517Z"
   }
 ]

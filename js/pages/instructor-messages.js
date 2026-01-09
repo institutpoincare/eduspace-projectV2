@@ -255,94 +255,119 @@ class InstructorMessages {
     }
 
     renderMessageDetail() {
-        const container = document.getElementById('message-detail-container');
-        if (!container || !this.selectedMessage) return;
+    const container = document.getElementById('message-detail-container');
+    if (!container || !this.selectedMessage) return;
 
-        // إزالة كلاسات التوسيط الافتراضية
-        container.classList.remove('items-center', 'justify-center', 'text-gray-400', 'flex');
-        container.classList.add('block', 'h-full');
+    // إزالة كلاسات التوسيط الافتراضية
+    container.classList.remove('items-center', 'justify-center', 'text-gray-400', 'flex');
+    container.classList.add('block', 'h-full');
 
-        const msg = this.selectedMessage;
-        const roleIcon = msg.from.role === 'parent' ? 'users' : 'user';
-        const roleLabel = msg.from.role === 'parent' ? 'Parent' : 'Étudiant';
-        const roleColor = msg.from.role === 'parent' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700';
+    const msg = this.selectedMessage;
+    const roleIcon = msg.from.role === 'parent' ? 'users' : 'user';
+    const roleLabel = msg.from.role === 'parent' ? 'Parent' : 'Étudiant';
+    const roleColor = msg.from.role === 'parent' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700';
+    const isSent = msg.from.id === this.currentUser.id;
 
-        container.innerHTML = `
-            <div class="flex flex-col h-full">
-                <!-- Header -->
-                <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br ${msg.from.role === 'parent' ? 'from-purple-500 to-purple-600' : 'from-blue-500 to-blue-600'} flex items-center justify-center text-white font-bold text-lg">
+    container.innerHTML = `
+        <div class="flex flex-col h-full">
+            <!-- Message Header - Messenger Style -->
+            <div class="message-header">
+                <div class="message-header-avatar" style="background: linear-gradient(135deg, ${msg.from.role === 'parent' ? '#9333ea, #a855f7' : '#3b82f6, #60a5fa'})">
+                    ${msg.from.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="message-header-info">
+                    <div class="message-header-name">${msg.from.name}</div>
+                    <div class="message-header-role">
+                        <span class="inline-block px-2 py-1 rounded-full text-xs font-bold ${roleColor}">
+                            <i data-lucide="${roleIcon}" class="w-3 h-3 inline mr-1"></i>${roleLabel}
+                        </span>
+                    </div>
+                </div>
+                <span class="text-sm text-gray-500">${this.formatDate(msg.createdAt)}</span>
+            </div>
+
+            <!-- Messages Area - Messenger Style Bubbles -->
+            <div class="chat-messages flex-1">
+                <!-- Subject Header -->
+                <div class="message-time-divider">
+                    <span><strong>${msg.subject}</strong></span>
+                </div>
+
+                <!-- Original Message Bubble -->
+                <div class="flex flex-col ${isSent ? 'items-end' : 'items-start'} mb-4">
+                    ${!isSent ? `
+                        <div class="message-sender-info">
+                            <div class="message-sender-avatar" style="background: linear-gradient(135deg, ${msg.from.role === 'parent' ? '#9333ea, #a855f7' : '#3b82f6, #60a5fa'})">
                                 ${msg.from.name.charAt(0).toUpperCase()}
                             </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-900">${msg.from.name}</h3>
-                                <span class="inline-block px-2 py-1 rounded-full text-xs font-bold ${roleColor} mt-1">
-                                    <i data-lucide="${roleIcon}" class="w-3 h-3 inline mr-1"></i>${roleLabel}
-                                </span>
-                            </div>
-                        </div>
-                        <span class="text-sm text-gray-500">${this.formatDate(msg.createdAt)}</span>
-                    </div>
-                    <h2 class="text-xl font-bold text-gray-900">${msg.subject}</h2>
-                </div>
-
-                <!-- Message Content -->
-                <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
-                    <!-- Original Message -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-5 mb-4 shadow-sm">
-                        <p class="text-gray-700 leading-relaxed whitespace-pre-line">${msg.message}</p>
-                    </div>
-
-                    <!-- Replies -->
-                    ${msg.replies && msg.replies.length > 0 ? `
-                        <div class="space-y-3">
-                            <h4 class="font-bold text-gray-700 flex items-center gap-2">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i> Réponses
-                            </h4>
-                            ${msg.replies.map(reply => {
-                                const isMyReply = reply.from === this.currentUser.id;
-                                const replyFrom = isMyReply ? this.currentUser : msg.from;
-                                return `
-                                <div class="${isMyReply ? 'bg-blue-50 border-blue-200 ml-8' : 'bg-gray-50 border-gray-200 mr-8'} border rounded-xl p-4">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-bold ${isMyReply ? 'text-blue-900' : 'text-gray-900'}">${isMyReply ? 'Vous' : replyFrom.name}</span>
-                                        <span class="text-xs ${isMyReply ? 'text-blue-600' : 'text-gray-600'}">${this.formatDate(reply.createdAt)}</span>
-                                    </div>
-                                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">${reply.message}</p>
-                                </div>
-                            `;
-                            }).join('')}
+                            <span class="message-sender-name">${msg.from.name}</span>
                         </div>
                     ` : ''}
-                </div>
-
-                <!-- Reply Box -->
-                <div class="p-6 border-t border-gray-200 bg-gray-50">
-                    <div class="flex flex-col gap-3">
-                        <textarea id="reply-text" rows="3" 
-                            class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                            placeholder="Écrivez votre réponse..."></textarea>
-                        <div class="flex justify-end gap-2">
-                            <button onclick="instructorMessages.sendReply()" 
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 font-medium shadow-sm transition-all">
-                                <i data-lucide="send" class="w-4 h-4"></i> Envoyer
-                            </button>
-                        </div>
+                    <div class="message-bubble ${isSent ? 'message-sent' : 'message-received'}">
+                        ${msg.message}
+                    </div>
+                    <div class="message-timestamp ${isSent ? 'text-right' : 'text-left'}">
+                        ${this.getTimeAgo(msg.createdAt)}
                     </div>
                 </div>
+
+                <!-- Replies as Bubbles -->
+                ${msg.replies && msg.replies.length > 0 ? 
+                    msg.replies.map(reply => {
+                        const isMyReply = reply.from === this.currentUser.id;
+                        const replyFrom = isMyReply ? this.currentUser : msg.from;
+                        
+                        return `
+                            <div class="flex flex-col ${isMyReply ? 'items-end' : 'items-start'} mb-4">
+                                ${!isMyReply ? `
+                                    <div class="message-sender-info">
+                                        <div class="message-sender-avatar" style="background: linear-gradient(135deg, ${msg.from.role === 'parent' ? '#9333ea, #a855f7' : '#3b82f6, #60a5fa'})">
+                                            ${replyFrom.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <span class="message-sender-name">${replyFrom.name}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="message-bubble ${isMyReply ? 'message-sent' : 'message-received'}">
+                                    ${reply.message}
+                                </div>
+                                <div class="message-timestamp ${isMyReply ? 'text-right' : 'text-left'}">
+                                    ${this.getTimeAgo(reply.createdAt)}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                : ''}
             </div>
-        `;
 
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+            <!-- Reply Input Area - Messenger Style -->
+            <div class="chat-input-area">
+                <textarea id="reply-text" rows="3" required
+                    class="flex-1"
+                    placeholder="Écrivez un message..."></textarea>
+                <button onclick="instructorMessages.sendReply()" class="btn-send">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    `;
 
-        // Scroll to bottom
-        const historyContainer = container.querySelector('.custom-scrollbar');
-        if (historyContainer) {
-            historyContainer.scrollTop = historyContainer.scrollHeight;
-        }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Auto-resize textarea
+    const textarea = document.getElementById('reply-text');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
     }
+
+    // Scroll to bottom
+    const messagesContainer = container.querySelector('.chat-messages');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  }
 
     async sendReply() {
         const replyText = document.getElementById('reply-text');
