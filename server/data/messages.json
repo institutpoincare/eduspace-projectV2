@@ -122,5 +122,25 @@
     "createdAt": "2026-01-09T09:47:35.517Z",
     "replies": [],
     "updatedAt": "2026-01-09T09:47:35.517Z"
+  },
+  {
+    "id": "msg_1767953975069",
+    "from": {
+      "id": "2518962c-e5c7-468b-b923-7b6343ad48be",
+      "name": "Ahmed Haddad",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "aaa",
+    "message": "qs",
+    "isRead": false,
+    "createdAt": "2026-01-09T10:19:35.071Z",
+    "replies": [],
+    "updatedAt": "2026-01-09T10:19:35.072Z"
   }
 ]

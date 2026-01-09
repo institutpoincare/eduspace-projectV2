@@ -365,7 +365,7 @@ class StudentMessages {
     if (textarea) {
       textarea.addEventListener('input', function() {
         this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        this.style.height = Math.min(this.scrollHeight, 250) + 'px'; // كبرناه من 200px
       });
     }
 

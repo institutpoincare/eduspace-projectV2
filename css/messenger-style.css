@@ -16,10 +16,10 @@
 
 /* 2. تصميم الرسائل (Bubbles) كيما Messenger */
 .message-bubble {
-    max-width: 70%;
-    padding: 12px 16px;
+    max-width: 80%; /* كبرناه من 70% */
+    padding: 14px 18px; /* زدنا شوية في الـ padding */
     font-size: 15px;
-    line-height: 1.4;
+    line-height: 1.5;
     border-radius: 20px;
     position: relative;
     margin-bottom: 5px;
@@ -73,14 +73,15 @@
     background-color: #f0f2f5;
     border: none;
     border-radius: 20px;
-    padding: 14px 18px;
-    font-size: 15px;
+    padding: 16px 20px;
+    font-size: 16px;
     font-family: 'Outfit', sans-serif;
-    min-height: 80px;
-    max-height: 200px;
+    min-height: 100px; /* كبرناه من 80px */
+    max-height: 250px; /* زدنا الحد الأقصى */
     resize: none;
     outline: none;
     transition: background-color 0.2s;
+    line-height: 1.5;
 }
 
 .chat-input-area textarea:focus {
@@ -226,16 +227,24 @@
 /* 8. Responsive Design */
 @media (max-width: 768px) {
     .message-bubble {
-        max-width: 85%;
+        max-width: 90%; /* على الموبايل نكبروه أكثر */
+        padding: 12px 16px;
     }
     
     .chat-input-area {
-        padding: 15px;
+        padding: 12px 15px;
     }
     
     .chat-input-area textarea {
-        min-height: 60px;
-        font-size: 14px;
+        min-height: 80px; /* على الموبايل شوية أصغر */
+        font-size: 15px;
+        padding: 14px 16px;
+    }
+    
+    .btn-send {
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 20px;
     }
 }
 
