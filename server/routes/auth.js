@@ -17,7 +17,8 @@ const SECRET_KEY = process.env.JWT_SECRET || "eduspace_jwt_secret_key";
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    // process.env.GOOGLE_REDIRECT_URI // On force l'URL pour être sûr
+    "https://eduspace-projectv2.onrender.com/api/auth/google/callback"
 );
 
 // Scopes pour l'authentification utilisateur (profil + email)
