@@ -335,14 +335,37 @@ class StudentMessages {
           : ''}
         </div>
 
-        <!-- Reply Input Area - Messenger Style -->
-        <div class="chat-input-area">
-          <form id="reply-form" class="flex gap-3 w-full items-end">
-            <textarea id="reply-input" rows="3" required
-              class="flex-1"
-              placeholder="Écrivez un message..."></textarea>
-            <button type="submit" class="btn-send">
-              <i data-lucide="send" class="w-5 h-5"></i>
+        <!-- Reply Input Area - Messenger Style with Inline Styles -->
+        <div class="chat-input-area" style="background-color: white; padding: 20px; border-top: 1px solid #ddd; position: sticky; bottom: 0;">
+          <form id="reply-form" class="d-flex align-items-center" style="gap: 15px; display: flex; align-items: flex-end;">
+            <textarea id="reply-input" required
+              class="form-control"
+              placeholder="Écrivez votre message ici..."
+              style="
+                height: 80px !important;
+                min-height: 80px !important;
+                border-radius: 20px !important;
+                resize: none;
+                padding: 15px;
+                font-size: 16px;
+                background-color: #f0f2f5;
+                border: none;
+                width: 100%;
+                flex: 1;
+              "></textarea>
+            <button type="submit" class="btn btn-primary btn-send" style="
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              border: none;
+              cursor: pointer;
+            ">
+              <i data-lucide="send" class="w-5 h-5" style="font-size: 24px; color: white;"></i>
             </button>
           </form>
         </div>
@@ -360,12 +383,12 @@ class StudentMessages {
       });
     }
 
-    // Auto-resize textarea
+    // Auto-resize textarea (minimum 80px, maximum 300px)
     const textarea = document.getElementById('reply-input');
     if (textarea) {
       textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 300) + 'px'; // كبرناه للـ 300px
+        this.style.height = '80px'; // Reset to minimum
+        this.style.height = Math.max(80, Math.min(this.scrollHeight, 300)) + 'px';
       });
     }
 
