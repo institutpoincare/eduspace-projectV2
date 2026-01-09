@@ -654,6 +654,9 @@ window.finishCreate = async () => {
     
     if(!title) { alert("Titre requis"); return; }
     if(!category) { alert("Catégorie requise"); return; }
+    if(!subject) { alert("Matière requise"); return; }
+    if(!level) { alert("Niveau requis"); return; }
+    if(!priceVal && priceVal !== 0) { alert("Prix requis"); return; }
 
     const newClass = {
         id: isEditing ? editingId : dataManager.generateId(),

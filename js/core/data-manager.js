@@ -46,7 +46,16 @@ class DataManager {
         if (data) options.body = JSON.stringify(data);
 
         const res = await fetch(`${API_URL}/${endpoint}`, options);
-        if (!res.ok) throw new Error(`Erreur API ${res.status}`);
+        if (!res.ok) {
+            if (res.status === 401) {
+                console.warn("⚠️ Session expirée ou invalide (401). Redirection...");
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.href = '../../pages/login-etudiant.html'; // Default redirect
+                return null;
+            }
+            throw new Error(`Erreur API ${res.status}`);
+        }
         if (res.status === 204) return null;
         return await res.json();
     }
