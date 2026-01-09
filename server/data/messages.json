@@ -1,1 +1,69 @@
-[]
+[
+  {
+    "id": "msg_1767965647723",
+    "from": {
+      "id": "2119a0ab-0fd1-4a3d-b463-cf662a82a61f",
+      "name": "Institut Poincare",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "sz",
+    "message": "dqs",
+    "isRead": true,
+    "createdAt": "2026-01-09T13:34:07.827Z",
+    "replies": [],
+    "updatedAt": "2026-01-09T16:34:50.842Z"
+  },
+  {
+    "id": "msg_1767966209218",
+    "from": {
+      "id": "2119a0ab-0fd1-4a3d-b463-cf662a82a61f",
+      "name": "Institut Poincare",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "ef",
+    "message": "ergegr",
+    "isRead": true,
+    "createdAt": "2026-01-09T13:43:29.219Z",
+    "replies": [],
+    "updatedAt": "2026-01-09T16:34:42.059Z"
+  },
+  {
+    "id": "msg_1767976578143",
+    "from": {
+      "id": "73a8611a-7042-4f69-bf12-2c83ebcde800",
+      "name": "test",
+      "role": "etudiant",
+      "avatar": ""
+    },
+    "to": {
+      "id": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+      "name": "Ahmed Aboudi",
+      "role": "formateur"
+    },
+    "subject": "sz",
+    "message": "sss",
+    "isRead": false,
+    "createdAt": "2026-01-09T16:36:18.152Z",
+    "replies": [
+      {
+        "id": "reply_1767976925013",
+        "from": "73a8611a-7042-4f69-bf12-2c83ebcde800",
+        "message": "bonjour",
+        "createdAt": "2026-01-09T16:42:05.013Z"
+      }
+    ],
+    "updatedAt": "2026-01-09T16:42:05.015Z"
+  }
+]

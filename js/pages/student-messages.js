@@ -265,138 +265,102 @@ class StudentMessages {
     const container = document.getElementById('message-detail-container');
     if (!container || !this.selectedMessage) return;
 
-    // إزالة كلاسات التوسيط الافتراضية لضمان أن المحتوى يأخذ كامل المساحة
+    // Remove any centering classes from the placeholder state
     container.classList.remove('items-center', 'justify-center', 'text-gray-400');
-    container.classList.add('block', 'h-full');
+    container.classList.add('block', 'w-full', 'h-full');
 
     const isSent = this.selectedMessage.from.id === this.currentUser.id;
     const otherPerson = isSent ? this.selectedMessage.to : this.selectedMessage.from;
 
     container.innerHTML = `
-      <div class="flex flex-col h-full">
-        <!-- Message Header - Messenger Style -->
+      <div class="flex flex-col h-full w-full bg-white">
+        <!-- Header -->
         <div class="message-header">
-          <div class="message-header-avatar">
-            ${otherPerson.name.charAt(0)}
-          </div>
-          <div class="message-header-info">
-            <div class="message-header-name">${otherPerson.name}</div>
-            <div class="message-header-role">${otherPerson.role === 'formateur' ? 'Formateur' : 'Étudiant'}</div>
-          </div>
-          <span class="text-sm text-gray-500">${this.formatDate(this.selectedMessage.createdAt)}</span>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+                ${otherPerson.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-900 text-lg">${otherPerson.name}</h3>
+                <span class="text-sm text-gray-500">${otherPerson.role === 'formateur' ? 'Formateur' : 'Étudiant'}</span>
+            </div>
         </div>
 
-        <!-- Messages Area - Messenger Style Bubbles -->
-        <div class="chat-messages flex-1">
+        <!-- Messages Area -->
+        <div class="chat-messages custom-scrollbar">
           <!-- Subject Header -->
-          <div class="message-time-divider">
-            <span><strong>${this.selectedMessage.subject}</strong></span>
+          <div class="text-center my-4">
+             <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">
+                ${this.selectedMessage.subject}
+             </span>
           </div>
 
-          <!-- Original Message Bubble -->
-          <div class="flex flex-col ${isSent ? 'items-end' : 'items-start'} mb-4">
-            ${!isSent ? `
-              <div class="message-sender-info">
-                <div class="message-sender-avatar">${this.selectedMessage.from.name.charAt(0)}</div>
-                <span class="message-sender-name">${this.selectedMessage.from.name}</span>
-              </div>
-            ` : ''}
+          <!-- Original Message -->
+          <div class="flex flex-col ${isSent ? 'items-end' : 'items-start'} mb-2">
             <div class="message-bubble ${isSent ? 'message-sent' : 'message-received'}">
               ${this.selectedMessage.message}
             </div>
-            <div class="message-timestamp ${isSent ? 'text-right' : 'text-left'}">
-              ${this.getTimeAgo(this.selectedMessage.createdAt)}
-            </div>
+            <span class="text-xs text-gray-400 mt-1 mx-1">
+              ${this.formatTime(this.selectedMessage.createdAt)}
+            </span>
           </div>
 
-          <!-- Replies as Bubbles -->
+          <!-- Replies -->
           ${this.selectedMessage.replies && this.selectedMessage.replies.length > 0 ? 
             this.selectedMessage.replies.map(reply => {
-              const replyFrom = reply.from === this.currentUser.id ? this.currentUser : otherPerson;
               const isMyReply = reply.from === this.currentUser.id;
-              
               return `
-                <div class="flex flex-col ${isMyReply ? 'items-end' : 'items-start'} mb-4">
-                  ${!isMyReply ? `
-                    <div class="message-sender-info">
-                      <div class="message-sender-avatar">${replyFrom.name.charAt(0)}</div>
-                      <span class="message-sender-name">${replyFrom.name}</span>
-                    </div>
-                  ` : ''}
+                <div class="flex flex-col ${isMyReply ? 'items-end' : 'items-start'} mb-2">
                   <div class="message-bubble ${isMyReply ? 'message-sent' : 'message-received'}">
                     ${reply.message}
                   </div>
-                  <div class="message-timestamp ${isMyReply ? 'text-right' : 'text-left'}">
-                    ${this.getTimeAgo(reply.createdAt)}
-                  </div>
+                  <span class="text-xs text-gray-400 mt-1 mx-1">
+                    ${this.formatTime(reply.createdAt)}
+                  </span>
                 </div>
               `;
             }).join('')
           : ''}
         </div>
 
-        <!-- Reply Input Area - Messenger Style with Inline Styles -->
-        <div class="chat-input-area" style="background-color: white; padding: 20px; border-top: 1px solid #ddd; position: sticky; bottom: 0;">
-          <form id="reply-form" class="d-flex align-items-center" style="gap: 15px; display: flex; align-items: flex-end;">
-            <textarea id="reply-input" required
-              class="form-control"
-              placeholder="Écrivez votre message ici..."
-              style="
-                height: 80px !important;
-                min-height: 80px !important;
-                border-radius: 20px !important;
-                resize: none;
-                padding: 15px;
-                font-size: 16px;
-                background-color: #f0f2f5;
-                border: none;
-                width: 100%;
-                flex: 1;
-              "></textarea>
-            <button type="submit" class="btn btn-primary btn-send" style="
-              width: 60px;
-              height: 60px;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              flex-shrink: 0;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              border: none;
-              cursor: pointer;
-            ">
-              <i data-lucide="send" class="w-5 h-5" style="font-size: 24px; color: white;"></i>
-            </button>
-          </form>
+        <!-- Input Area (Instructor Style) -->
+        <div class="chat-input-area">
+          <textarea id="reply-input" rows="1" placeholder="Écrivez un message..."></textarea>
+          <button onclick="window.studentMessages.sendReply()" class="btn-send">
+            <i data-lucide="send"></i>
+          </button>
         </div>
       </div>
     `;
 
     lucide.createIcons();
-
-    // Setup reply form
-    const replyForm = document.getElementById('reply-form');
-    if (replyForm) {
-      replyForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        this.sendReply();
-      });
-    }
-
-    // Auto-resize textarea (minimum 80px, maximum 300px)
+    
+    // Auto-resize textarea logic
     const textarea = document.getElementById('reply-input');
     if (textarea) {
-      textarea.addEventListener('input', function() {
-        this.style.height = '80px'; // Reset to minimum
-        this.style.height = Math.max(80, Math.min(this.scrollHeight, 300)) + 'px';
-      });
+        // Submit on Enter
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendReply();
+            }
+        });
+        
+        // Auto grow
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto'; 
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
     }
 
     // Scroll to bottom
-    const messagesContainer = container.querySelector('.chat-messages');
-    if (messagesContainer) {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    const messagesBody = container.querySelector('.chat-messages');
+    if (messagesBody) {
+        messagesBody.scrollTop = messagesBody.scrollHeight;
     }
+  }
+
+  formatTime(dateStr) {
+      return new Date(dateStr).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
   }
 
   async sendReply() {
