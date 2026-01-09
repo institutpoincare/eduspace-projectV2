@@ -403,7 +403,7 @@ class FormateurProfile {
             console.log('✅ Profil sauvegardé');
         } catch (error) {
             console.error('❌ Erreur sauvegarde:', error);
-            alert('❌ Erreur lors de la sauvegarde');
+            alert('❌ Erreur: ' + (error.message || error));
         }
     }
 }

@@ -12,6 +12,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Initialisation du tableau de bord étudiant moderne...');
     
     try {
+        // Handle Google Callback first if present (URL check)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('token') && urlParams.get('auth') === 'google') {
+            console.log('🔄 Detecting Google Auth callback...');
+            // Let google-auth.js handle it, small delay to ensure session set
+            await new Promise(r => setTimeout(r, 500));
+        }
+
         await dataManager.init();
         await loadStudentData();
         await loadDashboardContent();

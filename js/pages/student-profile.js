@@ -60,13 +60,14 @@ class StudentProfile {
         if (nameHeader) nameHeader.textContent = this.currentUser.name || 'Utilisateur';
         
         // Update form fields
-        const textInputs = document.querySelectorAll('#section-general input[type="text"]');
+        const firstNameInput = document.getElementById('profile-firstname');
+        const lastNameInput = document.getElementById('profile-lastname');
         const emailInput = document.querySelector('input[type="email"]');
-        const phoneInput = document.querySelector('input[type="tel"]');
-        const levelSelect = document.querySelector('select');
+        const phoneInput = document.getElementById('profile-phone');
+        const levelSelect = document.getElementById('profile-level');
 
-        if (textInputs[0]) textInputs[0].value = firstName;
-        if (textInputs[1]) textInputs[1].value = lastName;
+        if (firstNameInput) firstNameInput.value = firstName;
+        if (lastNameInput) lastNameInput.value = lastName;
         if (emailInput) emailInput.value = this.currentUser.email || '';
         if (phoneInput) phoneInput.value = this.currentUser.phone || '';
         if (levelSelect && this.currentUser.level) {
@@ -100,9 +101,11 @@ class StudentProfile {
 
     setupEventListeners() {
         // Save profile button
-        const saveBtn = document.querySelector('.bg-blue-600.text-white[class*="shadow-blue"]');
+        const saveBtn = document.getElementById('btn-save-profile');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => this.saveProfile());
+        } else {
+             console.error("Save Button not found! Check HTML ID 'btn-save-profile'");
         }
 
         // Change password button
@@ -120,12 +123,13 @@ class StudentProfile {
 
     async saveProfile() {
         try {
-            const inputs = document.querySelectorAll('#section-general input[type="text"]');
-            const phoneInput = document.querySelector('input[type="tel"]');
-            const levelSelect = document.querySelector('select');
+            const firstNameInput = document.getElementById('profile-firstname');
+            const lastNameInput = document.getElementById('profile-lastname');
+            const phoneInput = document.getElementById('profile-phone');
+            const levelSelect = document.getElementById('profile-level');
 
-            const firstName = inputs[0]?.value || '';
-            const lastName = inputs[1]?.value || '';
+            const firstName = firstNameInput?.value || '';
+            const lastName = lastNameInput?.value || '';
             const fullName = `${firstName} ${lastName}`.trim();
 
             const updates = {
@@ -134,13 +138,17 @@ class StudentProfile {
                 level: levelSelect?.value || ''
             };
 
-            await dataManager.updateById('users', this.currentUser.id, updates);
+            await dataManager.update('users', this.currentUser.id, updates);
             
             // Update session
             this.currentUser = { ...this.currentUser, ...updates };
             sessionStorage.setItem('user', JSON.stringify(this.currentUser));
 
+            // Refresh UI (Header name, etc.)
+            this.renderProfile();
+
             this.showNotification('Profil mis à jour avec succès !', 'success');
+            console.log('Profile saved!');
         } catch (error) {
             console.error('❌ Erreur sauvegarde profil:', error);
             this.showNotification('Erreur lors de la sauvegarde', 'error');
@@ -170,7 +178,7 @@ class StudentProfile {
 
         try {
             // In a real app, verify old password first
-            await dataManager.updateById('users', this.currentUser.id, {
+            await dataManager.update('users', this.currentUser.id, {
                 password: newPassword
             });
 

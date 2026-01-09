@@ -4,7 +4,8 @@
  * Remplace tout usage de localStorage par des appels API
  */
 
-const API_URL = 'http://localhost:3001/api';
+//const API_URL = 'http://localhost:3001/api';
+const API_URL = '/api'; // Use relative path to work with any IP/Hostname
 
 class DataManager {
     constructor() {
@@ -26,8 +27,22 @@ class DataManager {
     async request(endpoint, method = 'GET', data = null) {
         const options = {
             method,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json'
+            }
         };
+
+        // Add Auth Token
+        let token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        if (!token) {
+            // Fallback for legacy Google Auth sessions
+            token = sessionStorage.getItem('authToken');
+        }
+
+        if (token) {
+            options.headers['Authorization'] = `Bearer ${token}`;
+        }
+
         if (data) options.body = JSON.stringify(data);
 
         const res = await fetch(`${API_URL}/${endpoint}`, options);
@@ -64,25 +79,39 @@ class DataManager {
 
     // --- AUTHENTIFICATION ---
 
-    async login(email, password, role) {
+    async login(email, password, role, rememberMe = false) {
         try {
             // On envoie au backend endpoint spécial 'login' qui vérifie dans la collection users
             // Note: Pour simplifier dans ce backend vanilla, on tape 'login' comme une collection virtuelle
-            const res = await this.request('login', 'POST', { email, password });
+            const res = await this.request('login', 'POST', { email, password, role });
             if (res && res.user) {
                 if (res.user.role !== role) throw new Error("Role incorrect");
                 this.currentUser = res.user;
+                
+                // Store Token
+                if (res.token) {
+                    if (rememberMe) {
+                        localStorage.setItem('token', res.token);
+                        localStorage.setItem('user', JSON.stringify(res.user));
+                    } else {
+                        sessionStorage.setItem('token', res.token);
+                    }
+                }
+
                 // On garde en Session Storage juste pour ne pas perdre la connexion au F5
                 sessionStorage.setItem('user', JSON.stringify(res.user));
                 return res.user;
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error(e); throw e; }
         throw new Error("Identifiants invalides");
     }
 
     logout() {
         this.currentUser = null;
         sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
         window.location.href = '../../index.html';
     }
 
@@ -118,7 +147,20 @@ class DataManager {
 
     getCurrentUser() {
         if (this.currentUser) return this.currentUser;
-        const stored = sessionStorage.getItem('user');
+        
+        // Check Session first
+        let stored = sessionStorage.getItem('user');
+        
+        // If not in session, check Local (Remember Me)
+        if (!stored) {
+            stored = localStorage.getItem('user');
+            // If found in local, sync to session but check if valid is hard from here without req
+            if (stored) {
+                sessionStorage.setItem('user', stored);
+                // Assume token is in localStorage and request() picks it up
+            }
+        }
+
         if (stored) {
             this.currentUser = JSON.parse(stored);
             return this.currentUser;

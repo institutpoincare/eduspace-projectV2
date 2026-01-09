@@ -177,31 +177,28 @@
     "recordings": []
   },
   {
-    "id": "id-1767380950052-cksy7ihib",
+    "id": "id-1767710174226-rquqxt49a",
     "instructorId": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
     "type": "class",
-    "title": "anglais 2026",
-    "name": "anglais 2026",
-    "category": "suivi-scolaire",
-    "subject": "anglais-scolaire",
-    "level": "4eme-secondaire",
-    "meetLink": "https://meet.google.com/hne-yqxr-shk",
+    "title": "Anglais",
+    "description": "aaaa",
+    "name": "Anglais",
+    "category": "langue",
+    "subject": "anglais",
+    "level": "b2.1",
+    "meetLink": "",
+    "recordingsFolderUrl": "https://drive.google.com/drive/folders/1kUS6aaa2PCh15du_a9y16z3p08Ov9epT?usp=sharing",
     "pricing": {
       "type": "monthly",
-      "price": 80,
+      "price": 20,
       "currency": "TND"
     },
-    "price": 80,
+    "price": 20,
     "schedule": [
       {
         "day": "Lundi",
         "startTime": "10:00",
         "endTime": "12:00"
-      },
-      {
-        "day": "Mercredi",
-        "startTime": "14:00",
-        "endTime": "16:00"
       }
     ],
     "students": {
@@ -210,56 +207,49 @@
     },
     "resources": [
       {
-        "id": 1767380931751,
-        "type": "drive",
-        "title": "démo",
-        "link": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view?usp=drive_link"
-      },
-      {
-        "id": 1767380948531,
+        "id": 1767724571291,
         "type": "pdf",
-        "title": "manuel",
-        "link": "https://drive.google.com/file/d/1CSFt8Nnt7BlmfF6TCFZd3vvehBbKxy2_/view?usp=drive_link"
-      },
-      {
-        "id": 1767608178341,
-        "type": "video",
-        "title": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view",
-        "link": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view",
-        "folderId": "1767608158561"
-      },
-      {
-        "id": 1767627887494,
-        "type": "video",
-        "title": "vidéo",
-        "link": "https://drive.google.com/file/d/1LcbQghDCN_MhJ7aahsRRSQchnKDl2mWt/view",
+        "title": "livre",
+        "link": "https://drive.google.com/file/d/1vs69m1FPFoEciLBPkpXc4RhX2TVjmXp3/view?usp=drive_link",
         "folderId": null
       }
     ],
-    "updatedAt": "2026-01-05T18:38:24.006Z",
-    "createdAt": "2026-01-02T19:09:10.057Z",
-    "recordingsFolderUrl": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link",
-    "recordings": [
+    "folders": [],
+    "updatedAt": "2026-01-06T18:36:12.093Z",
+    "createdAt": "2026-01-06T14:36:14.228Z"
+  },
+  {
+    "id": "id-1767710493738-sdzhzs0hy",
+    "instructorId": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
+    "type": "class",
+    "title": "Français",
+    "description": "",
+    "name": "Français",
+    "category": "langue",
+    "subject": "francais",
+    "level": "a2.2",
+    "meetLink": "",
+    "recordingsFolderUrl": "",
+    "pricing": {
+      "type": "monthly",
+      "price": 0,
+      "currency": "TND"
+    },
+    "price": 0,
+    "schedule": [
       {
-        "id": 1767638246772,
-        "title": "cours",
-        "url": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link",
-        "link": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link",
-        "type": "drive",
-        "date": "2026-01-05T18:37:26.772Z"
+        "day": "Lundi",
+        "startTime": "11:00",
+        "endTime": "12:00"
       }
     ],
-    "folders": [
-      {
-        "id": "1767601001767",
-        "name": "cours enregistré",
-        "link": "https://drive.google.com/drive/folders/1P3VdjEbE78B9jCCkKO8DfdWCAvbSATxE?usp=drive_link"
-      },
-      {
-        "id": "1767608158561",
-        "name": "cours enregistré test 2",
-        "link": null
-      }
-    ]
+    "students": {
+      "enrolled": [],
+      "invited": []
+    },
+    "resources": [],
+    "folders": [],
+    "updatedAt": "2026-01-06T14:41:33.738Z",
+    "createdAt": "2026-01-06T14:41:33.741Z"
   }
 ]

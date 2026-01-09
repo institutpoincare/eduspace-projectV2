@@ -52,14 +52,17 @@ class InstructorPayments {
             
             console.log('💳 Paiements chargés:', this.transactions.length);
 
-            // Calculate real totals
+            // Calculate real totals - ENSURE AMOUNTS ARE NUMBERS
             const totalRevenue = this.transactions
                 .filter(p => p.status === 'paid')
-                .reduce((sum, p) => sum + (p.amount || 0), 0);
+                .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
             
             const pendingAmount = this.transactions
                 .filter(p => p.status === 'pending')
-                .reduce((sum, p) => sum + (p.amount || 0), 0);
+                .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+
+            console.log('💰 Total Revenus Calculé:', totalRevenue, 'TND');
+            console.log('⏳ Montant En Attente:', pendingAmount, 'TND');
 
             this.updateStats(totalRevenue, pendingAmount);
             this.renderTransactions(this.transactions);
@@ -147,7 +150,7 @@ class InstructorPayments {
                 </td>
                 <td class="py-4 px-6 text-sm text-slate-500">${dateStr}</td>
                 <td class="py-4 px-6 text-sm font-bold ${payment.status === 'paid' ? 'text-emerald-600' : 'text-slate-600'}">
-                    ${payment.status === 'paid' ? '+' : ''}${payment.amount.toLocaleString()} TND
+                    ${payment.status === 'paid' ? '+' : ''}${parseFloat(payment.amount || 0).toLocaleString()} TND
                 </td>
                 <td class="py-4 px-6 text-sm text-slate-500">${payment.method || '-'}</td>
                 <td class="py-4 px-6">
@@ -252,47 +255,90 @@ class InstructorPayments {
     }
 
     async approveAccess(enrollmentId) {
-        if (!confirm("Confirmer la réception du paiement et débloquer l'accès ?")) return;
+        console.log("👉 Demande validation pour:", enrollmentId);
+        this.pendingEnrollmentId = enrollmentId;
+        this.openConfirmModal();
+    }
+
+    openConfirmModal() {
+        const modal = document.getElementById('confirm-modal');
+        const btn = document.getElementById('confirm-action-btn');
+        if (modal) {
+            modal.classList.remove('hidden');
+            // Re-bind to ensure fresh state closure if needed, though class property is safer
+            if (btn) btn.onclick = () => this.processApproval();
+        } else {
+            // Fallback just in case HTML update failed hot reload
+             if(confirm("Confirmer la validation ?")) this.processApproval();
+        }
+    }
+
+    closeConfirmModal() {
+        this.pendingEnrollmentId = null;
+        const modal = document.getElementById('confirm-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    async processApproval() {
+        const enrollmentId = this.pendingEnrollmentId;
+        this.closeConfirmModal(); // Close immediately to prevent double clicks
+
+        if (!enrollmentId) { 
+            console.error("❌ Pas d'ID d'inscription en attente");
+            return;
+        }
 
         try {
-            // Get the enrollment to check amountPaid/studentId
+            console.log("🔄 Traitement de la validation...", enrollmentId);
+            // Get the enrollment
             const enrollment = await dataManager.getById('enrollments', enrollmentId);
             
-            if (enrollment) {
-                // Get the course to fetch the actual price
-                const course = await dataManager.getById('courses', enrollment.courseId);
-                const actualAmount = course ? course.price : 0;
-                
-                // Update Enrollment Status with the actual amount
-                await dataManager.update('enrollments', enrollmentId, {
-                    status: 'active',
-                    amountPaid: actualAmount,
-                    activatedAt: new Date().toISOString()
-                });
-                
-                // Create Payment Record
-                const payment = {
-                    id: dataManager.generateId ? dataManager.generateId() : crypto.randomUUID(),
-                    instructorId: this.currentInstructor.id,
-                    amount: actualAmount,
-                    status: 'paid',
-                    date: new Date().toISOString(),
-                    createdAt: new Date().toISOString(),
-                    method: 'Virement',
-                    description: 'Achat Cours (Validé)',
-                    courseName: course ? course.title : 'Cours',
-                    studentId: enrollment.studentId
-                };
-                
-                // Use create() not add()
-                await dataManager.create('payments', payment);
-                
-                this.init(); // Reload
-                alert("Accès validé avec succès !");
+            if (!enrollment) {
+                throw new Error("Inscription non trouvée (ID: " + enrollmentId + ")");
             }
+
+            // Get the course
+            const course = await dataManager.getById('courses', enrollment.courseId);
+            const actualAmount = course && course.price ? parseFloat(course.price) : 0; 
+            
+            console.log("💰 Montant:", actualAmount);
+
+            // Update Enrollment
+            console.log("🔄 Mise à jour enrollment...");
+            await dataManager.update('enrollments', enrollmentId, {
+                status: 'active',
+                amountPaid: actualAmount,
+                activatedAt: new Date().toISOString()
+            });
+            
+            // Create Payment
+            const paymentId = dataManager.generateId ? dataManager.generateId() : ('pay-' + Date.now());
+            const payment = {
+                id: paymentId,
+                instructorId: this.currentInstructor.id,
+                amount: actualAmount,
+                status: 'paid',
+                date: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                method: 'Virement',
+                description: 'Achat Cours (Validé)',
+                courseName: course ? course.title : 'Cours Inconnu',
+                studentId: enrollment.studentId
+            };
+            
+            console.log("💾 Création paiement...", payment);
+            await dataManager.create('payments', payment);
+            
+            console.log("✅ TERMINÉ");
+            
+            // Success Feedback
+            alert("Accès validé avec succès !");
+            
+            this.init(); // Reload UI
+
         } catch (error) {
-            console.error("Erreur validation:", error);
-            alert("Erreur lors de la validation: " + error.message);
+            console.error("❌ Erreur process:", error);
+            alert("Erreur: " + error.message);
         }
     }
 

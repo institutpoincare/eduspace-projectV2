@@ -18,3 +18,14 @@ npm-debug.log*
 # Ignore temporary files
 *.tmp
 .cache/
+
+# Environment and Secrets
+.env
+.env.local
+.env.*.local
+credentials.json
+token.json
+client_secret.json
+service_account.json
+key.json
+*.pem

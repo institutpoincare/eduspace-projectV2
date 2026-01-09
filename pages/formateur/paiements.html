@@ -318,6 +318,28 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="instructorPayments.closeConfirmModal()"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 relative z-10 overflow-hidden transform transition-all scale-100">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="check-circle" class="w-8 h-8 text-indigo-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Confirmer la validation ?</h3>
+                <p class="text-slate-500 mb-6">Cela débloquera l'accès à l'étudiant et enregistrera le paiement.</p>
+                <div class="flex gap-3">
+                    <button onclick="instructorPayments.closeConfirmModal()" class="flex-1 py-2.5 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors">
+                        Annuler
+                    </button>
+                    <button id="confirm-action-btn" class="flex-1 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-colors">
+                        Confirmer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Imports -->
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js?v=2"></script>

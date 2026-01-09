@@ -1,410 +1,189 @@
-/**
- * Interface Professeur : Connexion Google Drive
- * Gestion de l'authentification et configuration du dossier Drive
- */
+// --- CONFIGURATION ---
+const CLIENT_ID = '646023168754-34h0jj0g5hhnbeq1i7uh7vq1napapkdt.apps.googleusercontent.com'; 
+const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
 
-class TeacherDriveManager {
-    constructor() {
-        this.isConnected = false;
-        this.folderId = null;
-        this.init();
-    }
+let tokenClient;
+let accessToken = null;
 
-    async init() {
-        // Vérifier le statut de connexion au chargement
-        await this.checkConnectionStatus();
-        
-        // Gérer les paramètres de callback OAuth
-        this.handleOAuthCallback();
-        
-        // Initialiser les event listeners
-        this.setupEventListeners();
-    }
-
-    /**
-     * Vérifier si Google Drive est connecté
-     */
-    async checkConnectionStatus() {
-        try {
-            const response = await fetch('/api/drive/status', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
+// API Object expected by the Dashboard
+window.teacherDrive = {
+    mount: function() {
+        console.log("TeacherDrive Mounted");
+        this.setupListeners();
+    },
+    
+    setupListeners: function() {
+        // Handle Sidebar Button
+        const sidebarBtn = document.getElementById('connect-drive-btn');
+        if (sidebarBtn) {
+            // Remove old listeners by cloning
+            const newBtn = sidebarBtn.cloneNode(true);
+            sidebarBtn.parentNode.replaceChild(newBtn, sidebarBtn);
+            
+            newBtn.addEventListener('click', () => {
+                this.triggerAuth();
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                this.isConnected = data.connected;
-                this.folderId = data.folderId;
-                this.updateUI();
-            }
-        } catch (error) {
-            console.error('❌ Erreur lors de la vérification du statut:', error);
-        }
-    }
-
-    /**
-     * Gérer le callback OAuth
-     */
-    handleOAuthCallback() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        if (urlParams.has('drive_connected')) {
-            this.showNotification('✅ Google Drive connecté avec succès !', 'success');
-            this.isConnected = true;
-            this.updateUI();
             
-            // Nettoyer l'URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-            
-            // Afficher le formulaire de configuration
-            setTimeout(() => this.showFolderConfigModal(), 500);
-        }
-        
-        if (urlParams.has('error')) {
-            const error = urlParams.get('error');
-            let message = 'Erreur lors de la connexion à Google Drive';
-            
-            if (error === 'oauth_denied') {
-                message = 'Vous avez refusé l\'autorisation Google Drive';
-            } else if (error === 'oauth_failed') {
-                message = 'Échec de la connexion à Google Drive';
-            }
-            
-            this.showNotification(`❌ ${message}`, 'error');
-            
-            // Nettoyer l'URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
-
-    /**
-     * Initialiser les event listeners
-     */
-    setupEventListeners() {
-        // Bouton de connexion Drive
-        const connectBtn = document.getElementById('connect-drive-btn');
-        if (connectBtn) {
-            connectBtn.addEventListener('click', () => this.connectGoogleDrive());
+            // Allow re-connection if already "connected" in UI but we want to refresh
+            newBtn.classList.remove('hidden'); 
         }
 
-        // Bouton de configuration du dossier
-        const configBtn = document.getElementById('config-folder-btn');
-        if (configBtn) {
-            configBtn.addEventListener('click', () => this.showFolderConfigModal());
-        }
-
-        // Bouton de synchronisation manuelle
-        const syncBtn = document.getElementById('sync-now-btn');
-        if (syncBtn) {
-            syncBtn.addEventListener('click', () => this.syncNow());
-        }
-
-        // Bouton de déconnexion
-        const disconnectBtn = document.getElementById('disconnect-drive-btn');
-        if (disconnectBtn) {
-            disconnectBtn.addEventListener('click', () => this.disconnectDrive());
-        }
-    }
-
-    /**
-     * Initier la connexion Google Drive
-     */
-    async connectGoogleDrive() {
-        try {
-            this.showLoading('Connexion à Google Drive...');
-
-            const response = await fetch('/api/auth/google-drive', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
+        // Handle generic Auth Button if present
+        const authBtn = document.getElementById('google-auth-btn');
+        if (authBtn) {
+             authBtn.addEventListener('click', () => {
+                this.triggerAuth();
             });
-
-            if (!response.ok) {
-                throw new Error('Erreur lors de la génération de l\'URL OAuth');
-            }
-
-            const data = await response.json();
-            
-            if (data.success && data.authUrl) {
-                // Rediriger vers Google OAuth
-                window.location.href = data.authUrl;
-            } else {
-                throw new Error('URL d\'autorisation invalide');
-            }
-        } catch (error) {
-            console.error('❌ Erreur lors de la connexion:', error);
-            this.hideLoading();
-            this.showNotification('❌ Erreur lors de la connexion à Google Drive', 'error');
         }
-    }
+    },
 
-    /**
-     * Afficher le modal de configuration du dossier
-     */
-    showFolderConfigModal() {
-        const modalHTML = `
-        <div id="folder-config-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 animate-in fade-in zoom-in duration-200">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <i data-lucide="folder" class="w-6 h-6 text-blue-600"></i>
-                        Configurer le Dossier Drive
-                    </h3>
-                    <button onclick="document.getElementById('folder-config-modal').remove()" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">
-                            URL du Dossier Google Drive
-                        </label>
-                        <input 
-                            type="url" 
-                            id="drive-folder-url" 
-                            class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium" 
-                            placeholder="https://drive.google.com/drive/folders/..."
-                        >
-                        <p class="mt-2 text-xs text-gray-500">
-                            💡 Collez l'URL complète du dossier contenant vos enregistrements OBS
-                        </p>
-                    </div>
-
-                    <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                        <h4 class="font-bold text-blue-900 mb-2 flex items-center gap-2">
-                            <i data-lucide="info" class="w-4 h-4"></i>
-                            Comment obtenir l'URL ?
-                        </h4>
-                        <ol class="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
-                            <li>Ouvrez Google Drive</li>
-                            <li>Naviguez vers votre dossier d'enregistrements</li>
-                            <li>Copiez l'URL depuis la barre d'adresse</li>
-                            <li>Collez-la ci-dessus</li>
-                        </ol>
-                    </div>
-                </div>
-                
-                <div class="mt-6 flex justify-end gap-3">
-                    <button onclick="document.getElementById('folder-config-modal').remove()" class="px-5 py-2.5 font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
-                        Annuler
-                    </button>
-                    <button onclick="window.teacherDrive.configureFolder()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg shadow-blue-200 transition-all flex items-center gap-2">
-                        <i data-lucide="check" class="w-4 h-4"></i>
-                        Configurer
-                    </button>
-                </div>
-            </div>
-        </div>`;
-        
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        lucide.createIcons();
-        document.getElementById('drive-folder-url').focus();
-    }
-
-    /**
-     * Configurer le dossier Drive
-     */
-    async configureFolder() {
-        try {
-            const folderUrl = document.getElementById('drive-folder-url').value.trim();
-            
-            if (!folderUrl) {
-                this.showNotification('⚠️ Veuillez entrer l\'URL du dossier', 'warning');
-                return;
-            }
-
-            // Validation basique de l'URL
-            if (!folderUrl.includes('drive.google.com/drive/folders/')) {
-                this.showNotification('⚠️ URL du dossier invalide', 'warning');
-                return;
-            }
-
-            this.showLoading('Configuration du dossier...');
-
-            const response = await fetch('/api/drive/configure-folder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    folderUrl,
-                    classId: this.getCurrentClassId()
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                this.folderId = data.folderId;
-                this.showNotification('✅ Dossier configuré avec succès !', 'success');
-                document.getElementById('folder-config-modal').remove();
-                this.updateUI();
-                
-                // Lancer une synchronisation initiale
-                setTimeout(() => this.syncNow(), 1000);
-            } else {
-                throw new Error(data.message || 'Erreur de configuration');
-            }
-        } catch (error) {
-            console.error('❌ Erreur lors de la configuration:', error);
-            this.showNotification(`❌ ${error.message}`, 'error');
-        } finally {
-            this.hideLoading();
-        }
-    }
-
-    /**
-     * Synchroniser manuellement
-     */
-    async syncNow() {
-        try {
-            this.showLoading('Synchronisation en cours...');
-
-            const response = await fetch(`/api/drive/sync-now/${this.getCurrentClassId()}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                const message = `✅ Synchronisation terminée: ${data.newCount} nouveaux, ${data.updatedCount} mis à jour`;
-                this.showNotification(message, 'success');
-            } else {
-                throw new Error(data.message || 'Erreur de synchronisation');
-            }
-        } catch (error) {
-            console.error('❌ Erreur lors de la synchronisation:', error);
-            this.showNotification(`❌ ${error.message}`, 'error');
-        } finally {
-            this.hideLoading();
-        }
-    }
-
-    /**
-     * Déconnecter Google Drive
-     */
-    async disconnectDrive() {
-        if (!confirm('Êtes-vous sûr de vouloir déconnecter Google Drive ?')) {
+    triggerAuth: function() {
+        if (!tokenClient) {
+            alert("Librairie Google encore en chargement... Réessayez dans 2 secondes.");
             return;
         }
-
-        try {
-            this.showLoading('Déconnexion...');
-
-            const response = await fetch('/api/drive/disconnect', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (response.ok) {
-                this.isConnected = false;
-                this.folderId = null;
-                this.updateUI();
-                this.showNotification('✅ Google Drive déconnecté', 'success');
-            }
-        } catch (error) {
-            console.error('❌ Erreur lors de la déconnexion:', error);
-            this.showNotification('❌ Erreur lors de la déconnexion', 'error');
-        } finally {
-            this.hideLoading();
+        
+        if (accessToken === null) {
+            tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+            tokenClient.requestAccessToken({prompt: ''});
         }
+    },
+    
+    // Stub methods to prevent errors if called by old code
+    syncNow: async function() { alert("Utilisez le bouton 'Drive' dans le dossier pour importer."); },
+    configureFolder: async function() { alert("Non nécessaire avec le nouveau système."); }
+};
+
+// 1. Initialisation
+window.addEventListener('load', function() {
+    // const previousOnLoad = window.onload; // REMOVED TO FIX STACK OVERFLOW
+    // if (typeof previousOnLoad === 'function') previousOnLoad();
+
+    if (typeof google === 'undefined') {
+        console.error("Google Library not loaded!");
+        return;
     }
 
-    /**
-     * Mettre à jour l'interface
-     */
-    updateUI() {
-        const connectBtn = document.getElementById('connect-drive-btn');
-        const configBtn = document.getElementById('config-folder-btn');
-        const syncBtn = document.getElementById('sync-now-btn');
-        const disconnectBtn = document.getElementById('disconnect-drive-btn');
-        const statusBadge = document.getElementById('drive-status-badge');
-
-        if (this.isConnected) {
-            if (connectBtn) connectBtn.classList.add('hidden');
-            if (configBtn) configBtn.classList.remove('hidden');
-            if (syncBtn) syncBtn.classList.remove('hidden');
-            if (disconnectBtn) disconnectBtn.classList.remove('hidden');
-            if (statusBadge) {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: (response) => {
+            if (response.error !== undefined) {
+                console.error("Erreur Auth:", response);
+                return;
+            }
+            accessToken = response.access_token;
+            console.log("✅ Authentification réussie!");
+            
+            // Update UI to show connected state
+            const statusBadge = document.getElementById('drive-status-badge');
+            if(statusBadge) {
                 statusBadge.textContent = 'Connecté';
                 statusBadge.className = 'px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold';
             }
-        } else {
-            if (connectBtn) connectBtn.classList.remove('hidden');
-            if (configBtn) configBtn.classList.add('hidden');
-            if (syncBtn) syncBtn.classList.add('hidden');
-            if (disconnectBtn) disconnectBtn.classList.add('hidden');
-            if (statusBadge) {
-                statusBadge.textContent = 'Non connecté';
-                statusBadge.className = 'px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold';
-            }
+            
+            // Fetch Files
+            fetchDriveFiles(); 
+        },
+    });
+});
+
+// 3. Fetch Files Logic
+// --- CONFIGURATION: LIER UN DOSSIER DRIVE SPÉCIFIQUE ---
+window.configureDriveFolder = () => {
+    // 1. نطلبو الرابط من البروف
+    const folderLink = prompt("Collez le lien du dossier Drive pour cette classe :\n(Ex: drive.google.com/drive/folders/1AbC...)");
+    
+    if (!folderLink) return;
+
+    // 2. نستخرجو ID الدوسي (Regex)
+    // يقبل الصيغ: /folders/ID أو ?id=ID
+    let folderId = null;
+    const match = folderLink.match(/\/folders\/([a-zA-Z0-9_-]+)/) || folderLink.match(/id=([a-zA-Z0-9_-]+)/);
+    
+    if (match) {
+        folderId = match[1];
+    } else {
+        // بالكشي البروف حط ID ديركت
+        if (folderLink.length > 20 && !folderLink.includes('/')) {
+            folderId = folderLink;
         }
     }
 
-    /**
-     * Obtenir l'ID de la classe courante
-     */
-    getCurrentClassId() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('id') || localStorage.getItem('currentClassId');
+    if (!folderId) {
+        alert("Lien invalide. Veuillez coller le lien d'un dossier Google Drive.");
+        return;
     }
 
-    /**
-     * Afficher une notification
-     */
-    showNotification(message, type = 'info') {
-        // Utiliser votre système de notification existant
-        // ou créer un simple toast
-        const colors = {
-            success: 'bg-green-500',
-            error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500'
-        };
+    // 3. نسجلو الـ ID مربوط بالكلاس هذا برك (Unique per Class)
+    const classId = new URLSearchParams(window.location.search).get("id") || 'default';
+    localStorage.setItem('linked_folder_id_' + classId, folderId);
+    
+    alert("✅ Dossier lié avec succès ! Cliquez maintenant sur 'Connecter le Compte' pour synchroniser.");
+};
 
-        const toast = document.createElement('div');
-        toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-in slide-in-from-top duration-300`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
+// --- FIX: SYNC CIBLÉE (PAR DOSSIER) ---
+async function fetchDriveFiles() {
+    // 1. نثبتو الساعة: فماشي دوسي مربوط بالكلاس هذا؟
+    const classId = new URLSearchParams(window.location.search).get("id") || 'default';
+    const targetFolderId = localStorage.getItem('linked_folder_id_' + classId);
 
-        setTimeout(() => {
-            toast.classList.add('animate-out', 'fade-out');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+    if (!targetFolderId) {
+        // كان ما فماش، نقلو يربط دوسي الساعة
+        if(confirm("Aucun dossier Drive n'est lié à cette classe.\nVoulez-vous configurer un dossier maintenant ?")) {
+            window.configureDriveFolder();
+        }
+        return; // نقصو الحديث هنا
     }
 
-    /**
-     * Afficher le loading
-     */
-    showLoading(message = 'Chargement...') {
-        const loader = document.createElement('div');
-        loader.id = 'drive-loader';
-        loader.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm';
-        loader.innerHTML = `
-            <div class="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-4">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p class="text-gray-700 font-medium">${message}</p>
-            </div>
-        `;
-        document.body.appendChild(loader);
-    }
+    try {
+        console.log(`📂 Synchronisation depuis le dossier ID: ${targetFolderId}`);
 
-    /**
-     * Masquer le loading
-     */
-    hideLoading() {
-        const loader = document.getElementById('drive-loader');
-        if (loader) loader.remove();
+        // 2. الفيلتر الجديد: نزيدو شرط 'parents' باش نجيبو كان ولاد الدوسي هذا
+        // q = "ID in parents" AND "video" AND "not trashed"
+        const q = `'${targetFolderId}' in parents and mimeType contains 'video/' and trashed = false`;
+        const fields = "files(id, name, webViewLink, thumbnailLink)";
+        
+        const response = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=${q}&fields=${fields}`, 
+            { headers: { 'Authorization': `Bearer ${accessToken}` } }
+        );
+        
+        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+        const data = await response.json();
+        const folderVideos = data.files;
+
+        // 3. التنظيف والحفظ (نفس اللوجيك متاع Miroir)
+        const newVideos = folderVideos.map(v => ({
+            id: v.id,
+            title: v.name,
+            url: `https://drive.google.com/file/d/${v.id}/preview`,
+            type: 'drive',
+            addedAt: new Date().toISOString()
+        }));
+
+        // نفسخو القديم متاع Drive (تنظيف)
+        let currentList = window.recordings || [];
+        const manualVideos = currentList.filter(v => v.type !== 'drive');
+
+        // نحطو الجديد
+        window.recordings = [...manualVideos, ...newVideos];
+        localStorage.setItem('class_recordings_' + classId, JSON.stringify(window.recordings));
+
+        if (typeof renderRecordings === 'function') renderRecordings(window.recordings);
+        
+        // Add integration with Dashboard if present
+        if (window.dashboard) {
+             window.dashboard.driveRecordings = newVideos; // Update internals
+             // Optionally trigger a render or save if dashboard expects it
+             if(typeof window.dashboard.render === 'function') window.dashboard.render();
+        }
+        
+        alert(`✅ ${newVideos.length} vidéos synchronisées depuis le dossier spécifique.`);
+
+    } catch (err) {
+        console.error('Erreur:', err);
+        alert("Erreur de synchronisation. Vérifiez que le dossier est partagé/accessible.");
     }
 }
-
-// Initialiser au chargement de la page
-window.teacherDrive = new TeacherDriveManager();

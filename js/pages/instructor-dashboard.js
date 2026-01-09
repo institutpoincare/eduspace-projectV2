@@ -145,7 +145,7 @@ class InstructorDashboard {
                         </span>
                     </div>
                 </div>
-                <img src="${course.image}" alt="${course.title}" 
+                <img src="${course.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'}" alt="${course.title}" 
                      class="w-24 h-24 object-cover rounded-lg ml-4">
             </div>
 
@@ -280,7 +280,7 @@ class InstructorDashboard {
             );
 
             // Charger les infos des étudiants
-            const studentIds = [...new Set(myEnrollments.map(e => e.userId))];
+            const studentIds = [...new Set(myEnrollments.map(e => e.userId))].filter(id => id);
             this.students = await Promise.all(
                 studentIds.map(id => dataManager.getById('users', id))
             );
@@ -342,9 +342,11 @@ class InstructorDashboard {
         let pendingRevenue = 0;
         let totalHours = 0;
         let uniqueStudents = new Set();
+        let allTransactions = []; // Store transactions for the modal
 
-        // Récupérer tous les enrollments pour plus de précision
+        // Récupérer tous les enrollments et utilisateurs pour plus de précision
         const allEnrollments = await dataManager.getAll('enrollments');
+        const allUsers = await dataManager.getAll('users');
         
         this.courses.forEach(course => {
             // Revenus & Pending
@@ -357,6 +359,19 @@ class InstructorDashboard {
                     pendingRevenue += (price - paid);
                 }
                 uniqueStudents.add(e.userId);
+
+                // Collect transaction details
+                if (paid > 0) {
+                    const student = allUsers.find(u => u.id === e.userId);
+                    allTransactions.push({
+                        studentId: e.userId,
+                        studentName: student ? student.name : (e.studentName || e.name || 'Étudiant'), // Robust name lookup
+                        courseName: course.title,
+                        amount: paid,
+                        date: e.enrolledAt || e.createdAt || new Date().toISOString(), // Use reliable date
+                        status: 'Payé'
+                    });
+                }
             });
 
             // Heures (Estimation si pas de sessions précises)
@@ -372,11 +387,180 @@ class InstructorDashboard {
         this.animateValue('stat-total-hours', totalHours, 'h');
         this.animateValue('stat-active-students', uniqueStudents.size, '');
 
+        // --- NEW: Add Click Event for Detailed Revenue Modal ---
+        const revCard = document.getElementById('stat-total-revenue')?.parentElement?.parentElement || document.querySelector('.bg-green-50')?.parentElement; // Target the card
+        if(revCard) {
+            revCard.style.cursor = 'pointer';
+            revCard.onclick = () => this.openRevenueModal(allTransactions);
+        }
+        // --------------------------------------------------------
+
         // Charger la prochaine session
         this.loadNextSession();
         
         // Charger l'activité récente
         this.loadRecentActivity(allEnrollments);
+    }
+
+    /**
+     * Open Revenue Details Modal
+     */
+    openRevenueModal(transactions) {
+        // Clean old modal
+        const oldInfo = document.getElementById('revenue-modal');
+        if(oldInfo) oldInfo.remove();
+
+        // Sort by newest first
+        transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const modalHTML = `
+        <div id="revenue-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in">
+            <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden m-4">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i data-lucide="wallet" class="w-5 h-5 text-green-600"></i>
+                            Détails des Revenus
+                        </h3>
+                        <p class="text-sm text-gray-500">Historique complet des paiements reçus</p>
+                    </div>
+                    <button onclick="document.getElementById('revenue-modal').remove()" class="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="p-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-white border-b border-gray-50">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Période</label>
+                        <select id="rev-filter-period" class="w-full mt-1 p-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" onchange="instructorDashboard.filterRevenue()">
+                            <option value="all">Tout l'historique</option>
+                            <option value="today">Aujourd'hui</option>
+                            <option value="week">Cette Semaine</option>
+                            <option value="month">Ce Mois</option>
+                            <option value="custom">Personnalisé</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Date Début</label>
+                        <input type="date" id="rev-filter-start" class="w-full mt-1 p-2 border border-gray-200 rounded-lg text-sm disabled:bg-gray-100" disabled onchange="instructorDashboard.filterRevenue()">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Date Fin</label>
+                        <input type="date" id="rev-filter-end" class="w-full mt-1 p-2 border border-gray-200 rounded-lg text-sm disabled:bg-gray-100" disabled onchange="instructorDashboard.filterRevenue()">
+                    </div>
+                     <div class="flex items-end">
+                        <div class="w-full bg-green-50 p-2 rounded-lg border border-green-100 text-center">
+                            <span class="text-xs text-green-600 font-bold uppercase">Total Filtré</span>
+                            <div class="text-lg font-black text-green-700" id="rev-filtered-total">0 TND</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="flex-1 overflow-y-auto p-4 bg-gray-50/50">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="text-left text-xs font-bold text-gray-500 uppercase border-b border-gray-200">
+                                <th class="pb-3 pl-2">Étudiant</th>
+                                <th class="pb-3">Cours</th>
+                                <th class="pb-3">Date</th>
+                                <th class="pb-3 text-right pr-2">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rev-table-body" class="text-sm text-gray-700">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+                     <div id="rev-empty-state" class="hidden flex flex-col items-center justify-center py-12 text-gray-400">
+                        <i data-lucide="search-x" class="w-12 h-12 mb-2 opacity-50"></i>
+                         <p>Aucune transaction trouvée pour cette période.</p>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+        
+        // Store for filtering
+        this.currentTransactions = transactions;
+        
+        // Initial Render
+        this.filterRevenue();
+
+        // Add Listener for Custom Date Toggle
+        document.getElementById('rev-filter-period').addEventListener('change', (e) => {
+            const isCustom = e.target.value === 'custom';
+            document.getElementById('rev-filter-start').disabled = !isCustom;
+            document.getElementById('rev-filter-end').disabled = !isCustom;
+        });
+    }
+
+    filterRevenue() {
+        const period = document.getElementById('rev-filter-period').value;
+        const startStr = document.getElementById('rev-filter-start').value;
+        const endStr = document.getElementById('rev-filter-end').value;
+        const tbody = document.getElementById('rev-table-body');
+        const emptyState = document.getElementById('rev-empty-state');
+        const totalEl = document.getElementById('rev-filtered-total');
+
+        if(!this.currentTransactions) return;
+
+        let filtered = this.currentTransactions;
+        const now = new Date();
+
+        // 1. Filter Logic
+        if (period === 'today') {
+            filtered = filtered.filter(t => new Date(t.date).toDateString() === now.toDateString());
+        } else if (period === 'week') {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(now.getDate() - 7);
+            filtered = filtered.filter(t => new Date(t.date) >= oneWeekAgo);
+        } else if (period === 'month') {
+             filtered = filtered.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+             });
+        } else if (period === 'custom' && startStr && endStr) {
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+            endDate.setHours(23, 59, 59); // End of day
+            filtered = filtered.filter(t => {
+                const d = new Date(t.date);
+                return d >= startDate && d <= endDate;
+            });
+        }
+
+        // 2. Calculate Total
+        const total = filtered.reduce((sum, t) => sum + (t.amount || 0), 0);
+        totalEl.textContent = total.toLocaleString('fr-TN', { minimumFractionDigits: 0 }) + ' TND';
+
+        // 3. Render Rows
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filtered.map(t => `
+                <tr class="group hover:bg-white border-b border-gray-100 last:border-0 transition-colors">
+                    <td class="py-3 pl-2 rounded-l-lg">
+                        <div class="font-bold text-gray-900">${t.studentName}</div>
+                        <!-- <div class="text-xs text-gray-400">ID: ${t.studentId}</div> -->
+                    </td>
+                    <td class="py-3 text-gray-600">${t.courseName}</td>
+                    <td class="py-3 text-gray-500 text-xs">
+                        ${new Date(t.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        <span class="text-gray-300 ml-1">${new Date(t.date).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}</span>
+                    </td>
+                    <td class="py-3 pr-2 text-right rounded-r-lg">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            +${t.amount} TND
+                        </span>
+                    </td>
+            `).join('');
+        }
     }
 
     animateValue(id, end, suffix) {

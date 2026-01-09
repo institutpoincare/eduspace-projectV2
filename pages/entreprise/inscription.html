@@ -388,19 +388,17 @@
         }
 
         function finishRegistration() {
-            // Animate button
-            const btn = document.getElementById('nextBtn');
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Traitement...';
-            btn.classList.add('brightness-90', 'cursor-not-allowed');
-
-            setTimeout(() => {
-                alert("🎉 Inscription réussie ! \nL'apprenant a été ajouté et la facture a été générée.");
-                window.location.href = 'employes.html';
-            }, 1000);
+            // Handled by js/pages/entreprise-inscription.js
+            if (window.finishRegistration) {
+                 window.finishRegistration();
+            } else {
+                 console.error("Script inscription non chargé");
+            }
         }
     </script>
     <!-- Dynamic System Scripts -->
     <script src="../../js/core/data-manager.js"></script>
+    <script src="../../js/pages/entreprise-inscription.js"></script>
 </body>
 
 </html>

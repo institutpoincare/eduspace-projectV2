@@ -113,8 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('📡 Envoi de la requête API...');
 
         try {
-            // Send to API
-            const response = await fetch('http://localhost:3001/api/users', {
+            // Send to API - Use public register route
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -125,16 +125,21 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('📨 Réponse reçue:', response.status, response.statusText);
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Erreur serveur:', errorText);
-                throw new Error('Erreur lors de l\'inscription');
+                const errorData = await response.json();
+                console.error('❌ Erreur serveur:', errorData.message);
+                throw new Error(errorData.message || 'Erreur lors de l\'inscription');
             }
 
             const result = await response.json();
             console.log('✅ Inscription réussie:', result);
 
-            // Store user info in sessionStorage (compatible with dataManager)
-            sessionStorage.setItem('user', JSON.stringify(result));
+            // Store user info in sessionStorage
+            if (result.user) {
+                sessionStorage.setItem('user', JSON.stringify(result.user));
+                // Optional: Store Token if returned (usually auto-login after register)
+                if (result.token) sessionStorage.setItem('token', result.token);
+            }
+
             console.log('💾 Utilisateur sauvegardé dans sessionStorage');
 
             // Show success message

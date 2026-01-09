@@ -2,18 +2,19 @@
   {
     "id": "id-1766939924309-aez8ehg0g",
     "instructorId": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-    "amount": 0,
+    "amount": 100,
     "status": "paid",
     "date": "2025-12-28T16:38:44.309Z",
     "method": "Virement",
     "description": "Achat Cours (Validé)",
+    "courseName": "Cours Initial",
     "studentId": "1da49e89-c3c7-4897-849c-29bd5a3bd04e",
     "createdAt": "2025-12-28T16:38:44.310Z"
   },
   {
     "id": "id-1766941674465-qh68k7vq6",
     "instructorId": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-    "amount": "90",
+    "amount": 90,
     "status": "paid",
     "date": "2025-12-28T17:07:54.465Z",
     "createdAt": "2025-12-28T17:07:54.465Z",
@@ -49,7 +50,7 @@
   {
     "id": "id-1767383799258-vkn0sxxt4",
     "instructorId": "3fe68e9a-f5a7-4a34-b110-5b10879e40a8",
-    "amount": 50,
+    "amount": 180,
     "status": "paid",
     "date": "2026-01-02T19:56:39.258Z",
     "createdAt": "2026-01-02T19:56:39.259Z",

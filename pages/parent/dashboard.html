@@ -191,13 +191,22 @@
         </main>
     </div>
 
+    <!-- Dynamic System Scripts -->
+    <script src="../../js/core/google-auth.js"></script>
+    <script>
+        // Gérer le callback Google OAuth AVANT tout le reste
+        if (window.googleAuth) {
+            window.googleAuth.handleCallback();
+        }
+    </script>
+    <script src="../../js/core/data-manager.js"></script>
+    
     <!-- Scripts -->
     <script src="../../js/components/sidebar-parent.js"></script>
     <script>
         lucide.createIcons();
     </script>
-    <!-- Dynamic System Scripts -->
-    <script src="../../js/core/data-manager.js"></script>
+
 </body>
 
 </html>

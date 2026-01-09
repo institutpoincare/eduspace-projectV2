@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EduSpace Mobile QR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 90%; }
+        h1 { margin: 0 0 10px 0; color: #111827; font-size: 24px; }
+        p { color: #6b7280; margin: 0 0 20px 0; }
+        #qrcode { margin: 20px auto; display: flex; justify-content: center; }
+        .url-box { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-family: 'Courier New', monospace; color: #374151; font-weight: bold; word-break: break-all; }
+        .hint { font-size: 13px; color: #9ca3af; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📱 Mobile Access</h1>
+        <p>Scan this QR code with your phone camera</p>
+        
+        <div id="qrcode"></div>
+        
+        <div class="url-box">http://192.168.100.27:3001</div>
+        
+        <div class="hint">Ensure your phone is on the same Wi-Fi network</div>
+    </div>
+
+    <script>
+        // Generate QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: "http://192.168.100.27:3001",
+            width: 200,
+            height: 200,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>

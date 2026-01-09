@@ -45,14 +45,24 @@
 
     const sidebarHTML = `
         <div class="flex flex-col h-full bg-white border-r border-gray-100 p-6">
-            <div class="flex items-center gap-3 mb-10 px-2">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">EduSpace</span>
-                    <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-widest">Formateur</span>
-                </div>
+            <!-- Logo cliquable + Bouton retour -->
+            <div class="mb-10">
+                <!-- Bouton Retour ROUGE -->
+                <button data-back-btn class="mb-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-full flex items-center justify-center gap-2 shadow-lg" title="Retour">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    <span class="text-sm font-bold">Retour</span>
+                </button>
+                
+                <!-- Logo cliquable -->
+                <a href="dashboard.html" class="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity" title="Retour à l'accueil">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">EduSpace</span>
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-widest">Formateur</span>
+                    </div>
+                </a>
             </div>
 
             <nav class="flex-1 space-y-1">

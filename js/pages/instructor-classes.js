@@ -90,9 +90,12 @@ function renderClassesList(classes, enrollments) {
 
         return `
         <div class="premium-card p-6 rounded-3xl group relative bg-white border border-gray-100/50 hover:border-blue-200 transaction-all duration-300">
-            <div class="absolute top-4 right-4">
-                <button onclick="editClass('${c.id}')" class="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-blue-600 transition-colors">
-                    <i data-lucide="more-vertical" class="w-5 h-5"></i>
+            <div class="absolute top-4 right-4 flex gap-1">
+                <button onclick="editClass('${c.id}')" class="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-blue-600 transition-colors" title="Modifier">
+                    <i data-lucide="edit-2" class="w-5 h-5"></i>
+                </button>
+                <button onclick="deleteClass('${c.id}')" class="p-2 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-600 transition-colors" title="Supprimer">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
                 </button>
             </div>
             
@@ -318,11 +321,11 @@ window.editClass = async (id) => {
         }
     }
     
-    // Fill Arrays
-    tempResources = course.resources || [];
-    tempSchedule = course.schedule || [];
-    tempInvites = (course.students && course.students.invited) ? course.students.invited : [];
-    tempFolders = course.folders || [];
+    // Fill Arrays - Use Deep Copy to prevent reference issues
+    tempResources = course.resources ? JSON.parse(JSON.stringify(course.resources)) : [];
+    tempSchedule = course.schedule ? JSON.parse(JSON.stringify(course.schedule)) : [];
+    tempInvites = (course.students && course.students.invited) ? [...course.students.invited] : [];
+    tempFolders = course.folders ? JSON.parse(JSON.stringify(course.folders)) : [];
     
     renderTempFoldersSelect();
     renderTempResources();
@@ -335,6 +338,10 @@ window.closeModal = () => {
 };
 
 function resetWizard() {
+    // Only reset if we are NOT in editing mode or if explicitly requested
+    // This prevents accidental clearing if openCreateModal is called redundantly
+    if(isEditing && editingId) return;
+
     document.getElementById("w-name").value = "";
     document.getElementById("w-desc").value = "";
     document.getElementById("w-meet-link").value = "";
@@ -596,6 +603,25 @@ function renderResourceItem(r) {
     `;
 }
 
+window.deleteClass = async (id) => {
+    if(confirm("Êtes-vous sûr de vouloir supprimer cette classe ? Cette action est irréversible.")) {
+        try {
+            // Also optional: Delete image from storage if exists, but we skip for now
+            await dataManager.delete("courses", id);
+            
+            // Cleanup related enrollments locally if needed (backend usually handles cascade)
+            // But since this is JSON DB, we might want to manually clean up enrollments?
+            // For now, let's just delete the course.
+            
+            showToast("Classe supprimée avec succès", "success");
+            loadClasses();
+        } catch (e) {
+            console.error(e);
+            showToast("Erreur lors de la suppression", "error");
+        }
+    }
+};
+
 window.finishCreate = async () => {
     // Basic Info
     const title = document.getElementById("w-name").value;
@@ -656,9 +682,10 @@ window.finishCreate = async () => {
         newClass.createdAt = new Date().toISOString();
         await dataManager.create("courses", newClass);
     } else {
+        // Fix: Pass ID as second argument to update
         let existing = (await dataManager.getAll("courses")).find(c => c.id === editingId) || {};
         const updated = { ...existing, ...newClass };
-        await dataManager.update("courses", updated);
+        await dataManager.update("courses", editingId, updated);
     }
     
     closeModal();

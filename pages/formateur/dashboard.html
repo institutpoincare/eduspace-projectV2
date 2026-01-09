@@ -296,11 +296,20 @@
     </div>
 
     <!-- Scripts -->
+    <script src="../../js/core/google-auth.js"></script>
+    <script>
+        // Gérer le callback Google OAuth AVANT tout chargement de données
+        if (window.googleAuth) {
+            window.googleAuth.handleCallback();
+        }
+    </script>
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/components/sidebar-formateur.js?v=2"></script>
     <script src="../../js/pages/instructor-dashboard.js?v=4"></script>
 
     <script>
+
+        
         // Init Icons
         lucide.createIcons();
 

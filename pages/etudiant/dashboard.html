@@ -257,6 +257,13 @@
     </div>
 
     <!-- Dynamic System Scripts -->
+    <script src="../../js/core/google-auth.js"></script>
+    <script>
+        // Gérer le callback Google OAuth AVANT le chargement des données
+        if (window.googleAuth) {
+            window.googleAuth.handleCallback();
+        }
+    </script>
     <script src="../../js/core/data-manager.js"></script>
     <script src="../../js/pages/student-dashboard-modern.js"></script>
     <script src="../../js/components/sidebar-etudiant.js"></script>

@@ -244,6 +244,54 @@ window.addChapter = () => {
     renderChapters();
 }
 
+window.updateChapterTitle = (chapterId, newTitle) => {
+    const chapter = tempChapters.find(c => c.id === chapterId);
+    if (chapter) {
+        chapter.title = newTitle;
+        console.log(`✅ Titre du chapitre mis à jour: "${newTitle}"`);
+    }
+}
+
+window.removeChapter = (chapterId) => {
+    if(confirm('Supprimer ce chapitre et tout son contenu ?')) {
+        tempChapters = tempChapters.filter(c => c.id !== chapterId);
+        renderChapters();
+        renderCourseSummary();
+    }
+}
+
+window.removeLesson = (chapterId, lessonId) => {
+    if(confirm('Supprimer cette leçon ?')) {
+        const chapter = tempChapters.find(c => c.id === chapterId);
+        if (chapter) {
+            chapter.lessons = chapter.lessons.filter(l => l.id !== lessonId);
+            renderChapters();
+            renderCourseSummary();
+        }
+    }
+}
+
+window.openContentModal = (chapterId, lessonId, type) => {
+    currentChapterId = chapterId;
+    currentLessonId = lessonId;
+    
+    // Open the lesson modal and set the type
+    const modal = document.getElementById('lesson-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Set the type and show appropriate inputs
+    if(type === 'video') {
+        document.getElementById('section-video').classList.remove('hidden');
+        document.getElementById('input-file').classList.add('hidden');
+        document.querySelector('#lesson-modal h3').innerText = "Ajouter une Vidéo";
+    } else if(type === 'pdf') {
+        document.getElementById('section-video').classList.add('hidden');
+        document.getElementById('input-file').classList.remove('hidden');
+        document.querySelector('#lesson-modal h3').innerText = "Ajouter une Ressource";
+    }
+}
+
 /**
  * Open Modal to add a lesson
  */
@@ -1352,9 +1400,20 @@ window.finish = async () => {
 
     const user = dataManager.getCurrentUser();
     if(!user) {
-        alert("Erreur: Utilisateur non connecté.");
+        alert("❌ Erreur: Vous devez être connecté pour créer un cours.\n\nVeuillez vous reconnecter.");
+        window.location.href = '/index.html';
         return;
     }
+
+    // Check if token exists
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if(!token) {
+        alert("❌ Session expirée. Veuillez vous reconnecter.");
+        window.location.href = '/index.html';
+        return;
+    }
+
+    console.log("✅ Utilisateur connecté:", user.name, "| Token présent:", !!token);
 
     const courseData = {
         title,
@@ -1379,22 +1438,36 @@ window.finish = async () => {
     try {
         if(editingId) {
             // Update
+            console.log("📝 Mise à jour du cours:", editingId);
             await dataManager.update("courses", editingId, courseData);
-            console.log("Course updated:", editingId);
+            console.log("✅ Course updated:", editingId);
         } else {
             // Create New
             courseData.createdAt = new Date().toISOString();
             courseData.id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
             
+            console.log("📝 Création du cours:", courseData.title);
             await dataManager.create("courses", courseData);
-            console.log("Course created");
+            console.log("✅ Course created:", courseData.id);
         }
 
-        alert("Cours publié avec succès ! 🚀");
+        alert("✅ Cours publié avec succès ! 🚀");
         showList();
     } catch (error) {
-        console.error("Erreur saving course:", error);
-        alert("Erreur lors de la sauvegarde. Vérifiez la console.");
+        console.error("❌ Erreur saving course:", error);
+        
+        // Better error messages
+        let errorMsg = "❌ Erreur lors de la sauvegarde:\n\n";
+        if(error.message.includes('401')) {
+            errorMsg += "Session expirée. Veuillez vous reconnecter.";
+            setTimeout(() => window.location.href = '/index.html', 2000);
+        } else if(error.message.includes('403')) {
+            errorMsg += "Accès refusé. Vérifiez vos permissions.";
+        } else {
+            errorMsg += error.message || "Erreur inconnue";
+        }
+        
+        alert(errorMsg);
     } finally {
         if(btnFinish) {
             btnFinish.disabled = false;

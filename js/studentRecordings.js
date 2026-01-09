@@ -1,6 +1,7 @@
 /**
  * Interface Étudiant : Affichage des Enregistrements
  * Affichage automatique des vidéos synchronisées depuis Google Drive
+ * Avec auto-refresh automatique
  */
 
 class StudentRecordingsViewer {
@@ -9,6 +10,8 @@ class StudentRecordingsViewer {
         this.recordings = [];
         this.currentPage = 1;
         this.totalPages = 1;
+        this.refreshInterval = null;
+        this.isLoading = false;
         this.init();
     }
 
@@ -24,14 +27,64 @@ class StudentRecordingsViewer {
 
         // Charger les enregistrements
         await this.loadRecordings();
+
+        // Démarrer l'auto-refresh toutes les 30 secondes
+        this.startAutoRefresh();
+
+        // Écouter quand l'utilisateur quitte/revient sur la page
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.stopAutoRefresh();
+            } else {
+                this.loadRecordings(this.currentPage, true); // Silent refresh
+                this.startAutoRefresh();
+            }
+        });
+    }
+
+    /**
+     * Démarrer le rafraîchissement automatique
+     */
+    startAutoRefresh() {
+        // Éviter les doublons
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+
+        // Rafraîchir toutes les 30 secondes
+        this.refreshInterval = setInterval(() => {
+            this.loadRecordings(this.currentPage, true); // Silent refresh
+        }, 30000); // 30 secondes
+
+        console.log('✅ Auto-refresh activé (toutes les 30 secondes)');
+    }
+
+    /**
+     * Arrêter le rafraîchissement automatique
+     */
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+            console.log('⏸️ Auto-refresh désactivé');
+        }
     }
 
     /**
      * Charger les enregistrements depuis l'API
+     * @param {number} page - Numéro de page
+     * @param {boolean} silent - Si true, ne pas afficher le loading
      */
-    async loadRecordings(page = 1) {
+    async loadRecordings(page = 1, silent = false) {
+        // Éviter les appels multiples simultanés
+        if (this.isLoading) return;
+        
         try {
-            this.showLoading();
+            this.isLoading = true;
+
+            if (!silent) {
+                this.showLoading();
+            }
 
             const response = await fetch(`/api/drive/recordings/${this.classId}?page=${page}&limit=20`, {
                 headers: {
@@ -46,19 +99,57 @@ class StudentRecordingsViewer {
             const data = await response.json();
 
             if (data.success) {
+                // Vérifier si il y a des changements
+                const hasChanges = JSON.stringify(this.recordings) !== JSON.stringify(data.recordings);
+                
                 this.recordings = data.recordings;
                 this.currentPage = data.pagination.page;
                 this.totalPages = data.pagination.pages;
-                this.render();
+                
+                // Re-render seulement si il y a des changements ou si ce n'est pas silent
+                if (!silent || hasChanges) {
+                    this.render();
+                    
+                    if (silent && hasChanges) {
+                        this.showNotification('📹 Nouvelles vidéos disponibles!');
+                    }
+                }
             } else {
                 throw new Error(data.message || 'Erreur inconnue');
             }
         } catch (error) {
             console.error('❌ Erreur lors du chargement:', error);
-            this.showError('Impossible de charger les enregistrements');
+            if (!silent) {
+                this.showError('Impossible de charger les enregistrements');
+            }
         } finally {
-            this.hideLoading();
+            this.isLoading = false;
+            if (!silent) {
+                this.hideLoading();
+            }
         }
+    }
+
+    /**
+     * Afficher une notification
+     */
+    showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-slide-in';
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()" class="ml-2 text-white hover:text-gray-200">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        lucide.createIcons();
+
+        // Auto-fermeture après 5 secondes
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
     }
 
     /**
@@ -79,9 +170,19 @@ class StudentRecordingsViewer {
                     <i data-lucide="video" class="w-6 h-6 text-red-600"></i>
                     Enregistrements des Séances
                 </h2>
-                <span class="text-sm text-gray-500">
-                    ${this.recordings.length} vidéo${this.recordings.length > 1 ? 's' : ''}
-                </span>
+                <div class="flex items-center gap-3">
+                    <button 
+                        onclick="window.studentRecordings.manualRefresh()"
+                        class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-bold transition-colors flex items-center gap-2"
+                        title="Actualiser maintenant"
+                    >
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        Actualiser
+                    </button>
+                    <span class="text-sm text-gray-500">
+                        ${this.recordings.length} vidéo${this.recordings.length > 1 ? 's' : ''}
+                    </span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -92,6 +193,14 @@ class StudentRecordingsViewer {
         `;
 
         lucide.createIcons();
+    }
+
+    /**
+     * Rafraîchissement manuel
+     */
+    async manualRefresh() {
+        console.log('🔄 Rafraîchissement manuel...');
+        await this.loadRecordings(this.currentPage, false);
     }
 
     /**
@@ -211,8 +320,11 @@ class StudentRecordingsViewer {
                 <i data-lucide="video-off" class="w-10 h-10 text-gray-400"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">Aucun enregistrement</h3>
-            <p class="text-gray-500 max-w-md">
+            <p class="text-gray-500 max-w-md mb-4">
                 Les enregistrements des séances apparaîtront ici automatiquement lorsque votre professeur les ajoutera.
+            </p>
+            <p class="text-xs text-gray-400">
+                🔄 Actualisation automatique toutes les 30 secondes
             </p>
         </div>
         `;
@@ -232,7 +344,7 @@ class StudentRecordingsViewer {
                 <div class="absolute top-0 left-0 right-0 z-10 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/80 to-transparent">
                     <h3 class="text-white font-medium truncate pr-4">${title}</h3>
                     <button 
-                        onclick="document.getElementById('video-modal').remove()"
+                        onclick="document.getElementById('video-modal').remove(); document.body.style.overflow = 'auto';"
                         class="text-white hover:text-red-500 font-bold p-2 transition-colors"
                     >
                         <i data-lucide="x" class="w-6 h-6"></i>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Instructor Class Dashboard
  * Mimics Student View but with Edit Capabilities (Create Folders, Upload Resources)
  */
@@ -8,6 +8,7 @@ class InstructorClassDashboard {
         this.courseId = null;
         this.course = null;
         this.currentFolder = null; // null = root
+        this.driveRecordings = [];
     }
 
     async init() {
@@ -34,6 +35,17 @@ class InstructorClassDashboard {
         if (!this.course) {
             alert('Cours non trouvé');
             window.location.href = 'classes.html';
+            return;
+        }
+
+        // --- INTELLIGENT MODE INTERCEPTOR ---
+        // Inject memory recordings if loadFromMemory finished first
+        if (window.recordings && window.recordings.length > 0) {
+            console.log("⚡ Injection des données en mémoire dans le cours...");
+            const others = (this.course.resources || []).filter(r => 
+                !['video', 'drive', 'drive-pdf'].includes(r.type)
+            );
+            this.course.resources = [...others, ...window.recordings];
         }
     }
 
@@ -155,14 +167,68 @@ class InstructorClassDashboard {
             ${this.renderHeader()}
             
             <div class="flex flex-col lg:flex-row gap-6 p-6 max-w-7xl mx-auto w-full flex-1 overflow-hidden">
+                <!-- Main Content (Resources) -->
+                <div class="flex-1 overflow-y-auto">
+                    ${this.renderResourcesSection()}
+                </div>
+
                 <!-- Sidebar (Schedule & Quick Actions) -->
                 <div class="w-full lg:w-80 shrink-0 space-y-6">
                     ${this.renderScheduleCard()}
+                    ${this.renderDriveSection()}
                     ${this.renderQuickActions()}
                 </div>
             </div>
         `;
         lucide.createIcons();
+        
+        // Initialize Drive Manager if present
+        if (window.teacherDrive) {
+            window.teacherDrive.mount();
+        }
+    }
+
+    renderDriveSection() {
+        return `
+        <div class="relative overflow-hidden bg-white rounded-2xl border border-blue-100 shadow-lg shadow-blue-900/5 p-6 group" id="drive-management-card">
+            <!-- Decorative Background Element -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none group-hover:bg-blue-100 transition-colors duration-500"></div>
+
+            <h3 class="relative font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                    <i data-lucide="hard-drive" class="w-5 h-5"></i>
+                </div>
+                <span>Google Drive</span>
+                <span id="drive-status-badge" class="ml-auto px-2.5 py-1 bg-gray-50 text-gray-500 border border-gray-100 rounded-full text-[10px] font-extrabold uppercase tracking-wider">...</span>
+            </h3>
+            
+            <div class="space-y-3 relative">
+                <div class="flex gap-2 w-full">
+                    <button onclick="window.configureDriveFolder()" class="bg-gray-100 text-gray-700 border border-gray-200 px-3 py-2 rounded-xl hover:bg-gray-200 transition-colors font-bold text-sm flex items-center gap-2" title="Choisir le dossier Drive">
+                        ⚙️ <span class="hidden xl:inline">Config</span>
+                    </button>
+
+                    <button id="google-auth-btn" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-blue-200 hover:shadow-lg hover:shadow-blue-300 hover:-translate-y-0.5 flex items-center justify-center gap-2 group/btn">
+                        <i data-lucide="log-in" class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform"></i>
+                        Connecter Drive
+                    </button>
+                </div>
+                
+                <!-- Hidden old buttons for reference or safe removal -->
+                <button id="config-folder-btn" class="hidden"></button>
+                <button id="sync-now-btn" class="hidden"></button>
+                
+                <button id="disconnect-drive-btn" class="hidden w-full py-1 text-red-500/70 hover:text-red-600 text-[10px] font-medium hover:underline text-center transition-colors">
+                    Déconnecter le compte
+                </button>
+            </div>
+            
+            <!-- Helper Text -->
+            <p class="mt-4 text-xs text-gray-400 text-center leading-relaxed">
+                Connectez votre Drive pour synchroniser automatiquement vos enregistrements OBS.
+            </p>
+        </div>
+        `;
     }
 
     renderHeader() {
@@ -188,22 +254,49 @@ class InstructorClassDashboard {
     renderResourcesSection() {
         const folders = this.course.folders || [];
         const resources = this.course.resources || [];
-        const recordings = this.course.recordings || []; // Dedicated Recordings Array
+        
+        // UNIFIED SOURCE OF TRUTH: All videos come from resources
+        const allVideos = resources.filter(r => r.type === 'video' || r.type === 'drive');
+        // UNIFIED SOURCE FOR PDFS
+        const allPdfs = resources.filter(r => r.type === 'pdf' || r.type === 'drive-pdf');
 
         let content = '';
 
         if (this.currentFolder === null) {
             // ROOT VIEW
             
-            // 1. HARDCODED "ENREGISTREMENTS" FOLDER
+            // 1. DYNAMIC "ENREGISTREMENTS" FOLDER
             const recordingsFolderCard = `
-                 <div class="relative group">
-                    <div class="flex flex-col items-center justify-center p-6 bg-white border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 cursor-pointer transition-all" onclick="dashboard.openFolder('recordings-root')">
-                        <div class="p-3 bg-red-100 text-red-600 rounded-full mb-2 group-hover:scale-110 transition-transform">
-                            <i data-lucide="play-circle" class="w-8 h-8 fill-current"></i>
+                 <div class="relative group h-full">
+                    <div class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white border border-red-100 rounded-2xl hover:shadow-lg hover:shadow-red-500/10 cursor-pointer transition-all duration-300 h-full group-hover:-translate-y-1" onclick="dashboard.openFolder('recordings-root')">
+                        <div class="relative mb-3">
+                            <div class="absolute inset-0 bg-red-400 rounded-full blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                            <div class="relative p-4 bg-white text-red-600 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="play-circle" class="w-8 h-8 fill-red-50 text-red-600"></i>
+                            </div>
                         </div>
-                        <h4 class="font-bold text-gray-900 group-hover:text-red-700 max-w-full truncate px-2 text-center">Enregistrements</h4>
-                        <p class="text-xs text-gray-500">${recordings.length} vidéos</p>
+                        <h4 class="font-extrabold text-gray-900 group-hover:text-red-600 max-w-full truncate px-2 text-center text-lg transition-colors">Enregistrements</h4>
+                        <div class="mt-2 px-3 py-1 bg-white/60 rounded-full border border-red-100 text-xs font-medium text-red-600">
+                            ${allVideos.length} vidéos
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 2. DYNAMIC "DOCUMENTS" FOLDER (NEW)
+            const documentsFolderCard = `
+                 <div class="relative group h-full">
+                    <div class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-2xl hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer transition-all duration-300 h-full group-hover:-translate-y-1" onclick="dashboard.openFolder('documents-root')">
+                        <div class="relative mb-3">
+                            <div class="absolute inset-0 bg-amber-400 rounded-full blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                            <div class="relative p-4 bg-white text-amber-600 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="book-open" class="w-8 h-8 fill-amber-50 text-amber-600"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-extrabold text-gray-900 group-hover:text-amber-600 max-w-full truncate px-2 text-center text-lg transition-colors">Resources Nécessaires</h4>
+                        <div class="mt-2 px-3 py-1 bg-white/60 rounded-full border border-amber-100 text-xs font-medium text-amber-600">
+                            ${allPdfs.length} fichiers
+                        </div>
                     </div>
                 </div>
             `;
@@ -241,6 +334,7 @@ class InstructorClassDashboard {
             content = `
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                     ${recordingsFolderCard}
+                    ${documentsFolderCard}
                     ${folderCards}
                     ${addFolderBtn}
                 </div>
@@ -248,21 +342,68 @@ class InstructorClassDashboard {
             
         } else if (this.currentFolder === 'recordings-root') {
              // VIEW: RECORDINGS
-            const normalizedRecordings = recordings.map(r => ({ ...r, type: 'video' })); 
-            const listHTML = this.renderFilesList(normalizedRecordings);
+            const listHTML = this.renderFilesList(allVideos);
 
             content = `
-                 <div class="mb-4 flex items-center justify-between">
+                 <div class="mb-4 flex items-center justify-between gap-4">
                     <button onclick="dashboard.openFolder(null)" class="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 font-medium transition-colors">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour
                     </button>
-                    <button onclick="dashboard.addRecording()" class="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 flex items-center gap-2 transition-colors shadow-lg shadow-red-200">
-                        <i data-lucide="video" class="w-4 h-4"></i> Ajouter un Enregistrement
-                    </button>
+                    
+                    <div class="flex gap-2">
+                         <button onclick="window.teacherDrive.syncNow().then(() => dashboard.openFolder('recordings-root'))" class="px-3 py-2 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Drive
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 flex items-start gap-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-bold mb-1">D'où viennent ces vidéos ?</p>
+                        <p class="opacity-90">
+                            Ce dossier est <strong>automatiquement synchronisé</strong> avec le dossier Google Drive configuré.
+                        </p>
+                    </div>
                 </div>
                 
                 <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-                    <i data-lucide="play-circle" class="w-5 h-5 text-red-500"></i> Enregistrements des Séances
+                    <i data-lucide="play-circle" class="w-5 h-5 text-red-500"></i> Tous les enregistrements
+                    <span class="text-xs font-normal text-gray-400 ml-2">(${allVideos.length})</span>
+                </h3>
+                
+                ${listHTML}
+            `;
+        } else if (this.currentFolder === 'documents-root') {
+            // VIEW: DOCUMENTS (PDFs)
+             const listHTML = this.renderFilesList(allPdfs);
+
+            content = `
+                 <div class="mb-4 flex items-center justify-between gap-4">
+                    <button onclick="dashboard.openFolder(null)" class="flex items-center gap-2 text-sm text-gray-500 hover:text-amber-600 font-medium transition-colors">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour
+                    </button>
+                    
+                    <div class="flex gap-2">
+                         <button onclick="window.teacherDrive.syncNow().then(() => dashboard.openFolder('documents-root'))" class="px-3 py-2 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Drive
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-6 flex items-start gap-3">
+                    <i data-lucide="book-open" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+                    <div class="text-sm text-amber-800">
+                        <p class="font-bold mb-1">Resources Nécessaires</p>
+                        <p class="opacity-90">
+                            Ce dossier contient les manuels, livres et documents nécessaires pour le cours.
+                        </p>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                    <i data-lucide="library" class="w-5 h-5 text-amber-500"></i> Tous les documents
+                    <span class="text-xs font-normal text-gray-400 ml-2">(${allPdfs.length})</span>
                 </h3>
                 
                 ${listHTML}
@@ -284,14 +425,7 @@ class InstructorClassDashboard {
                             <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour
                         </button>
                     </div>
-                    
-                    <h3 class="font-bold text-lg text-green-700 mb-4 flex items-center gap-2">
-                        <i data-lucide="folder-search" class="w-5 h-5"></i> ${folder.name} <span class="text-xs text-gray-400 font-normal px-2 py-0.5 bg-gray-100 rounded">Drive</span>
-                    </h3>
-
-                    <div class="w-full h-[600px] bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                        ${id ? `<iframe src="${embedUrl}" class="w-full h-full border-0"></iframe>` : '<p class="p-10 text-center text-red-500">Lien Drive invalide</p>'}
-                    </div>
+                    ${id ? `<div class="w-full h-[600px] bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm"><iframe src="${embedUrl}" class="w-full h-full border-0"></iframe></div>` : '<p class="p-10 text-center text-red-500">Lien Drive invalide</p>'}
                   `;
              } else {
                  // Standard Folder
@@ -301,14 +435,6 @@ class InstructorClassDashboard {
                         <button onclick="dashboard.openFolder(null)" class="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 font-medium transition-colors">
                             <i data-lucide="arrow-left" class="w-4 h-4"></i> Retour
                         </button>
-                        <div class="flex gap-2">
-                             <button onclick="dashboard.handleBulkImport()" class="px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
-                                <span>📥</span> Importer Liste
-                            </button>
-                            <button onclick="dashboard.addResource()" class="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-bold hover:bg-black flex items-center gap-2 transition-colors">
-                                <i data-lucide="plus" class="w-4 h-4"></i> Ajouter un contenu
-                            </button>
-                        </div>
                     </div>
                     <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
                         <i data-lucide="folder-open" class="w-5 h-5 text-blue-500"></i> ${folder.name}
@@ -334,43 +460,17 @@ class InstructorClassDashboard {
     renderFilesList(resources) {
         if (resources.length === 0) return '<div class="text-center py-8 text-gray-400 italic bg-gray-50 rounded-xl border border-dashed border-gray-200">Dossier vide</div>';
 
-        // Add Thumbnail Styles explicitly if not present (User requested style)
+        // Add Thumbnail Styles explicitly if not present
         if (!document.getElementById('video-card-styles')) {
              const styleSheet = document.createElement("style");
              styleSheet.id = 'video-card-styles';
              styleSheet.innerText = `
                 .video-thumbnail-card {
-                    position: relative;
-                    cursor: pointer;
-                    overflow: hidden;
-                    border-radius: 12px;
-                    background: #1f2937; /* Gray-800 */
-                    aspect-ratio: 16/9;
-                    transition: transform 0.3s, box-shadow 0.3s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border: 1px solid #374151;
+                    position: relative; cursor: pointer; overflow: hidden; border-radius: 16px; background: #0f172a; aspect-ratio: 16/9; transition: all 0.4s; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
                 }
-                .video-thumbnail-card:hover {
-                    transform: scale(1.02);
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-                }
-                .play-icon-overlay {
-                    width: 60px;
-                    height: 60px;
-                    background: rgba(255, 255, 255, 0.2);
-                    backdrop-filter: blur(4px);
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s;
-                }
-                .video-thumbnail-card:hover .play-icon-overlay {
-                    background: #ef4444; /* Red-500 */
-                    transform: scale(1.1);
-                }
+                .video-thumbnail-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); border-color: rgba(59, 130, 246, 0.5); }
+                .play-icon-overlay { width: 56px; height: 56px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 10; pointer-events: none; }
+                .video-thumbnail-card:hover .play-icon-overlay { background: #ef4444; border-color: #ef4444; transform: scale(1.1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
              `;
              document.head.appendChild(styleSheet);
         }
@@ -379,23 +479,52 @@ class InstructorClassDashboard {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${resources.map(r => {
                 const isVideo = r.type === 'video' || r.type === 'drive';
-                
-                // RENDER AS VIDEO THUMBNAIL CARD
+                const isPdf = r.type === 'pdf' || r.type === 'drive-pdf';
+
                 if (isVideo) {
+                    let videoUrl = r.link || r.url || r.webViewLink;
+                    if (!videoUrl && r.id && isNaN(r.id)) videoUrl = `https://drive.google.com/file/d/${r.id}/preview`;
+                    const safeTitle = (r.title || 'Vidéo sans titre').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
                     return `
                     <div class="flex flex-col gap-2 group">
-                        <div class="video-thumbnail-card group" onclick="dashboard.playVideo('${r.link}', '${r.title.replace(/'/g, "\\'")}')">
-                            <div class="play-icon-overlay">
+                        <div class="video-thumbnail-card group relative cursor-pointer" onclick="window.globalPlayVideo('${videoUrl}', '${safeTitle}')">
+                            <div class="play-icon-overlay pointer-events-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                             </div>
                             <div class="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded text-[10px] text-white font-medium">VIDÉO</div>
                         </div>
                         <div class="flex justify-between items-start px-1">
                              <div class="min-w-0">
-                                <h4 class="font-bold text-gray-900 text-sm truncate group-hover:text-blue-600 transition-colors">${r.title}</h4>
+                                <h4 class="font-bold text-gray-900 text-sm truncate group-hover:text-blue-600 transition-colors">${r.title || 'Sans titre'}</h4>
                                 <p class="text-xs text-gray-400">Lecture interne</p>
                              </div>
-                             <button onclick="event.stopPropagation(); dashboard.deleteResource(${r.id})" class="text-gray-300 hover:text-red-500 transition-colors" title="Supprimer">
+                             <button onclick="event.stopPropagation(); dashboard.deleteResource('${r.id}')" class="text-gray-300 hover:text-red-500 transition-colors" title="Supprimer">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                             </button>
+                        </div>
+                    </div>`;
+                }
+
+                if (isPdf) {
+                    let pdfUrl = r.link || r.url || r.webViewLink;
+                    if (!pdfUrl && r.id && isNaN(r.id)) pdfUrl = `https://drive.google.com/file/d/${r.id}/preview`;
+                    const safeTitle = (r.title || 'Document PDF').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                    return `
+                    <div class="flex flex-col gap-2 group">
+                         <div class="video-thumbnail-card group relative cursor-pointer" style="background: #fffbeb; border-color: #fcd34d;" onclick="window.globalPlayVideo('${pdfUrl}', '${safeTitle}')">
+                            <div class="play-icon-overlay pointer-events-none" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            </div>
+                            <div class="absolute bottom-2 right-2 px-2 py-1 bg-amber-100 text-amber-800 rounded text-[10px] font-bold">PDF</div>
+                        </div>
+                        <div class="flex justify-between items-start px-1">
+                             <div class="min-w-0">
+                                <h4 class="font-bold text-gray-900 text-sm truncate group-hover:text-amber-600 transition-colors">${r.title || 'Document'}</h4>
+                                <p class="text-xs text-gray-400">Lecture interne</p>
+                             </div>
+                             <button onclick="event.stopPropagation(); dashboard.deleteResource('${r.id}')" class="text-gray-300 hover:text-red-500 transition-colors" title="Supprimer">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                              </button>
                         </div>
@@ -463,24 +592,27 @@ class InstructorClassDashboard {
     // Bridge method to use the new VideoModal class
     playVideo(url, title) {
         if (!url) return;
-        if (url.includes('/folders/') || url.includes('drive.google.com/drive/u/')) {
-            alert("Veuillez utiliser un lien vidéo spécifique.");
-            return;
-        }
         
-        // Use the global video modal instance
-        if (window.videoModal) {
-            window.videoModal.open(url);
+        // Use the new URGENT FIX implementation
+        if (window.playPopup) {
+            window.playPopup(url, title);
         } else {
-            console.error("VideoModal not initialized");
+            console.error("playPopup not found");
+            window.open(url, '_blank');
         }
     }
 
 
-    openFolder(id) {
+// 1. Restore the openFolder method cleanly
+    async openFolder(id) {
         this.currentFolder = id;
         this.render();
     }
+
+// 2. We remove the global functions from here because they are syntactically invalid inside a class.
+// We will append them at the end or use a designated area.
+// Since I can't easily append in the same tool call without complex targeting, 
+// I will just delete the injected code from here first.
 
     renderScheduleCard() {
          return `
@@ -502,6 +634,35 @@ class InstructorClassDashboard {
             </button>
         </div>
         `;
+    }
+    
+    async addRecording() {
+        const title = prompt("Titre de la vidéo :");
+        if (!title) return;
+        
+        const link = prompt("Lien de la vidéo (Drive, YouTube, etc.) :");
+        if (!link) return;
+
+        if (!this.course.resources) this.course.resources = [];
+        
+        const newRecording = {
+            id: Date.now(),
+            type: 'video',
+            title: title,
+            link: link,
+            folderId: 'recordings-root', // Special Virtual Folder
+            addedAt: new Date().toISOString(),
+            isManual: true
+        };
+
+        this.course.resources.push(newRecording);
+
+        await this.saveCourse("Vidéo ajoutée manuellement !");
+        
+        // Refresh current folder view if we are inside recordings
+        if (this.currentFolder === 'recordings-root') {
+            this.openFolder('recordings-root');
+        }
     }
     
     renderQuickActions() {
@@ -715,11 +876,430 @@ class VideoModal {
     }
 }
 
-// Global helper function for adding videos
+// Global helper for adding videos
 const dashboard = new InstructorClassDashboard();
 window.dashboard = dashboard;
+
+// (Ancien Script de Mémoire supprimé - Remplacé par le mode intelligent ci-dessous)
+
+// URGENT FIX: Force Preview Mode to avoid redirects
+// --- FIX FINAL: LECTEUR UNIVERSEL (يحل أي رابط Drive) ---
+window.playPopup = (url, title) => {
+    console.log("🎬 محاولة تشغيل:", title, url);
+
+    // 1. استخراج ID بطريقة ذكية (تقبل كل أنواع روابط Drive)
+    // يقبل: /file/d/ID, /open?id=ID, ?id=ID, etc.
+    let fileId = null;
+    const regex = /(?:\/d\/|id=|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/;
+    const match = url.match(regex);
+    
+    if (match && match[1]) {
+        fileId = match[1];
+    }
+
+    if (!fileId) {
+        // محاولة أخيرة: بالكشي الرابط هو بيدو ID
+        if (url.length > 20 && !url.includes('/')) {
+            fileId = url;
+        } else {
+            alert("⚠️ Lien vidéo non reconnu. Vérifiez qu'il s'agit bien d'une vidéo Drive.");
+            return;
+        }
+    }
+
+    // 2. صنع رابط Preview (السحري)
+    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+
+    // 3. تنظيف القديم
+    if (document.getElementById('video-modal')) document.getElementById('video-modal').remove();
+
+    // 4. Affichage
+    const modalHTML = `
+    <div id="video-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 animate-in fade-in">
+        <div class="absolute inset-0" onclick="document.getElementById('video-modal').remove()"></div>
+        <div class="relative w-full max-w-5xl aspect-video bg-black rounded-xl border border-gray-800 shadow-2xl flex flex-col z-10">
+            <div class="flex justify-between items-center px-4 py-3 bg-gray-900 border-b border-gray-800 rounded-t-xl">
+                <h3 class="text-white font-medium truncate pr-4">${title}</h3>
+                <button onclick="document.getElementById('video-modal').remove()" class="text-white hover:text-red-500 font-bold px-2">✕</button>
+            </div>
+            <iframe src="${embedUrl}" class="flex-1 w-full border-0 rounded-b-xl" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+};
+
+// ======================================================
+// 🚀 SYSTÈME AUTOMATIQUE : MEMOIRE + SYNC (Refactored)
+// ======================================================
+
+// Variables globales partagées avec teacherDrive.js
+// const CLIENT_ID = ... (Déjà déclaré dans teacherDrive.js)
+// const SCOPES = ...
+// let tokenClient;
+// let accessToken = null;
+
+// 1️⃣ Démarrage Automatique + Persistance
 document.addEventListener('DOMContentLoaded', () => {
-    dashboard.init();
-    // Initialize Video Modal
-    window.videoModal = new VideoModal();
+    console.log("⚡ Démarrage systéme...");
+    
+    // --- Initialisation des Objets Globaux ---
+    if (window.dashboard) window.dashboard.init();
+    if (window.VideoModal) window.videoModal = new VideoModal();
+    // ---------------------------------------
+
+    // A) CHARGEMENT IMMÉDIAT (Stateful Load)
+    loadFromMemory();
+
+    // B) INIT GOOGLE AUTH (Silent Prep)
+    if (typeof google === 'undefined') {
+        const script = document.createElement('script');
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = initGoogleAuth;
+        document.head.appendChild(script);
+    } else {
+        initGoogleAuth();
+    }
 });
+
+// 2️⃣ Fonction de Chargement Mémoire (Optimisée)
+function loadFromMemory() {
+    const classId = new URLSearchParams(window.location.search).get("id") || 'default';
+    const savedData = localStorage.getItem('class_recordings_' + classId);
+
+    if (savedData) {
+        try {
+            window.recordings = JSON.parse(savedData);
+            console.log(`💾 Mémoire locale: ${window.recordings.length} éléments chargés.`);
+            
+            // Attendre que renderRecordings soit disponible
+            const waitForRender = setInterval(() => {
+                if (typeof renderRecordings === 'function') {
+                    clearInterval(waitForRender);
+                    renderRecordings(window.recordings);
+                    
+                    // UI Polish: Show grid immediately
+                    const emptyState = document.getElementById('empty-state');
+                    if (emptyState) emptyState.classList.add('hidden');
+                    
+                    // Update Title if needed
+                    const titleEl = document.getElementById('current-folder-title');
+                    if(titleEl && window.recordings.length > 0) titleEl.innerText = "Enregistrements (Mémoire)";
+                }
+            }, 50);
+        } catch (e) {
+            console.error("Erreur lecture mémoire:", e);
+        }
+    }
+}
+
+// 3️⃣ Initialisation Auth Google
+function initGoogleAuth() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID, // Use global
+        scope: SCOPES,        // Use global
+        callback: (response) => {
+            if (response.error) {
+                console.error('Erreur Auth:', response);
+                return;
+            }
+            accessToken = response.access_token;
+            // Auto-Sync after successful login
+            fetchDriveFiles();
+        },
+    });
+
+    // Attach Click Listener to Button properly
+    document.body.addEventListener('click', (e) => {
+        const btn = e.target.closest('#google-auth-btn');
+        if (btn) {
+            if (!accessToken) {
+                if (tokenClient) tokenClient.requestAccessToken({prompt: ''});
+                else alert("Google Library loading...");
+            } else {
+                fetchDriveFiles(); 
+            }
+        }
+    });
+}
+
+// 4️⃣ LOGIQUE SYNC MIROIR (Stateful Mirror Sync)
+async function fetchDriveFiles() {
+    const classId = new URLSearchParams(window.location.search).get("id") || 'default';
+    const btn = document.getElementById('google-auth-btn');
+
+    // 1. Lire configuration dossier
+    const linkedFolderId = localStorage.getItem('linked_folder_id_' + classId);
+    let folderQuery = "";
+    
+    if (linkedFolderId) {
+        console.log(`🎯 Sync cible: ${linkedFolderId}`);
+        folderQuery = `'${linkedFolderId}' in parents and `;
+    } else {
+        // Optionnel: Demander de lier si pas fait (UX Choice)
+        if(confirm("Aucun dossier lié. Voulez-vous lier un dossier Google Drive maintenant ?")) {
+            configureDriveFolder();
+            return;
+        }
+    }
+
+    try {
+        if(btn) btn.innerText = "🔄 Syncing...";
+
+        // 2. Requête API
+        const q = `${folderQuery} (mimeType contains 'video/' or mimeType = 'application/pdf') and trashed = false`;
+        const fields = "files(id, name, webViewLink, thumbnailLink, mimeType)";
+        
+        const response = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=${q}&fields=${fields}`, 
+            { headers: { 'Authorization': `Bearer ${accessToken}` } }
+        );
+
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
+        const data = await response.json();
+        const apiFiles = data.files || [];
+
+        // 3. Transformation Données
+        const newDriveItems = apiFiles.map(f => ({
+            id: f.id,
+            title: f.name,
+            url: `https://drive.google.com/file/d/${f.id}/preview`, // Standardize URL
+            type: f.mimeType === 'application/pdf' ? 'pdf' : 'drive',
+            addedAt: new Date().toISOString()
+        }));
+
+        // 4. MIRROR LOGIC: Clean & Merge
+        let currentList = window.recordings || [];
+
+        // A) Garder UNIQUEMENT les manuels (Non-Drive)
+        const manualItems = currentList.filter(item => {
+            // Un item est manuel s'il n'est PAS de type 'drive' OU s'il a été marqué explicitement manual
+            // Safe heuristic: if type != 'drive' AND type != 'pdf' (assumed drive-pdf fallback)
+            // Better: Check explicit flag isManual OR if url is NOT google drive
+            return item.isManual === true || (item.type !== 'drive' && !item.url.includes('drive.google.com'));
+        });
+
+        // B) Remplacer TOUT le reste par la nouvelle liste API (Le Miroir)
+        window.recordings = [...manualItems, ...newDriveItems];
+
+        // 5. Persistance Immédiate
+        localStorage.setItem('class_recordings_' + classId, JSON.stringify(window.recordings));
+
+        // 6. Mise à jour UI
+        renderRecordings(window.recordings);
+        
+        if(btn) {
+            btn.innerText = "✅ Synced";
+            setTimeout(() => btn.innerText = "🔄 Synchroniser", 2500);
+        }
+
+    } catch (err) {
+        console.error("Sync Failed:", err);
+        alert("Erreur Sync: " + err.message);
+        if(btn) btn.innerText = "❌ Erreur";
+    }
+}
+
+// 5️⃣ Configuration Dossier (Helper)
+function configureDriveFolder() {
+    const folderLink = prompt("Lien du dossier Google Drive (ou ID) :");
+    if (!folderLink) return;
+
+    // Robust ID Extraction
+    let folderId = null;
+    const match = folderLink.match(/[-\w]{25,}/); // Matches generic ID patterns
+    if (match) folderId = match[0];
+
+    if (!folderId) {
+        alert("ID de dossier introuvable. Veuillez coller un lien valide.");
+        return;
+    }
+
+    const classId = new URLSearchParams(window.location.search).get("id") || 'default';
+    localStorage.setItem('linked_folder_id_' + classId, folderId);
+
+    alert("✅ Dossier lié ! La synchronisation ciblera ce dossier.");
+    // Auto-trigger sync if ready
+    if (accessToken) fetchDriveFiles();
+}
+
+// 6️⃣ UNIVERSAL PLAYER FIX (Validation)
+// (Déjà présent via window.playPopup mais on s'assure qu'il est robuste)
+window.playPopup = (url, title) => {
+    // Robust Extraction
+    let fileId = null;
+    // Matches: /d/ID, id=ID, open?id=ID
+    const regex = /(?:\/d\/|id=|open\?id=|uc\?id=)([a-zA-Z0-9_-]{25,})/; 
+    const match = url.match(regex);
+    
+    if (match && match[1]) {
+        fileId = match[1];
+    } else if (url.match(/^[a-zA-Z0-9_-]{25,}$/)) {
+        // Direct ID check
+        fileId = url;
+    }
+
+    if (!fileId) {
+        alert("Impossible de lire la vidéo: ID non reconnu.");
+        return;
+    }
+
+    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    
+    // Clean old modal
+    const existing = document.getElementById('video-modal');
+    if (existing) existing.remove();
+
+    const modalHTML = `
+    <div id="video-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 animate-in fade-in">
+         <div class="absolute inset-0" onclick="document.getElementById('video-modal').remove()"></div>
+         <div class="relative w-full max-w-6xl aspect-video bg-black rounded-xl border border-gray-800 shadow-2xl flex flex-col z-10">
+             <div class="flex justify-between items-center px-4 py-3 bg-gray-900 border-b border-gray-800 rounded-t-xl">
+                 <h3 class="text-white font-medium truncate pr-4">${title}</h3>
+                 <button onclick="document.getElementById('video-modal').remove()" class="text-white hover:text-red-500 font-bold px-2 text-xl">&times;</button>
+             </div>
+             <iframe src="${embedUrl}" class="flex-1 w-full border-0 rounded-b-xl" allow="autoplay; fullscreen" allowfullscreen></iframe>
+         </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+};
+// --- FIX: USER PROVIDED CLEAN LOGIC ---
+// Added at the end to ensure overrides and global access
+
+window.recordings = []; // Ensure it exists
+
+window.renderRecordings = (videos) => {
+    // Adapter to use the existing dashboard render logic
+    
+    if (window.dashboard && window.dashboard.course) {
+        console.log("Rendering via Dashboard Render with new videos");
+        
+        // 1. Preserve non-video resources (Docs, Links, etc.)
+        const currentResources = window.dashboard.course.resources || [];
+        // We assume 'videos' (arg) contains the authorized list of recordings/drive files
+        // We keep everything that is NOT a video/drive file from the original list
+        const otherResources = currentResources.filter(r => 
+            !['video', 'drive', 'drive-pdf'].includes(r.type) && 
+            !r.link?.includes('drive.google.com') // Safety check
+        );
+
+        // 2. Update Source of Truth
+        window.dashboard.course.resources = [...otherResources, ...videos];
+
+        // 3. Render
+        if (document.getElementById('recordings-container')) {
+            // If we are in the specific view, just update that part (Cleaner)
+            const html = window.dashboard.renderFilesList(videos);
+            document.getElementById('recordings-container').innerHTML = html;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        } else {
+            // Full re-render
+            window.dashboard.render();
+        }
+    } else {
+        console.log("⏳ Dashboard pas encore prêt... Les données sont stockées dans window.recordings");
+        // Les données sont déjà dans window.recordings (passé par référence ou global), 
+        // donc loadData() les récupérera quand il finira.
+    }
+};
+
+window.openFolder = (folderId, folderName) => {
+    console.log("ðŸ“‚ Ouvrir dossier:", folderName);
+    
+    const titleElement = document.getElementById('current-folder-title');
+    if (titleElement) titleElement.innerText = folderName;
+
+    const foldersGrid = document.getElementById('folders-grid');
+    const recordingsGrid = document.getElementById('recordings-grid');
+    
+    if (foldersGrid) foldersGrid.classList.add('hidden');
+    if (recordingsGrid) recordingsGrid.classList.remove('hidden');
+
+    let videosToShow = window.recordings || [];
+    
+    // Fallback LocalStorage
+    if (videosToShow.length === 0) {
+        const classId = new URLSearchParams(window.location.search).get("id");
+        const savedData = localStorage.getItem('class_recordings_' + classId);
+        if (savedData) {
+            try {
+                videosToShow = JSON.parse(savedData);
+            } catch(e) { console.error("Error parsing recordings", e); }
+        } else if (window.dashboard && window.dashboard.course && window.dashboard.course.resources) {
+            videosToShow = window.dashboard.course.resources.filter(r => r.type === 'video');
+        }
+    }
+
+    if (videosToShow.length > 0) {
+        if (typeof window.renderRecordings === 'function') {
+            window.renderRecordings(videosToShow);
+        } else if(window.dashboard) {
+             window.dashboard.currentFolder = folderId; 
+             window.dashboard.render();
+        }
+    } else {
+        const container = document.getElementById('recordings-container');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-10">
+                    <p class="text-gray-500 mb-4">Aucune vidÃ©o chargÃ©e.</p>
+                    <button onclick="document.getElementById('google-auth-btn').click()" class="text-blue-600 underline font-bold">
+                        Cliquez ici pour connecter Google Drive
+                    </button>
+                </div>`;
+        } else if(window.dashboard) {
+             window.dashboard.currentFolder = folderId;
+             window.dashboard.render();
+        }
+    }
+};
+
+window.backToFolders = () => {
+    console.log("â¬…ï¸ Retour aux dossiers");
+    const foldersGrid = document.getElementById('folders-grid');
+    const recordingsGrid = document.getElementById('recordings-grid');
+    
+    if (foldersGrid) foldersGrid.classList.remove('hidden');
+    if (recordingsGrid) recordingsGrid.classList.add('hidden');
+    
+    const titleElement = document.getElementById('current-folder-title');
+    if (titleElement) titleElement.innerText = "Ressources & Documents";
+    
+    if(window.dashboard) {
+        window.dashboard.openFolder(null);
+    }
+};
+
+// Also ensure we save to LocalStorage when importing
+const originalSaveCourse = window.dashboard ? window.dashboard.saveCourse : null;
+if (window.dashboard) {
+    window.dashboard.saveCourse = async function(msg) {
+        // Original save
+        if(this.constructor.prototype.saveCourse) {
+           await this.constructor.prototype.saveCourse.call(this, msg);
+        }
+        
+        // LocalStorage backup for the user's specific logic
+        const classId = new URLSearchParams(window.location.search).get("id");
+        const videos = this.course.resources.filter(r => r.type === 'video');
+        localStorage.setItem('class_recordings_' + classId, JSON.stringify(videos));
+        console.log("Saved specific recordings to LocalStorage");
+    }
+}
+// --- DEBUG & GLOBAL HELPER ---
+window.globalPlayVideo = (url, title) => {
+    console.log("⚡ GLOBAL CLICK:", title, url);
+    if (!url) { alert("Lien vidéo manquant"); return; }
+    
+    // Call the universal player
+    if (window.playPopup) {
+         window.playPopup(url, title);
+    } else {
+         console.error("playPopup missing, using fallback");
+         window.open(url, '_blank');
+    }
+};

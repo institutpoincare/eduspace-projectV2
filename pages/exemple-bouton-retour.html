@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemple - Bouton Retour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../css/main.css">
+</head>
+<body class="bg-gray-50">
+    
+    <!-- EXEMPLE 1: Header avec bouton retour -->
+    <header class="bg-white border-b border-gray-200 p-4">
+        <div class="max-w-7xl mx-auto flex items-center gap-4">
+            <!-- Bouton retour automatique -->
+            <button data-back-btn class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors" title="Retour">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-2xl font-bold text-gray-900">Exemple de Page</h1>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6">
+        
+        <!-- EXEMPLE 2: Bouton retour avec texte -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-bold mb-4">Exemple 1: Bouton avec icône et texte</h2>
+            <button data-back-btn class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span>Retour</span>
+            </button>
+        </div>
+
+        <!-- EXEMPLE 3: Bouton retour simple -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-bold mb-4">Exemple 2: Bouton simple</h2>
+            <button data-back-btn class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                ← Retour
+            </button>
+        </div>
+
+        <!-- EXEMPLE 4: Bouton retour dans un formulaire -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-bold mb-4">Exemple 3: Dans un formulaire</h2>
+            <form class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Nom</label>
+                    <input type="text" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Votre nom">
+                </div>
+                <div class="flex gap-3">
+                    <button data-back-btn type="button" class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- EXEMPLE 5: Bouton retour avec onclick (méthode alternative) -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-bold mb-4">Exemple 4: Avec onclick (méthode alternative)</h2>
+            <button onclick="goBack()" class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors">
+                Retour (onclick)
+            </button>
+        </div>
+
+        <!-- EXEMPLE 6: Bouton ROUGE (Annuler/Danger) -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-bold mb-4">Exemple 5: Bouton Rouge (Annuler)</h2>
+            <div class="flex flex-wrap gap-4">
+                <!-- Rouge plein -->
+                <button data-back-btn class="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Retour</span>
+                </button>
+                
+                <!-- Rouge bordure -->
+                <button data-back-btn class="flex items-center gap-2 px-6 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Annuler</span>
+                </button>
+                
+                <!-- Rouge foncé -->
+                <button data-back-btn class="flex items-center gap-2 px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-all shadow-md hover:shadow-lg">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                    <span>Fermer</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- EXEMPLE 7: Bouton flottant -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Exemple 5: Bouton flottant</h2>
+            <p class="text-gray-600 mb-4">Scroll vers le bas pour voir le bouton flottant</p>
+            <div class="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+                <p class="text-gray-500">Contenu de la page...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bouton retour flottant (fixe en bas à gauche) -->
+    <button data-back-btn class="fixed bottom-6 left-6 p-4 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110">
+        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="../../js/main.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Demo: Show alert when form is submitted
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Formulaire soumis ! (démo)');
+        });
+    </script>
+</body>
+</html>

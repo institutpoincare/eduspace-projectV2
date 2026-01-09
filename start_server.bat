@@ -1,8 +1,25 @@
 @echo off
-echo Lancement d'EduSpace...
-echo 1. Demarrage du Serveur Node.js (Backend)...
-start /B node server.js
+echo ===============================================
+echo     DEMARRAGE EDUSPACE - NOUVEAU SERVEUR
+echo ===============================================
 echo.
-echo Serveur lance ! Vous pouvez ouvrir : http://localhost:3001/pages/formateur/enregistre.html
+echo 1. Fermeture des processus Node.js existants...
+taskkill /F /IM node.exe >nul 2>&1
+echo    (OK)
 echo.
+
+echo 2. Installation des dependances (si besoin)...
+if not exist "server\node_modules" (
+    echo    Installation...
+    cd server && cmd /c npm install && cd ..
+)
+
+echo.
+echo 3. Lancement du Serveur Express (Port 3001)...
+echo    Veuillez ne PAS fermer cette fenetre.
+echo.
+
+cd server
+node server.js
+
 pause
